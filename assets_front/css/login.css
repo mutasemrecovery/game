@@ -1,0 +1,276 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body, html {
+    height: 100%;
+    font-family: sans-serif;
+  }
+  
+  .signin-section {
+    background: linear-gradient(to bottom, #ffffff 50%, #d62828 50%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .signin-content {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    gap: 40px;
+  }
+  
+  /* === Left Panel === */
+  .signin-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    color: #fff;
+    padding-top: 10px;
+    position: relative;
+  }
+  
+  .signin-logo {
+    height: 50px;
+    width: 60px;
+    margin-bottom: 50px;
+  }
+  
+  .signin-heading {
+    color: #D22028;
+    font-size: 26px;
+    font-weight: bold;
+  }
+  
+  .signin-subheading {
+    font-size: 22px;
+    font-weight: 300;
+    color: #D22028;
+  }
+  
+  .signin-tagline {
+    font-size: 14px;
+    max-width: 300px;
+    color: #D22028;
+    margin: 10px 0 30px;
+  }
+  
+  .signin-dish {
+    width: 350px;
+    position: relative;
+    bottom: 50px;
+    left: 20%;
+  }
+  
+  /* === Right Panel === */
+  .signin-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .signin-box {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .signin-welcome {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  
+  .red {
+    color: #D22028;
+  }
+  
+  .signin-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .signin-social {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+  }
+  
+ 
+  .social-btn {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+  }
+  
+
+  .google-btn {
+    flex: 1;
+    padding: 10px 15px;
+    min-width: 180px;
+    gap: 8px;
+    background-color: #E9F1FF;
+    color: #0072ff;
+  }
+  
+
+  .icon-btn {
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    font-size: 16px;
+  }
+  
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  form label {
+    font-size: 13px;
+    color: #333;
+  }
+  
+  form input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+  
+  .signin-options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #555;
+  }
+  
+  .signin-options a {
+    color: #0077ff;
+    text-decoration: none;
+  }
+  
+  .signin-submit {
+    background-color: #0077ff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .signin-submit:hover {
+    background-color: #005fd1;
+  }
+  
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .signin-content {
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .signin-left, .signin-right {
+      text-align: center;
+      align-items: center;
+    }
+  
+    .signin-dish {
+        display: none;
+    }
+  }
+  
+
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+
+  .auth-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+  }
+  
+
+  .auth-form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+
+  .auth-input-full {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  
+
+  .auth-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  
+
+  .auth-options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #555;
+  }
+  
+  .auth-options a {
+    color: #0077ff;
+    text-decoration: none;
+  }
+  
+
+  .auth-submit-btn {
+    background-color: #0077ff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .auth-submit-btn:hover {
+    background-color: #005fd1;
+  }
+  
