@@ -68,6 +68,19 @@
                         </a>
                     </li>
                 <?php endif; ?>
+         
+                 <?php if(
+                    $user->can('product-table') ||
+                        $user->can('product-add') ||
+                        $user->can('product-edit') ||
+                        $user->can('product-delete')): ?>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('products.selection')); ?>" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p> <?php echo e(__('messages.send Products To Customer')); ?>  </p>
+                        </a>
+                    </li>
+                <?php endif; ?>
 
 
                   <?php if(

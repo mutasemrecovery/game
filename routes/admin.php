@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\ContactAdminController;
+use App\Http\Controllers\Admin\ProductSelectionController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Spatie\Permission\Models\Permission;
 /*
@@ -61,7 +62,9 @@ Route::get('/permissions/{guard_name}', function($guard_name){
 // Route for ajax
 Route::get('orders/available-products', [OrderController::class, 'getAvailableProducts'])
 ->name('orders.available-products');
-
+// web.php
+Route::get('/products/selection', [ProductSelectionController::class, 'index'])->name('products.selection');
+Route::post('/products/filtered', [ProductSelectionController::class, 'getFilteredProducts'])->name('products.filtered');
 // end
 
 // Resource Route

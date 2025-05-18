@@ -6,7 +6,7 @@
 
 
 @section('contentheaderlink')
-    <a href="{{ route('admin.customer.index') }}"> {{ __('messages.Customers') }} </a>
+    <a href="{{ route('users.index') }}"> {{ __('messages.Customers') }} </a>
 @endsection
 
 @section('contentheaderactive')
@@ -25,9 +25,10 @@
 
 
 
-                <form action="{{ route('admin.customer.update', $data['id']) }}" method="POST" enctype='multipart/form-data'>
+                <form action="{{ route('users.update', $data['id']) }}" method="POST" enctype='multipart/form-data'>
                     <div class="row">
                     @csrf
+                    @method('PUT')
 
                     <div class="col-md-6">
                         <div class="form-group">
@@ -61,7 +62,7 @@
                     <div class="col-md-12">
                         <div class="form-group text-center">
                             <button id="do_add_item_cardd" type="submit" class="btn btn-primary btn-sm"> {{ __('messages.Update') }}</button>
-                            <a href="{{ route('admin.customer.index') }}" class="btn btn-sm btn-danger">{{ __('messages.Cancel') }}</a>
+                            <a href="{{ route('users.index') }}" class="btn btn-sm btn-danger">{{ __('messages.Cancel') }}</a>
 
                         </div>
                     </div>

@@ -68,6 +68,19 @@
                         </a>
                     </li>
                 @endif
+         
+                 @if (
+                    $user->can('product-table') ||
+                        $user->can('product-add') ||
+                        $user->can('product-edit') ||
+                        $user->can('product-delete'))
+                    <li class="nav-item">
+                        <a href="{{ route('products.selection') }}" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p> {{__('messages.send Products To Customer')}}  </p>
+                        </a>
+                    </li>
+                @endif
 
 
                   @if (
