@@ -10,8 +10,6 @@
 
 @section('content')
 
-test
-
       <div class="card">
         <div class="card-header">
           <h3 class="card-title card_title_center"> {{ __('messages.deliveries') }} </h3>

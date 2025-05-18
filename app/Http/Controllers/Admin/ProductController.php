@@ -115,31 +115,38 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
 
-            $product->number = $request->input('number');
-            $product->name = $request->input('name');
-            $product->description = $request->input('description');
+             $product->number = $request->input('number');
+            $product->name_en = $request->input('name_en');
+            $product->name_ar = $request->input('name_ar');
+            $product->description_en = $request->input('description_en');
+            $product->description_ar = $request->input('description_ar');
             $product->selling_price = $request->input('selling_price');
             $product->status = $request->input('status');
-
+            
+            // Save the product first to get an ID
+            $product->save();
+            
+            // Now that the product has an ID, associate images
             if ($request->hasFile('photo')) {
                 $photos = $request->file('photo');
                 foreach ($photos as $photo) {
                     $photoPath = uploadImage('assets/admin/uploads', $photo); // Use the uploadImage function
                     if ($photoPath) {
-                        // Create a record in the product_images table for each image using the relationship
+                        // Create a record in the product_images table for each image
                         $productImage = new ProductImage();
                         $productImage->photo = $photoPath;
-
-                        $product->productImages()->save($productImage); // Associate the image with the product
+                        $productImage->product_id = $product->id; // Explicitly set the product_id
+                        $productImage->save();
                     }
                 }
             }
+            
 
-            if ($product->save()) {
-                return redirect()->route('products.index')->with(['success' => 'Product updated']);
-            } else {
-                return redirect()->back()->with(['error' => 'Something went wrong while updating the product']);
-            }
+        if ($product->save()) {
+            return redirect()->route('products.index')->with(['success' => 'Product updated']);
+        } else {
+            return redirect()->back()->with(['error' => 'Something went wrong while updating the product']);
+        }
         } catch (\Exception $ex) {
             Log::error($ex);
             return redirect()->back()
