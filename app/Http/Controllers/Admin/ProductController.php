@@ -103,19 +103,13 @@ class ProductController extends Controller
         return view('admin.products.edit', ['data' => $data]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+  
+     public function update(Request $request, $id)
     {
         try {
             $product = Product::findOrFail($id);
-
-             $product->number = $request->input('number');
+            
+            $product->number = $request->input('number');
             $product->name_en = $request->input('name_en');
             $product->name_ar = $request->input('name_ar');
             $product->description_en = $request->input('description_en');
@@ -123,30 +117,45 @@ class ProductController extends Controller
             $product->selling_price = $request->input('selling_price');
             $product->status = $request->input('status');
             
-            // Save the product first to get an ID
+            // Save the product first
             $product->save();
             
-            // Now that the product has an ID, associate images
+            // Handle image removal if checkboxes are selected
+            if ($request->has('remove_images')) {
+                $imagesToRemove = $request->input('remove_images');
+                
+                foreach ($imagesToRemove as $imageId) {
+                    $image = ProductImage::findOrFail($imageId);
+                    
+                    // Make sure the image belongs to this product for security
+                    if ($image->product_id == $product->id) {
+                        // Delete file from storage
+                        $imagePath = base_path('assets/admin/uploads/' . $image->photo);
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                        
+                        // Delete record from database
+                        $image->delete();
+                    }
+                }
+            }
+            
+            // Handle new image uploads
             if ($request->hasFile('photo')) {
                 $photos = $request->file('photo');
                 foreach ($photos as $photo) {
-                    $photoPath = uploadImage('assets/admin/uploads', $photo); // Use the uploadImage function
+                    $photoPath = uploadImage('assets/admin/uploads', $photo);
                     if ($photoPath) {
-                        // Create a record in the product_images table for each image
                         $productImage = new ProductImage();
                         $productImage->photo = $photoPath;
-                        $productImage->product_id = $product->id; // Explicitly set the product_id
+                        $productImage->product_id = $product->id;
                         $productImage->save();
                     }
                 }
             }
             
-
-        if ($product->save()) {
-            return redirect()->route('products.index')->with(['success' => 'Product updated']);
-        } else {
-            return redirect()->back()->with(['error' => 'Something went wrong while updating the product']);
-        }
+            return redirect()->route('products.index')->with(['success' => 'Product updated successfully']);
         } catch (\Exception $ex) {
             Log::error($ex);
             return redirect()->back()

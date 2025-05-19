@@ -160,7 +160,7 @@ return [
      'Review Your Cart' => 'Review Your Cart',
      'Your cart is empty' => 'Your cart is empty',
      'Back to Products' => 'Back to Products',
-     'Proceed to Checkout' => 'Proceed to Checkout',
+     'Proceed to Checkout' => 'Proceed to Booking',
      
      // Step 4 - Checkout
      'Complete Your Order' => 'Complete Your Order',
@@ -236,5 +236,22 @@ return [
     'at' => 'at',
     'Image' => 'Image',
     'Total Products' => 'Total Products',
+    // no tranlate
+    'Available Products' => 'Available Products',
+    'Customer Address' => 'Customer Address',
+    'send Products To Customer' => 'Send Products To Customer',
+    'Selling_price' => 'Selling price',
+    'Number' => 'Number',
+    "Products"=>"Products",
+    "Payment Status"=>"Payment Status",
+    "Unpaid"=>"Unpaid",
+    "Paid"=>"Paid",
+    "Card"=>"Card",
+    "Cliq"=>"Cliq",
+    "Order Status"=>"Order Status",
+    "Processing"=>"Processing",
+    "Completed"=>"Completed",
+    "Total Discount"=>"Total Discount",
+    "Final Total"=>"Final Total",
 ];
 

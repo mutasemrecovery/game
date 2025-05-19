@@ -155,13 +155,24 @@
 
         <div class="col-md-6">
             <div class="form-group">
-                @if($data->productImages->count() > 0)
-                    @foreach($data->productImages as $image)
-                        <img src="{{ asset('assets/admin/uploads/' . $image->photo) }}" alt="Product Image" height="50px" width="50px">
-                    @endforeach
-                @else
-                    <p>No images available for this product.</p>
-                @endif
+                <label>{{ __('messages.Current_Images') }}</label>
+                <div class="row">
+                    @if($data->productImages->count() > 0)
+                        @foreach($data->productImages as $image)
+                            <div class="col-md-3 mb-2">
+                                <div class="image-container" style="position: relative; display: inline-block;">
+                                    <img src="{{ asset('assets/admin/uploads/' . $image->photo) }}" alt="Product Image" height="100px" width="100px" style="margin-bottom: 5px;">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="remove_images[]" value="{{ $image->id }}" id="img{{ $image->id }}" class="form-check-input">
+                                        <label class="form-check-label" for="img{{ $image->id }}">{{ __('messages.Remove') }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <p>No images available for this product.</p>
+                    @endif
+                </div>
             </div>
         </div>
 

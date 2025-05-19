@@ -205,13 +205,24 @@ unset($__errorArgs, $__bag); ?>
 
         <div class="col-md-6">
             <div class="form-group">
-                <?php if($data->productImages->count() > 0): ?>
-                    <?php $__currentLoopData = $data->productImages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <img src="<?php echo e(asset('assets/admin/uploads/' . $image->photo)); ?>" alt="Product Image" height="50px" width="50px">
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                <?php else: ?>
-                    <p>No images available for this product.</p>
-                <?php endif; ?>
+                <label><?php echo e(__('messages.Current_Images')); ?></label>
+                <div class="row">
+                    <?php if($data->productImages->count() > 0): ?>
+                        <?php $__currentLoopData = $data->productImages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="col-md-3 mb-2">
+                                <div class="image-container" style="position: relative; display: inline-block;">
+                                    <img src="<?php echo e(asset('assets/admin/uploads/' . $image->photo)); ?>" alt="Product Image" height="100px" width="100px" style="margin-bottom: 5px;">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="remove_images[]" value="<?php echo e($image->id); ?>" id="img<?php echo e($image->id); ?>" class="form-check-input">
+                                        <label class="form-check-label" for="img<?php echo e($image->id); ?>"><?php echo e(__('messages.Remove')); ?></label>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                        <p>No images available for this product.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 

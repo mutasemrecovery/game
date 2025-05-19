@@ -101,7 +101,7 @@
                                     {{ __('messages.Card') }}
                                 </option>
                                 <option value="transfer" {{ old('payment_type') == 'transfer' ? 'selected' : '' }}>
-                                    {{ __('messages.Bank Transfer') }}
+                                    {{ __('messages.Cliq') }}
                                 </option>
                             </select>
                             @error('payment_type')

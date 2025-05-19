@@ -88,6 +88,35 @@ class OrderController extends Controller
         }
     }
 
+   public function getAllProducts()
+    {
+        // Get current date for offers
+        $currentDate = now();
+        
+        // Get all active products with their offers
+        $products = Product::where('status', 1) // Active products
+            ->with(['offers' => function($query) use ($currentDate) {
+                $query->where('start_at', '<=', $currentDate)
+                    ->where('expired_at', '>=', $currentDate);
+            }])
+            ->get()
+            ->map(function($product) {
+                $offer = $product->offers->first();
+                
+                return [
+                    'id' => $product->id,
+                    'name_en' => $product->name_en,
+                    'name_ar' => $product->name_ar,
+                    'selling_price' => $product->selling_price,
+                    'image' => asset('assets/admin/uploads/' . $product->productImages->first()->photo),
+                    'offer_price' => $offer ? $offer->price : null,
+                ];
+            });
+
+        return response()->json([
+            'products' => $products
+        ]);
+    }
     public function getAvailableProductsForUser(Request $request)
     {
         $selectedDate = Carbon::parse($request->date);

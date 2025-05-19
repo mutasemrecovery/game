@@ -64,16 +64,13 @@
 
 
                         <td>
+                           
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('product-edit')): ?>
                             <a href="<?php echo e(route('products.edit', $info->id)); ?>" class="btn btn-sm btn-primary"><?php echo e(__('messages.Edit')); ?></a>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('product-delete')): ?>
-                            <form action="<?php echo e(route('products.destroy', $info->id)); ?>" method="POST">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('DELETE'); ?>
-                                <button type="submit" class="btn btn-sm btn-danger"><?php echo e(__('messages.Delete')); ?></button>
-                            </form>
-                            <?php endif; ?>
+                            <?php endif; ?> 
+                           
+                      
+                          
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

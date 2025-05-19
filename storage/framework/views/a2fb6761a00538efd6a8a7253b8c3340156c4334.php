@@ -33,6 +33,7 @@
                 <thead class="custom_thead">
                     <th><?php echo e(__('messages.number')); ?></th>
                     <th><?php echo e(__('messages.total_prices')); ?></th>
+                    <th><?php echo e(__('messages.delivery_fee')); ?></th>
                     <th><?php echo e(__('messages.total_discounts')); ?></th>
                     <th><?php echo e(__('messages.order_status')); ?></th>
                     <th><?php echo e(__('messages.user')); ?></th>
@@ -46,22 +47,19 @@
 
                         <td><?php echo e($info->number); ?></td>
                         <td><?php echo e($info->total_prices); ?></td>
+                        <td><?php echo e($info->delivery_fee); ?></td>
                         <td><?php echo e($info->total_discounts); ?></td>
                         <td><?php if($info->order_status==1): ?> Pending <?php elseif($info->order_status==2): ?> OnTheWay <?php elseif($info->order_status==3): ?> Cancelled <?php elseif($info->order_status==4): ?> Failed <?php else: ?> DELIVERD <?php endif; ?></td>
                         <td><?php echo e($info->user->name); ?></td>
                         <td><?php echo e($info->date); ?></td>
 
                         <td>
+                             <?php if($info->order_status != 6 && $info->order_status != 3 ): ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('order-edit')): ?>
                             <a href="<?php echo e(route('orders.edit', $info->id)); ?>" class="btn btn-sm btn-primary"><?php echo e(__('messages.Edit')); ?></a>
                             <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('order-delete')): ?>
-                            <form action="<?php echo e(route('orders.destroy', $info->id)); ?>" method="POST">
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('DELETE'); ?>
-                                <button type="submit" class="btn btn-sm btn-danger"><?php echo e(__('messages.Delete')); ?></button>
-                            </form>
                             <?php endif; ?>
+                           
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

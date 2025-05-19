@@ -24,311 +24,10 @@
         <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/custom_rtl.css') }}">
     @endif
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/mycustomstyle.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets_front/css/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     
-<style>
-  .steps-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 2rem 0;
-      margin-bottom: 2rem;
-  }
-  
-  .step-indicator {
-      position: relative;
-      margin-bottom: 3rem;
-  }
-  
-  .step-indicator::before {
-      content: '';
-      position: absolute;
-      top: 30px;
-      left: 16.666%;
-      right: 16.666%;
-      height: 2px;
-      background: #e5e7eb;
-      z-index: 1;
-  }
-  
-  .step {
-      position: relative;
-      text-align: center;
-  }
-  
-  .step-number {
-      width: 60px;
-      height: 60px;
-      margin: 0 auto 1rem;
-      background: #fff;
-      border: 3px solid #e5e7eb;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.5rem;
-      position: relative;
-      z-index: 2;
-      transition: all 0.3s ease;
-  }
-  
-  .step.active .step-number {
-      background: #667eea;
-      color: white;
-      border-color: #667eea;
-      transform: scale(1.1);
-  }
-  
-  .step.completed .step-number {
-      background: #10b981;
-      color: white;
-      border-color: #10b981;
-  }
-  
-  .step-title {
-      font-weight: 600;
-      color: #374151;
-  }
-  
-  .step.active .step-title {
-      color: #667eea;
-  }
-  
-  .step-content {
-      display: none;
-      animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  .step-content.active {
-      display: block;
-  }
-  
-  .custom-card {
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
-      transition: all 0.3s ease;
-  }
-  
-  .custom-card:hover {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .date-time-picker {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 2rem;
-  }
-  
-  .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-  }
-  
-  .product-card {
-      border: 3px solid #e5e7eb;
-      border-radius: 12px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-  }
-  
-  .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Style for selected product cards */
-  .product-card.selected {
-      border: 3px solid #667eea !important;
-      transform: translateY(-4px);
-      box-shadow: 0 6px 12px rgba(102, 126, 234, 0.15) !important;
-  }
-  
-  .product-image-container {
-      height: 200px;
-      overflow: hidden;
-      position: relative;
-  }
-  
-  .product-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-  }
-  
-  .product-card:hover .product-image {
-      transform: scale(1.05);
-  }
-  
-  .product-info {
-      padding: 1rem;
-  }
-  
-  .product-name {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      line-height: 1.4;
-  }
-  
-  .product-prices {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-  }
-  
-  .price-original {
-      text-decoration: line-through;
-      color: #9ca3af;
-  }
-  
-  .price-offer {
-      color: #ef4444;
-      font-weight: bold;
-      font-size: 1.1rem;
-  }
-  
-  .discount-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #ef4444;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: bold;
-  }
-  
-  .selected-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(102, 126, 234, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 3rem;
-  }
-  
-  .product-card.selected .selected-overlay {
-      display: flex;
-  }
-  
-  .checkout-summary {
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 1.5rem;
-      position: sticky;
-      top: 20px;
-  }
-  
-  .summary-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-      padding: 0.5rem 0;
-  }
-  
-  .summary-item.total {
-      border-top: 2px solid #e5e7eb;
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #111827;
-      margin-top: 1rem;
-      padding-top: 1rem;
-  }
-  
-  .btn-primary {
-      background: #667eea;
-      border-color: #667eea;
-      transition: all 0.3s ease;
-  }
-  
-  .btn-primary:hover {
-      background: #5a67d8;
-      border-color: #5a67d8;
-  }
-  
-  .cart-item {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
-      border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .cart-item-image {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-right: 1rem;
-  }
-  
-  .quantity-controls {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      overflow: hidden;
-  }
-  
-  .quantity-btn {
-      padding: 0.5rem 1rem;
-      background: #f9fafb;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.2s;
-  }
-  
-  .quantity-btn:hover {
-      background: #e5e7eb;
-  }
-  
-  .quantity-input {
-      border: none;
-      width: 60px;
-      text-align: center;
-      padding: 0.5rem;
-  }
-  
-  .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: #6b7280;
-  }
-  
-  @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @media (max-width: 768px) {
-      .product-grid {
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 1rem;
-      }
-      
-      .steps-header {
-          padding: 1rem 0;
-      }
-      
-      .step-number {
-          width: 50px;
-          height: 50px;
-          font-size: 1.25rem;
-      }
-  }
-</style>
     @yield('css')
 </head>
 
@@ -399,8 +98,19 @@
         <!-- Step 2: Product Selection -->
         <div class="step-content" id="step2">
             <div class="custom-card card">
+                  
                 <div class="card-header bg-transparent border-0 pt-4">
                     <h3 class="text-center">{{ __('messages.Select Your Products') }}</h3>
+                    <div class="d-flex justify-content-center mt-3">
+                        <div class="btn-group" role="group" aria-label="Display mode">
+                            <button type="button" class="btn btn-outline-primary active" id="available-products-btn">
+                                {{ __('messages.Available Products') }}
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" id="all-products-btn">
+                                {{ __('messages.All Products') }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div id="products-loading" class="text-center py-5">
@@ -476,6 +186,15 @@
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
+                             
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">{{ __('messages.Customer Address') }}</label>
+                                    <input type="tel" class="form-control" id="address" name="address" 
+                                        value="{{ old('address') }}" required>
+                                    @error('address')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label for="delivery_id" class="form-label">{{ __('messages.Delivery') }}</label>
@@ -538,6 +257,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     let selectedProducts = {};
     let currentStep = 1;
@@ -547,6 +267,30 @@
         // Initialize Select2
         $('.select2').select2({
             theme: 'bootstrap-5'
+        });
+
+        $('#available-products-btn').on('click', function() {
+        $(this).addClass('active');
+        $('#all-products-btn').removeClass('active');
+        
+        // Show Review Cart button
+        $('#review-cart-btn').show();
+        
+        if ($('#order_date').val()) {
+            fetchAvailableProducts($('#order_date').val());
+        } else {
+            $('#products-container').html('<div class="alert alert-info">{{ __("messages.Please select a date first") }}</div>');
+        }
+     });
+        
+        $('#all-products-btn').on('click', function() {
+            $(this).addClass('active');
+            $('#available-products-btn').removeClass('active');
+            
+            // Hide Review Cart button
+            $('#review-cart-btn').hide();
+            
+            fetchAllProducts();
         });
 
         // When order date changes, fetch available products
@@ -565,11 +309,25 @@
 
     function nextStep(step) {
         if (step === 1) {
-            if (!$('#order_date').val()) {
+            if (!$('#order_date').val() && $('#available-products-btn').hasClass('active')) {
                 $('#order_date').addClass('is-invalid');
                 return;
             }
             $('#order_date').removeClass('is-invalid');
+            
+            // If switching to step 2 and "Available Products" is active, load them
+            if ($('#available-products-btn').hasClass('active') && $('#order_date').val()) {
+                fetchAvailableProducts($('#order_date').val());
+            } else if ($('#all-products-btn').hasClass('active')) {
+                // If "All Products" is active, load all products as non-selectable
+                fetchAllProducts();
+            }
+        }
+        
+        // Don't proceed if in All Products mode and trying to go past step 2
+        if (step === 2 && $('#all-products-btn').hasClass('active')) {
+            alert('{{ __("messages.Please switch to Available Products mode to select items for purchase") }}');
+            return;
         }
 
         if (step === 2) {
@@ -632,48 +390,77 @@
         });
     }
 
-    function displayProducts(products) {
-        const container = $('#products-container');
-        container.empty();
+    // Add this function to fetch all products
+   function fetchAllProducts() {
+    $('#products-loading').show();
+    $('#products-container').hide();
 
-        if (products.length === 0) {
-            container.html('<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p>{{ __('messages.No products available for the selected date') }}</p></div>');
-            return;
+    $.ajax({
+        url: '{{ route("user.orders.all-products") }}',
+        method: 'GET',
+        success: function(response) {
+            // Display products as non-selectable
+            displayProducts(response.products, false);
+            $('#products-loading').hide();
+            $('#products-container').show();
+        },
+        error: function(xhr) {
+            $('#products-loading').hide();
+            alert('{{ __("messages.Error loading products. Please try again") }}');
         }
+    });
+}
 
-        products.forEach(function(product) {
-            const discount = product.offer_price ? ((product.selling_price - product.offer_price) / product.selling_price * 100).toFixed(0) : 0;
-            
-            const productCard = `
-                <div class="product-card" data-product-id="${product.id}" onclick="toggleProduct(${product.id})">
-                    <div class="product-image-container">
-                        <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="product-image">
-                        ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-                    </div>
-                    <div class="product-info">
-                        <h5 class="product-name">${product.name_en || product.name_ar}</h5>
-                        <div class="product-prices">
-                            ${product.offer_price ? 
-                                `<span class="price-original">JD ${product.selling_price}</span>
-                                 <span class="price-offer">JD ${product.offer_price}</span>` :
-                                `<span class="price-current">JD ${product.selling_price}</span>`
-                            }
-                        </div>
-                    </div>
-                    <div class="selected-overlay">
-                        <i class="fas fa-check-circle"></i>
+  function displayProducts(products, selectable = true) {
+    const container = $('#products-container');
+    container.empty();
+    
+    if (products.length === 0) {
+        container.html('<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p>{{ __('messages.No products available for the selected date') }}</p></div>');
+        return;
+    }
+    
+    products.forEach(function(product) {
+        const discount = product.offer_price ? ((product.selling_price - product.offer_price) / product.selling_price * 100).toFixed(0) : 0;
+        
+        const productCard = `
+            <div class="product-card ${!selectable ? 'not-selectable' : ''}" data-product-id="${product.id}" ${selectable ? `onclick="toggleProduct(${product.id})"` : ''}>
+                <div class="product-image-container">
+                    <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="product-image">
+                    ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
+                    <button type="button" class="view-image-btn" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                </div>
+                <div class="product-info">
+                    <h5 class="product-name">${product.name_en || product.name_ar}</h5>
+                    <div class="product-prices">
+                        ${product.offer_price ? 
+                            `<span class="price-original">JD ${product.selling_price}</span>
+                             <span class="price-offer">JD ${product.offer_price}</span>` :
+                            `<span class="price-current">JD ${product.selling_price}</span>`
+                        }
                     </div>
                 </div>
-            `;
-            
-            container.append(productCard);
-        });
-
-        // Restore selected state
+                ${selectable ? `
+                <div class="selected-overlay">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        
+        container.append(productCard);
+    });
+    
+    // Restore selected state only if selectable
+    if (selectable) {
         Object.keys(selectedProducts).forEach(productId => {
             $(`.product-card[data-product-id="${productId}"]`).addClass('selected');
         });
     }
+    }
+    
 
     function toggleProduct(productId) {
         const productCard = $(`.product-card[data-product-id="${productId}"]`);
@@ -827,6 +614,82 @@
         $('#hidden_products').val(JSON.stringify(productIds));
         $('#hidden_products_data').val(JSON.stringify(productsDataArray));
     }
+
+   // Updated function for Bootstrap 5
+    function viewFullImage(imageUrl, productName, event) {
+        // Prevent triggering the toggleProduct function
+        event.stopPropagation();
+        
+        // Create modal if it doesn't exist
+        if (!$('#imageModal').length) {
+            const modalHtml = `
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="imageModalLabel"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img src="" class="img-fluid" id="modalImage" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+        }
+        
+        // Set modal content
+        $('#imageModal .modal-title').text(productName);
+        $('#modalImage').attr('src', imageUrl);
+        
+        // Show modal using Bootstrap 5 syntax
+        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        imageModal.show();
+    }
+
+    // Add these styles to your document
+    $(document).ready(function() {
+        // Add CSS for the view image button
+        $('head').append(`
+            <style>
+                .product-image-container {
+                    position: relative;
+                }
+                
+                .view-image-btn {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+                    background-color: rgba(255, 255, 255, 0.8);
+                    border: none;
+                    border-radius: 50%;
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    opacity: 0.7;
+                    transition: opacity 0.3s;
+                    z-index: 5;
+                }
+                
+                .view-image-btn:hover {
+                    opacity: 1;
+                }
+                
+                .product-card:hover .view-image-btn {
+                    opacity: 1;
+                }
+                
+                #modalImage {
+                    max-height: 80vh;
+                }
+            </style>
+        `);
+    });
 </script>
 </body>
 </html>

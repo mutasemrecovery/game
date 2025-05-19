@@ -33,6 +33,7 @@
                 <thead class="custom_thead">
                     <th>{{ __('messages.number') }}</th>
                     <th>{{ __('messages.total_prices') }}</th>
+                    <th>{{ __('messages.delivery_fee') }}</th>
                     <th>{{ __('messages.total_discounts') }}</th>
                     <th>{{ __('messages.order_status') }}</th>
                     <th>{{ __('messages.user') }}</th>
@@ -46,22 +47,19 @@
 
                         <td>{{ $info->number }}</td>
                         <td>{{ $info->total_prices }}</td>
+                        <td>{{ $info->delivery_fee }}</td>
                         <td>{{ $info->total_discounts }}</td>
                         <td>@if($info->order_status==1) Pending @elseif($info->order_status==2) OnTheWay @elseif($info->order_status==3) Cancelled @elseif($info->order_status==4) Failed @else DELIVERD @endif</td>
                         <td>{{ $info->user->name }}</td>
                         <td>{{ $info->date }}</td>
 
                         <td>
+                             @if ($info->order_status != 6 && $info->order_status != 3 )
                             @can('order-edit')
                             <a href="{{ route('orders.edit', $info->id) }}" class="btn btn-sm btn-primary">{{ __('messages.Edit') }}</a>
                             @endcan
-                            @can('order-delete')
-                            <form action="{{ route('orders.destroy', $info->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">{{ __('messages.Delete') }}</button>
-                            </form>
-                            @endcan
+                            @endif
+                           
                         </td>
                     </tr>
                     @endforeach

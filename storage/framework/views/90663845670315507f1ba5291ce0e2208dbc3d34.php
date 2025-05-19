@@ -187,7 +187,7 @@ unset($__errorArgs, $__bag); ?>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <img src="" id="image-preview" alt="Selected Image" height="50px" width="50px" style="display: none;">
-                                  <button class="btn"> <?php echo e(__('messages.photo')); ?></button>
+                                  <button class="btn"> <?php echo e(__('messages.Photo')); ?></button>
                                  <input  type="file" id="Item_img" name="photo[]" class="form-control" onchange="previewImage()" multiple>
                                     <?php $__errorArgs = ['photo'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');

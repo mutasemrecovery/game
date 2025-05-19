@@ -38,6 +38,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => ['lo
     Route::resource('userOrders', OrderController::class);
     Route::get('orders/available-products', [OrderController::class, 'getAvailableProductsForUser'])
     ->name('user.orders.available-products');
+    Route::get('/orders/all-products', [OrderController::class, 'getAllProducts'])->name('user.orders.all-products');
 
     Route::get('/order/success/{order}', [OrderController::class, 'orderSuccess'])->name('user.order.success');
     Route::get('/order/details/{order}', [OrderController::class, 'orderDetails'])->name('user.order.details');

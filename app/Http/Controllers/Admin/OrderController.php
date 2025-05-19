@@ -18,6 +18,12 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    public function getPrice(Request $request)
+    {
+        $delivery = Delivery::findOrFail($request->id);
+        return response()->json(['price' => $delivery->price]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -153,61 +159,89 @@ class OrderController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $data = Product::findOrFail($id); // Retrieve the category by ID
-        return view('admin.orders.edit', ['data' => $data]);
+   public function edit($id)
+{
+    try {
+        // Find the order with its related products
+        $order = Order::with(['orderProducts.product', 'user', 'delivery'])->findOrFail($id);
+        
+        // Get users and deliveries
+        $users = User::get(); // Adjust the role ID as needed
+        $deliveries = Delivery::all();
+        
+        // Get only the products that are in this order
+        $orderProducts = $order->orderProducts()->with('product')->get();
+        
+        return view('admin.orders.edit', compact('order', 'users', 'deliveries', 'orderProducts'));
+    } catch (\Exception $e) {
+        return redirect()->route('orders.index')
+            ->with('error', __('messages.Error loading order: ') . $e->getMessage());
     }
+}
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
+        $validatedData = $request->validate([
+            'date' => 'required|date',
+            'user_id' => 'required|exists:users,id',
+            'delivery_id' => 'nullable|exists:deliveries,id',
+            'payment_type' => 'required|string',
+            'payment_status' => 'required|in:1,2',
+            'order_status' => 'required|in:1,2,3,4,5,6',
+            'total_prices' => 'required|numeric|min:0',
+            'total_discounts' => 'required|numeric|min:0',
+            'products' => 'required|array|min:1',
+            'products_data' => 'required|string',
+        ]);
+        
         try {
-            $product = Product::findOrFail($id);
-
-            $product->number = $request->input('number');
-            $product->name = $request->input('name');
-            $product->description = $request->input('description');
-            $product->selling_price = $request->input('selling_price');
-            $product->status = $request->input('status');
-            $product->is_featured = $request->input('is_featured');
-
-            if ($request->hasFile('photo')) {
-                $photos = $request->file('photo');
-                foreach ($photos as $photo) {
-                    $photoPath = uploadImage('assets/admin/uploads', $photo); // Use the uploadImage function
-                    if ($photoPath) {
-                        // Create a record in the product_images table for each image using the relationship
-                        $productImage = new ProductImage();
-                        $productImage->photo = $photoPath;
-
-                        $product->productImages()->save($productImage); // Associate the image with the product
-                    }
-                }
+            DB::beginTransaction();
+            
+            // Find the order
+            $order = Order::findOrFail($id);
+            
+            // Get delivery fee
+            $delivery = Delivery::find($validatedData['delivery_id']);
+            
+            // Update order
+            $order->update([
+                'date' => $validatedData['date'],
+                'user_id' => $validatedData['user_id'],
+                'delivery_id' => $validatedData['delivery_id'],
+                'delivery_fee' => $delivery ? $delivery->price : 0,
+                'payment_type' => $validatedData['payment_type'],
+                'payment_status' => $validatedData['payment_status'],
+                'order_status' => $validatedData['order_status'],
+                'total_prices' => $validatedData['total_prices'],
+                'total_discounts' => $validatedData['total_discounts'],
+            ]);
+            
+            // Delete all previous order products
+            OrderProduct::where('order_id', $order->id)->delete();
+            
+            // Create new order products
+            $productsData = json_decode($request->products_data, true);
+            
+            foreach ($productsData as $productData) {
+                OrderProduct::create([
+                    'order_id' => $order->id,
+                    'product_id' => $productData['product_id'],
+                    'quantity' => $productData['quantity'],
+                    'unit_price' => $productData['unit_price'],
+                    'total_price' => $productData['total_price'],
+                    'discount_percentage' => $productData['discount_percentage'],
+                    'discount_value' => $productData['discount_value'],
+                ]);
             }
-
-            if ($product->save()) {
-                return redirect()->route('orders.index')->with(['success' => 'Product updated']);
-            } else {
-                return redirect()->back()->with(['error' => 'Something went wrong while updating the product']);
-            }
-        } catch (\Exception $ex) {
-            Log::error($ex);
-            return redirect()->back()
-                ->with(['error' => 'An error occurred: ' . $ex->getMessage()])
-                ->withInput();
+            
+            DB::commit();
+            
+            return redirect()->route('orders.index')
+                ->with('success', __('messages.Order updated successfully'));
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withInput()
+                ->with('error', __('messages.Error updating order: ') . $e->getMessage());
         }
     }
 

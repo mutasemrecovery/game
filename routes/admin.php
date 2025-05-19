@@ -65,6 +65,7 @@ Route::get('orders/available-products', [OrderController::class, 'getAvailablePr
 // web.php
 Route::get('/products/selection', [ProductSelectionController::class, 'index'])->name('products.selection');
 Route::post('/products/filtered', [ProductSelectionController::class, 'getFilteredProducts'])->name('products.filtered');
+Route::get('/deliveries/get-price',  [OrderController::class, 'getPrice'])->name('deliveries.get-price');
 // end
 
 // Resource Route

@@ -133,7 +133,7 @@ unset($__errorArgs, $__bag); ?>
 
                                 </option>
                                 <option value="transfer" <?php echo e(old('payment_type') == 'transfer' ? 'selected' : ''); ?>>
-                                    <?php echo e(__('messages.Bank Transfer')); ?>
+                                    <?php echo e(__('messages.Cliq')); ?>
 
                                 </option>
                             </select>
