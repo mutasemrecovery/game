@@ -99,7 +99,7 @@
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo e($info->user->name); ?></td>
-                                        <td><?php echo e($info->delivery->place); ?></td>
+                                        <td><?php echo e($info->delivery->place ?? null); ?></td>
                                         <td><?php echo e($info->date); ?></td>
 
                                         <td>

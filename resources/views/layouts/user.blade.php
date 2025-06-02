@@ -280,6 +280,7 @@
     flatpickr("#order_date", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
+        disableMobile: true, 
         locale: {
             weekdays: {
                 shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],

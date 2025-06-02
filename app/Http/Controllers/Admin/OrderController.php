@@ -193,26 +193,26 @@ class OrderController extends Controller
     }
 
    public function edit($id)
-{
-    try {
-        // Find the order with its related products
-        $order = Order::with(['orderProducts.product', 'user', 'delivery'])->findOrFail($id);
-        
-        // Get users and deliveries
-        $users = User::get(); // Adjust the role ID as needed
-        $deliveries = Delivery::all();
-        
-        // Get only the products that are in this order
-        $orderProducts = $order->orderProducts()->with('product')->get();
-        
-        return view('admin.orders.edit', compact('order', 'users', 'deliveries', 'orderProducts'));
-    } catch (\Exception $e) {
-        return redirect()->route('orders.index')
-            ->with('error', __('messages.Error loading order: ') . $e->getMessage());
+    {
+        try {
+            // Find the order with its related products
+            $order = Order::with(['orderProducts.product', 'user', 'delivery'])->findOrFail($id);
+            
+            // Get users and deliveries
+            $users = User::get(); // Adjust the role ID as needed
+            $deliveries = Delivery::all();
+            
+            // Get only the products that are in this order
+            $orderProducts = $order->orderProducts()->with('product')->get();
+            
+            return view('admin.orders.edit', compact('order', 'users', 'deliveries', 'orderProducts'));
+        } catch (\Exception $e) {
+            return redirect()->route('orders.index')
+                ->with('error', __('messages.Error loading order: ') . $e->getMessage());
+        }
     }
-}
 
-    public function update(Request $request, $id)
+  public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
             'date' => 'required|date',
@@ -235,18 +235,19 @@ class OrderController extends Controller
             
             // Get delivery fee
             $delivery = Delivery::find($validatedData['delivery_id']);
+            $deliveryFee = $delivery ? $delivery->price : 0;
             
-            // Update order
+            // Update order with the calculated totals from frontend
             $order->update([
                 'date' => $validatedData['date'],
                 'user_id' => $validatedData['user_id'],
                 'delivery_id' => $validatedData['delivery_id'],
-                'delivery_fee' => $delivery ? $delivery->price : 0,
+                'delivery_fee' => $deliveryFee,
                 'payment_type' => $validatedData['payment_type'],
                 'payment_status' => $validatedData['payment_status'],
                 'order_status' => $validatedData['order_status'],
-                'total_prices' => $validatedData['total_prices'],
-                'total_discounts' => $validatedData['total_discounts'],
+                'total_prices' => $validatedData['total_prices'], // This will be net total after all discounts
+                'total_discounts' => $validatedData['total_discounts'], // This includes both product and additional discounts
             ]);
             
             // Delete all previous order products
@@ -277,8 +278,6 @@ class OrderController extends Controller
                 ->with('error', __('messages.Error updating order: ') . $e->getMessage());
         }
     }
-
-
 
     /**
      * Remove the specified resource from storage.

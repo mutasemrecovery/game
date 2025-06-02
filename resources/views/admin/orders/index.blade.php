@@ -97,7 +97,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $info->user->name }}</td>
-                                        <td>{{ $info->delivery->place }}</td>
+                                        <td>{{ $info->delivery->place ?? null }}</td>
                                         <td>{{ $info->date }}</td>
 
                                         <td>

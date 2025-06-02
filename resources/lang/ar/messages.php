@@ -324,6 +324,11 @@ return [
     "reset"=>"تفريغ الحقول",
     "delivery_place"=>"منطقة التوصيل",
     "delivery"=>"التوصيل",
+     "Additional Order Discount"=>"الخصم",
+    "No Discount"=>"بدون خصم",
+    "Percentage"=>"نسبة",
+    "Fixed Amount"=>"ثابت",
+    "Additional Discount"=>"الخصومات",
     ""=>"",
     ""=>"",
 
