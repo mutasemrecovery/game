@@ -8,14 +8,11 @@ use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
 class OrderController extends Controller
 {
     public function getPrice(Request $request)
@@ -29,12 +26,45 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $data= Order::paginate(PAGINATION_COUNT);
+ 
 
-        return view('admin.orders.index',compact('data'));
+    public function index(Request $request)
+    {
+        $query = Order::query()->latest();
+
+        // Optional date filter
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $query->whereDate('date', '>=', $request->from_date)
+                ->whereDate('date', '<=', $request->to_date);
+        }
+
+        // Filter by order number
+        if ($request->filled('number')) {
+            $query->where('number', 'like', '%' . $request->number . '%');
+        }
+
+        // Filter by user name
+        if ($request->filled('user_name')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->user_name . '%');
+            });
+        }
+
+        // Filter by delivery place
+        if ($request->filled('delivery_place')) {
+            $query->whereHas('delivery', function ($q) use ($request) {
+                $q->where('place', 'like', '%' . $request->delivery_place . '%');
+            });
+        }
+
+        $deliveries = Delivery::all(); // for the dropdown
+
+        $data = $query->paginate(PAGINATION_COUNT);
+
+        return view('admin.orders.index', compact('data','deliveries'));
     }
+
+
 
     public function create()
     {
@@ -154,9 +184,12 @@ class OrderController extends Controller
     }
 
 
-    public function show($id)
+   public function show($id)
     {
-        //
+        $order = Order::with(['user', 'delivery', 'orderProducts.product'])
+                    ->findOrFail($id);
+        
+        return view('admin.orders.show', compact('order'));
     }
 
    public function edit($id)

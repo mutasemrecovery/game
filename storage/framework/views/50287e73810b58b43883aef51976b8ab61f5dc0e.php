@@ -81,6 +81,14 @@ unset($__errorArgs, $__bag); ?>
                                 <i class="fas fa-filter"></i> <?php echo e(__('messages.Filter Products')); ?>
 
                             </button>
+                            <button id="selectAllBtn" class="btn btn-secondary ml-2" style="display: none;">
+                                <i class="fas fa-check-double"></i> <?php echo e(__('messages.Select All Available')); ?>
+
+                            </button>
+                            <button id="deselectAllBtn" class="btn btn-warning ml-2" style="display: none;">
+                                <i class="fas fa-times-circle"></i> <?php echo e(__('messages.Deselect All')); ?>
+
+                            </button>
                         </div>
                     </div>
                     
@@ -96,6 +104,7 @@ unset($__errorArgs, $__bag); ?>
                             <div class="card">
                                 <div class="card-header">
                                     <h4><?php echo e(__('messages.Selected Products')); ?></h4>
+                                    <small id="selectedCount" class="text-muted"></small>
                                 </div>
                                 <div class="card-body">
                                     <div id="selectedProducts" class="list-group">
@@ -129,11 +138,57 @@ unset($__errorArgs, $__bag); ?>
         $('.select2').select2();
         
         let selectedProducts = [];
+        let availableProducts = []; // Store available products for select all functionality
         let userPhone = '';
         
         // Filter button click handler
         $('#filterBtn').click(function() {
             loadProducts();
+        });
+        
+        // Select All button click handler
+        $('#selectAllBtn').click(function() {
+            // Select all available products
+            availableProducts.forEach(product => {
+                if (product.available && !selectedProducts.some(p => p.id === product.id)) {
+                    selectedProducts.push({
+                        id: product.id,
+                        name: product.name_en,
+                        price: product.offer_price || product.selling_price,
+                        image: product.image
+                    });
+                }
+            });
+            
+            // Update UI for all product cards
+            $('.add-product').each(function() {
+                const productId = $(this).data('id');
+                const product = availableProducts.find(p => p.id === productId);
+                
+                if (product && product.available) {
+                    $(this).removeClass('btn-primary add-product')
+                           .addClass('btn-danger remove-product')
+                           .text('<?php echo e(__("messages.Remove")); ?>');
+                }
+            });
+            
+            updateSelectedProductsList();
+            updateWhatsAppButton();
+            updateSelectAllButtons();
+        });
+        
+        // Deselect All button click handler
+        $('#deselectAllBtn').click(function() {
+            selectedProducts = [];
+            
+            // Update UI for all product cards
+            $('.remove-product').removeClass('btn-danger remove-product')
+                               .addClass('btn-primary add-product')
+                               .text('<?php echo e(__("messages.Select")); ?>');
+            
+            updateSelectedProductsList();
+            updateWhatsAppButton();
+            updateSelectAllButtons();
         });
         
         // User selection change handler
@@ -162,14 +217,44 @@ unset($__errorArgs, $__bag); ?>
                 },
                 beforeSend: function() {
                     $('#productsContainer').html('<div class="col-12 text-center"><p><?php echo e(__("messages.Loading products...")); ?></p></div>');
+                    $('#selectAllBtn, #deselectAllBtn').hide();
                 },
                 success: function(response) {
+                    availableProducts = response.products; // Store products for select all functionality
                     renderProducts(response.products);
+                    updateSelectAllButtons();
                 },
                 error: function() {
                     $('#productsContainer').html('<div class="col-12 text-center"><p><?php echo e(__("messages.Error loading products. Please try again.")); ?></p></div>');
+                    $('#selectAllBtn, #deselectAllBtn').hide();
                 }
             });
+        }
+        
+        // Update Select All buttons visibility and state
+        function updateSelectAllButtons() {
+            if (availableProducts.length > 0) {
+                const availableCount = availableProducts.filter(p => p.available).length;
+                const selectedAvailableCount = selectedProducts.filter(p => {
+                    const product = availableProducts.find(ap => ap.id === p.id);
+                    return product && product.available;
+                }).length;
+                
+                if (availableCount > 0) {
+                    $('#selectAllBtn').show();
+                    
+                    if (selectedAvailableCount === availableCount) {
+                        $('#selectAllBtn').hide();
+                        $('#deselectAllBtn').show();
+                    } else if (selectedProducts.length > 0) {
+                        $('#deselectAllBtn').show();
+                    } else {
+                        $('#deselectAllBtn').hide();
+                    }
+                }
+            } else {
+                $('#selectAllBtn, #deselectAllBtn').hide();
+            }
         }
         
         // Render products function
@@ -240,6 +325,7 @@ unset($__errorArgs, $__bag); ?>
                     $(this).removeClass('btn-primary add-product').addClass('btn-danger remove-product').text('<?php echo e(__("messages.Remove")); ?>');
                     updateSelectedProductsList();
                     updateWhatsAppButton();
+                    updateSelectAllButtons();
                 }
             });
             
@@ -253,6 +339,7 @@ unset($__errorArgs, $__bag); ?>
                 $(this).removeClass('btn-danger remove-product').addClass('btn-primary add-product').text('<?php echo e(__("messages.Select")); ?>');
                 updateSelectedProductsList();
                 updateWhatsAppButton();
+                updateSelectAllButtons();
             });
         }
         
@@ -260,8 +347,11 @@ unset($__errorArgs, $__bag); ?>
         function updateSelectedProductsList() {
             if (selectedProducts.length === 0) {
                 $('#selectedProducts').html('<div class="text-center"><p><?php echo e(__("messages.No products selected")); ?></p></div>');
+                $('#selectedCount').text('');
                 return;
             }
+            
+            $('#selectedCount').text(`(${selectedProducts.length} <?php echo e(__("messages.products selected")); ?>)`);
             
             let html = '';
             
@@ -296,6 +386,7 @@ unset($__errorArgs, $__bag); ?>
                 
                 updateSelectedProductsList();
                 updateWhatsAppButton();
+                updateSelectAllButtons();
             });
         }
         

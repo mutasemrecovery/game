@@ -133,16 +133,16 @@ return [
     "banners"=>"Banners",
  // website
      // Header and Page Title
-     'Create Your Order' => 'Create Your Order',
+     'Create Your Order' => 'Create an initial reservation',
     
      // Step Titles
      'Date & Time' => 'Date & Time',
      'Select Products' => 'Select Products',
-     'Review Cart' => 'Review Cart',
-     'Checkout' => 'Checkout',
+     'Review Cart' => 'Selected Characters Review',
+     'Checkout' => 'Reservation',
      
      // Step 1 - Date & Time
-     'Select Order Date' => 'Select Order Date',
+     'Select Order Date' => 'Select reservation Date',
      'Time' => 'Time',
      'Order Date' => 'Order Date',
      'Continue to Products' => 'Continue to Products',
@@ -163,7 +163,7 @@ return [
      'Proceed to Checkout' => 'Proceed to Booking',
      
      // Step 4 - Checkout
-     'Complete Your Order' => 'Complete Your Order',
+     'Complete Your Order' => 'Initial reservation',
      'Customer Name' => 'Customer Name',
      'Customer Phone' => 'Customer Phone',
      'Delivery' => 'Delivery',
@@ -253,5 +253,79 @@ return [
     "Completed"=>"Completed",
     "Total Discount"=>"Total Discount",
     "Final Total"=>"Final Total",
+
+
+    "from_date"=>"From Date",
+    "to_date"=>"To Date",
+    "reset"=>"Reset",
+    "delivery_place"=>"Delivery place",
+    "delivery"=>"Delivery",
+    "Select All Available"=>"Select All Available",
+    "Deselect All"=>"Deselect All",
+     'orders' => 'Orders',
+    'New' => 'New',
+    'back' => 'Back',
+    'print' => 'Print',
+    'Search' => 'Search',
+    'reset' => 'Reset',
+    'choose' => 'Choose',
+    'Edit' => 'Edit',
+    'Action' => 'Action',
+    'No_data' => 'No Data Available',
+
+    // Form Fields
+    'from_date' => 'From Date',
+    'to_date' => 'To Date',
+    'Number' => 'Number',
+    'number' => 'Number',
+    'User' => 'User',
+    'user' => 'User',
+    'delivery_place' => 'Delivery Place',
+    'date' => 'Date',
+
+    // Table Headers
+    'total_prices' => 'Total Price',
+    'delivery_fee' => 'Delivery Fee',
+    'total_discounts' => 'Total Discounts',
+    'order_status' => 'Order Status',
+    'delivery' => 'Delivery',
+
+    // Invoice
+    'invoice' => 'Invoice',
+    'invoice_number' => 'Invoice Number',
+    'status' => 'Status',
+    'bill_to' => 'Bill To',
+    'delivery_information' => 'Delivery Information',
+    'payment_type' => 'Payment Type',
+    'payment_status' => 'Payment Status',
+    'product' => 'Product',
+    'quantity' => 'Quantity',
+    'unit_price' => 'Unit Price',
+    'discount' => 'Discount',
+    'total' => 'Total',
+    'payment_information' => 'Payment Information',
+    'payment_method' => 'Payment Method',
+    'order_date' => 'Order Date',
+    'subtotal' => 'Subtotal',
+    'total_amount' => 'Total Amount',
+    'terms_and_conditions' => 'Terms and Conditions',
+    'thank_you_for_business' => 'Thank you for your business!',
+
+    // Status Values
+    'pending' => 'Pending',
+    'on_the_way' => 'On The Way',
+    'cancelled' => 'Cancelled',
+    'failed' => 'Failed',
+    'refund' => 'Refund',
+    'delivered' => 'Delivered',
+    'paid' => 'Paid',
+    'unpaid' => 'Unpaid',
+
+    ""=>"",
+    ""=>"",
+    ""=>"",
+    ""=>"",
+    ""=>"",
+    ""=>"",
 ];
 
