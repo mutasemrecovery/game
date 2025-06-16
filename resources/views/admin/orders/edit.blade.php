@@ -354,31 +354,85 @@
                 }
             }
 
-            function initializeOrderProducts() {
-                // Populate the products dropdown with the existing order products
-                var productsSelect = $('#products');
-                productsSelect.empty();
-                
-                // Get order products
-                var orderProducts = {!! json_encode($orderProducts) !!};
-                
-                orderProducts.forEach(function(orderProduct) {
-                    var product = orderProduct.product;
+function initializeOrderProducts() {
+    var productsSelect = $('#products');
+    productsSelect.empty();
+    
+    // Get existing order products
+    var orderProducts = {!! json_encode($orderProducts) !!};
+    var orderDate = $('#order_date').val();
+    var orderId = {{ $order->id }}; // Get current order ID
+    
+    // Load all available products via AJAX
+    $.ajax({
+        url: '{{ route("orders.available-products") }}',
+        method: 'GET',
+        data: { 
+            date: orderDate,
+            order_id: orderId // Pass current order ID
+        },
+        success: function(response) {
+            if (response.products && response.products.length > 0) {
+                // Add all products to dropdown
+                response.products.forEach(function(product) {
+                    // Check if this product was in the original order
+                    var orderProduct = orderProducts.find(function(op) {
+                        return op.product_id == product.id;
+                    });
+                    
+                    var isSelected = orderProduct ? true : false;
+                    
                     var option = new Option(
                         product.name_en + ' - ' + product.selling_price,
                         product.id,
-                        true,
-                        true
+                        isSelected,
+                        isSelected
                     );
-                    $(option).attr('data-price', orderProduct.unit_price);
-                    $(option).attr('data-offer-price', 
-                        orderProduct.unit_price - (orderProduct.unit_price * orderProduct.discount_percentage / 100));
+                    
+                    // If this product was in the order, use the order data
+                    // Otherwise use the current product data
+                    if (orderProduct) {
+                        $(option).attr('data-price', orderProduct.unit_price);
+                        $(option).attr('data-offer-price', 
+                            orderProduct.unit_price - (orderProduct.unit_price * orderProduct.discount_percentage / 100));
+                    } else {
+                        $(option).attr('data-price', product.selling_price);
+                        $(option).attr('data-offer-price', product.offer_price || product.selling_price);
+                    }
+                    
                     productsSelect.append(option);
                 });
                 
-                // Load the summary table
+                // Trigger Select2 update
+                productsSelect.trigger('change');
+                
+                // Load the summary table with existing order data
                 loadOrderProductsSummary(orderProducts);
             }
+        },
+        error: function(xhr) {
+            console.error('Error loading all products, falling back to order products only:', xhr);
+            
+            // Fallback: Your original working code
+            orderProducts.forEach(function(orderProduct) {
+                var product = orderProduct.product;
+                var option = new Option(
+                    product.name_en + ' - ' + product.selling_price,
+                    product.id,
+                    true,
+                    true
+                );
+                $(option).attr('data-price', orderProduct.unit_price);
+                $(option).attr('data-offer-price', 
+                    orderProduct.unit_price - (orderProduct.unit_price * orderProduct.discount_percentage / 100));
+                productsSelect.append(option);
+            });
+            
+            // Load the summary table
+            loadOrderProductsSummary(orderProducts);
+        }
+    });
+}
             
             function loadOrderProductsSummary(orderProducts) {
                 var tableBody = $('#selected-products-table');
@@ -419,10 +473,14 @@
             }
 
             function fetchAvailableProducts(orderDate) {
+                var orderId = {{ $order->id }};
                 $.ajax({
                     url: '{{ route("orders.available-products") }}',
                     method: 'GET',
-                    data: { date: orderDate },
+                     data: { 
+                            date: orderDate,
+                            order_id: orderId
+                        },
                     success: function(response) {
                         var productsSelect = $('#products');
                         productsSelect.empty();

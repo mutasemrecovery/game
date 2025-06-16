@@ -1,10 +1,9 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title'); ?>
+    <?php echo e(__('messages.invoice')); ?> #<?php echo e($order->number); ?>
 
-@section('title')
-    {{ __('messages.invoice') }} #{{ $order->number }}
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('css')
+<?php $__env->startSection('css'); ?>
 <style>
     @media print {
         * {
@@ -317,17 +316,19 @@
     }
 </style>
    
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <div class="row mb-3 d-print-none">
         <div class="col-12">
-            <a href="{{ route('orders.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> {{ __('messages.back') }}
+            <a href="<?php echo e(route('orders.index')); ?>" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> <?php echo e(__('messages.back')); ?>
+
             </a>
             <button onclick="window.print()" class="btn btn-primary">
-                <i class="fas fa-print"></i> {{ __('messages.print') }}
+                <i class="fas fa-print"></i> <?php echo e(__('messages.print')); ?>
+
             </button>
         </div>
     </div>
@@ -337,7 +338,7 @@
             <div class="row">
                 <div class="col-6">
                     <div class="company-info">
-                        <h2 class="company-name">{{ config('app.name', 'Your Company') }}</h2>
+                        <h2 class="company-name"><?php echo e(config('app.name', 'Your Company')); ?></h2>
                         <p class="company-address">
                             Your Company Address<br>
                            00775504609<br>
@@ -345,10 +346,10 @@
                     </div>
                 </div>
                 <div class="col-6 text-right">
-                    <h1 class="invoice-title">{{ __('messages.invoice') }}</h1>
+                    <h1 class="invoice-title"><?php echo e(__('messages.invoice')); ?></h1>
                     <div class="invoice-meta">
-                        <p><strong>{{ __('messages.invoice_number') }}:</strong> #{{ $order->number }}</p>
-                        <p><strong>{{ __('messages.date') }}:</strong> {{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}</p>
+                        <p><strong><?php echo e(__('messages.invoice_number')); ?>:</strong> #<?php echo e($order->number); ?></p>
+                        <p><strong><?php echo e(__('messages.date')); ?>:</strong> <?php echo e(\Carbon\Carbon::parse($order->date)->format('d/m/Y')); ?></p>
                       
                     </div>
                 </div>
@@ -359,22 +360,23 @@
             <div class="row">
                 <div class="col-6">
                     <div class="bill-to">
-                        <h4>{{ __('messages.bill_to') }}:</h4>
+                        <h4><?php echo e(__('messages.bill_to')); ?>:</h4>
                         <div class="customer-info">
-                            <p><strong>{{ $order->user->name }}</strong></p>
-                            <p>{{ $order->user->email ?? '' }}</p>
-                            <p>{{ $order->user->phone ?? '' }}</p>
+                            <p><strong><?php echo e($order->user->name); ?></strong></p>
+                            <p><?php echo e($order->user->email ?? ''); ?></p>
+                            <p><?php echo e($order->user->phone ?? ''); ?></p>
                         </div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="delivery-info">
-                        <h4>{{ __('messages.delivery_information') }}:</h4>
-                        <p><strong>{{ __('messages.delivery_place') }}:</strong> {{ $order->delivery->place }}</p>
-                        <p><strong>{{ __('messages.payment_type') }}:</strong> {{ ucfirst($order->payment_type) }}</p>
-                        <p><strong>{{ __('messages.payment_status') }}:</strong> 
-                            <span class="payment-status payment-{{ $order->payment_status }}">
-                                {{ $order->payment_status == 1 ? __('messages.paid') : __('messages.unpaid') }}
+                        <h4><?php echo e(__('messages.delivery_information')); ?>:</h4>
+                        <p><strong><?php echo e(__('messages.delivery_place')); ?>:</strong> <?php echo e($order->delivery->place); ?></p>
+                        <p><strong><?php echo e(__('messages.payment_type')); ?>:</strong> <?php echo e(ucfirst($order->payment_type)); ?></p>
+                        <p><strong><?php echo e(__('messages.payment_status')); ?>:</strong> 
+                            <span class="payment-status payment-<?php echo e($order->payment_status); ?>">
+                                <?php echo e($order->payment_status == 1 ? __('messages.paid') : __('messages.unpaid')); ?>
+
                             </span>
                         </p>
                     </div>
@@ -387,38 +389,38 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>{{ __('messages.product') }}</th>
-                        <th>{{ __('messages.quantity') }}</th>
-                        <th>{{ __('messages.unit_price') }}</th>
-                        <th>{{ __('messages.discount') }}</th>
-                        <th>{{ __('messages.total') }}</th>
+                        <th><?php echo e(__('messages.product')); ?></th>
+                        <th><?php echo e(__('messages.quantity')); ?></th>
+                        <th><?php echo e(__('messages.unit_price')); ?></th>
+                        <th><?php echo e(__('messages.discount')); ?></th>
+                        <th><?php echo e(__('messages.total')); ?></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($order->orderProducts as $index => $item)
+                    <?php $__currentLoopData = $order->orderProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td><?php echo e($index + 1); ?></td>
                         <td>
                             <div class="product-info">
-                                <strong>{{ $item->product->name_ar }}</strong>
-                                @if($item->product->number)
-                                    <br><small class="text-muted">{{ $item->product->number}}</small>
-                                @endif
+                                <strong><?php echo e($item->product->name_ar); ?></strong>
+                                <?php if($item->product->number): ?>
+                                    <br><small class="text-muted"><?php echo e($item->product->number); ?></small>
+                                <?php endif; ?>
                             </div>
                         </td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>JD{{ number_format($item->unit_price, 2) }}</td>
+                        <td><?php echo e($item->quantity); ?></td>
+                        <td>JD<?php echo e(number_format($item->unit_price, 2)); ?></td>
                         <td>
-                            @if($item->discount_percentage > 0)
-                                {{ $item->discount_percentage }}%<br>
-                                <small>(-JD{{ number_format($item->discount_value, 2) }})</small>
-                            @else
+                            <?php if($item->discount_percentage > 0): ?>
+                                <?php echo e($item->discount_percentage); ?>%<br>
+                                <small>(-JD<?php echo e(number_format($item->discount_value, 2)); ?>)</small>
+                            <?php else: ?>
                                 -
-                            @endif
+                            <?php endif; ?>
                         </td>
-                        <td><strong>JD{{ number_format($item->total_price, 2) }}</strong></td>
+                        <td><strong>JD<?php echo e(number_format($item->total_price, 2)); ?></strong></td>
                     </tr>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
         </div>
@@ -427,31 +429,31 @@
             <div class="row">
                 <div class="col-6">
                     <div class="payment-info">
-                        <h5>{{ __('messages.payment_information') }}</h5>
-                        <p>{{ __('messages.payment_method') }}: {{ ucfirst($order->payment_type) }}</p>
-                        <p>{{ __('messages.order_date') }}: {{ \Carbon\Carbon::parse($order->date)->format('d/m/Y H:i') }}</p>
+                        <h5><?php echo e(__('messages.payment_information')); ?></h5>
+                        <p><?php echo e(__('messages.payment_method')); ?>: <?php echo e(ucfirst($order->payment_type)); ?></p>
+                        <p><?php echo e(__('messages.order_date')); ?>: <?php echo e(\Carbon\Carbon::parse($order->date)->format('d/m/Y H:i')); ?></p>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="summary-table">
                         <table class="total-table">
                             <tr>
-                                <td>{{ __('messages.subtotal') }}:</td>
-                                <td>JD{{ number_format($order->total_prices + $order->total_discounts, 2) }}</td>
+                                <td><?php echo e(__('messages.subtotal')); ?>:</td>
+                                <td>JD<?php echo e(number_format($order->total_prices + $order->total_discounts, 2)); ?></td>
                             </tr>
-                            @if($order->total_discounts > 0)
+                            <?php if($order->total_discounts > 0): ?>
                             <tr>
-                                <td>{{ __('messages.discount') }}:</td>
-                                <td class="discount">-JD{{ number_format($order->total_discounts, 2) }}</td>
+                                <td><?php echo e(__('messages.discount')); ?>:</td>
+                                <td class="discount">-JD<?php echo e(number_format($order->total_discounts, 2)); ?></td>
                             </tr>
-                            @endif
+                            <?php endif; ?>
                             <tr>
-                                <td>{{ __('messages.delivery_fee') }}:</td>
-                                <td>JD{{ number_format($order->delivery_fee, 2) }}</td>
+                                <td><?php echo e(__('messages.delivery_fee')); ?>:</td>
+                                <td>JD<?php echo e(number_format($order->delivery_fee, 2)); ?></td>
                             </tr>
                             <tr class="total-row">
-                                <td><strong>{{ __('messages.total_amount') }}:</strong></td>
-                                <td><strong>JD{{ number_format($order->total_prices + $order->delivery_fee, 2) }}</strong></td>
+                                <td><strong><?php echo e(__('messages.total_amount')); ?>:</strong></td>
+                                <td><strong>JD<?php echo e(number_format($order->total_prices + $order->delivery_fee, 2)); ?></strong></td>
                             </tr>
                         </table>
                     </div>
@@ -464,7 +466,7 @@
                 <div class="col-12">
                     
                     <div class="thank-you">
-                        <p><em>{{ __('messages.thank_you_for_business') }}</em></p>
+                        <p><em><?php echo e(__('messages.thank_you_for_business')); ?></em></p>
                     </div>
                 </div>
             </div>
@@ -474,12 +476,13 @@
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
 <script>
     // Auto-focus print dialog when page loads (optional)
     // window.onload = function() {
     //     window.print();
     // }
 </script>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/u833050780/domains/ewformarketing.com/public_html/game/resources/views/admin/orders/show.blade.php ENDPATH**/ ?>

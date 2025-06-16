@@ -35,6 +35,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(), 'middleware' => ['lo
 
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/showProducts', [HomeController::class, 'showProductsToUser'])->name('showProducts');
     Route::resource('userOrders', OrderController::class);
     Route::get('orders/available-products', [OrderController::class, 'getAvailableProductsForUser'])
     ->name('user.orders.available-products');

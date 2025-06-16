@@ -138,50 +138,55 @@ class OrderController extends Controller
         }
     }
 
-    public function getAvailableProducts(Request $request)
-    {
-        $selectedDate = Carbon::parse($request->date);
+   public function getAvailableProducts(Request $request)
+{
+    $selectedDate = Carbon::parse($request->date);
+    $currentOrderId = $request->order_id; // Add this parameter
+    
+    // Define date range: one day before, selected day, one day after
+    $startDate = $selectedDate->copy()->subDay()->startOfDay();
+    $endDate = $selectedDate->copy()->addDay()->endOfDay();
+    
+    // Get products that don't have pending orders in the date range
+    // BUT exclude the current order being edited
+    $unavailableProductIds = Order::where('order_status', 1) // Pending orders
+        ->whereBetween('date', [$startDate, $endDate])
+        ->when($currentOrderId, function($query, $currentOrderId) {
+            return $query->where('id', '!=', $currentOrderId); // Exclude current order
+        })
+        ->pluck('id');
         
-        // Define date range: one day before, selected day, one day after
-        $startDate = $selectedDate->copy()->subDay()->startOfDay();
-        $endDate = $selectedDate->copy()->addDay()->endOfDay();
-
-        // Get products that don't have pending orders in the date range
-        $unavailableProductIds = Order::where('order_status', 1) // Pending orders
-            ->whereBetween('date', [$startDate, $endDate])
-            ->pluck('id');
-
-        $unavailableProductIdsArray = OrderProduct::whereIn('order_id', $unavailableProductIds)
-            ->pluck('product_id')
-            ->unique()
-            ->toArray();
-
-        // Get available products with current offers
-        $currentDate = now();
-        $products = Product::where('status', 1) // Active products
-            ->whereNotIn('id', $unavailableProductIdsArray)
-            ->with(['offers' => function($query) use ($currentDate) {
-                $query->where('start_at', '<=', $currentDate)
-                      ->where('expired_at', '>=', $currentDate);
-            }])
-            ->get()
-            ->map(function($product) {
-                $offer = $product->offers->first();
-                
-                return [
-                    'id' => $product->id,
-                    'name_en' => $product->name_en,
-                    'name_ar' => $product->name_ar,
-                    'selling_price' => $product->selling_price,
-                    'image' =>  asset('assets/admin/uploads/' . $product->productImages->first()->photo), 
-                    'offer_price' => $offer ? $offer->price : null,
-                ];
-            });
-
-        return response()->json([
-            'products' => $products
-        ]);
-    }
+    $unavailableProductIdsArray = OrderProduct::whereIn('order_id', $unavailableProductIds)
+        ->pluck('product_id')
+        ->unique()
+        ->toArray();
+    
+    // Get available products with current offers
+    $currentDate = now();
+    $products = Product::where('status', 1) // Active products
+        ->whereNotIn('id', $unavailableProductIdsArray)
+        ->with(['offers' => function($query) use ($currentDate) {
+            $query->where('start_at', '<=', $currentDate)
+                  ->where('expired_at', '>=', $currentDate);
+        }])
+        ->get()
+        ->map(function($product) {
+            $offer = $product->offers->first();
+            
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'selling_price' => $product->selling_price,
+                'image' => asset('assets/admin/uploads/' . $product->productImages->first()->photo), 
+                'offer_price' => $offer ? $offer->price : null,
+            ];
+        });
+        
+    return response()->json([
+        'products' => $products
+    ]);
+}
 
 
    public function show($id)

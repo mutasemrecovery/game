@@ -25,6 +25,17 @@ class HomeController extends Controller
         return view('layouts.user',compact('deliveries'));
     }
 
+
+     public function showProductsToUser()
+    {
+        $products = Product::with('productImages')
+            ->where('status', 1)
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('layouts.product', compact('products'));
+    }
    
 
 }
