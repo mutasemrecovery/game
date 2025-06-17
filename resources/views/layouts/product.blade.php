@@ -195,227 +195,217 @@
         }
 
         /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            animation: fadeIn 0.3s ease;
-        }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    animation: fadeIn 0.3s ease;
+}
 
-        .modal.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .modal-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            animation: scaleIn 0.3s ease;
-        }
+.modal-content {
+    position: relative;
+    max-width: 95%;
+    max-height: 95%;
+    width: 90vw;
+    height: 90vh;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    animation: scaleIn 0.3s ease;
+}
 
-        .modal-header {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
+.modal-header {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
 
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-        }
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
 
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
+.close-btn {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
 
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
 
-        .gallery-container {
-            padding: 30px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
+.gallery-container {
+    padding: 20px;
+    height: calc(90vh - 80px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
 
-        .main-image {
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
+.main-image {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: calc(90vh - 180px);
+    object-fit: contain;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
 
-        .thumbnail-container {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
+.thumbnail-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
 
-        .thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-        }
+.thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
 
-        .thumbnail:hover {
-            transform: scale(1.1);
-            border-color: #3498db;
-        }
+.thumbnail:hover {
+    transform: scale(1.1);
+    border-color: #3498db;
+}
 
-        .thumbnail.active {
-            border-color: #e74c3c;
-            transform: scale(1.1);
-        }
+.thumbnail.active {
+    border-color: #e74c3c;
+    transform: scale(1.1);
+}
 
-        .image-counter {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-        }
+.image-counter {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
 
-        .navigation-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.navigation-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .navigation-btn:hover {
-            background: white;
-            transform: translateY(-50%) scale(1.1);
-        }
+.navigation-btn:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+}
 
-        .prev-btn {
-            left: 20px;
-        }
+.prev-btn {
+    left: 20px;
+}
 
-        .next-btn {
-            right: 20px;
-        }
+.next-btn {
+    right: 20px;
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
-        @keyframes scaleIn {
-            from { transform: scale(0.7); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+@keyframes scaleIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
 
-        /* Arabic text alignment improvements */
-        .product-name, .product-description {
-            text-align: right;
-        }
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 98%;
+        max-height: 98%;
+        width: 98vw;
+        height: 98vh;
+    }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
+    .gallery-container {
+        padding: 15px;
+        height: calc(98vh - 80px);
+    }
 
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                gap: 20px;
-            }
+    .main-image {
+        max-height: calc(98vh - 160px);
+    }
 
-            .modal-content {
-                max-width: 95%;
-                max-height: 95%;
-            }
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+    }
 
-            .gallery-container {
-                padding: 20px;
-            }
+    .navigation-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
 
-            .main-image {
-                height: 300px;
-            }
+@media (max-width: 480px) {
+    .main-image {
+        max-height: calc(98vh - 140px);
+    }
 
-            .thumbnail {
-                width: 60px;
-                height: 60px;
-            }
+    .thumbnail-container {
+        gap: 10px;
+    }
 
-            .navigation-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-            }
-        }
+    .thumbnail {
+        width: 50px;
+        height: 50px;
+    }
+}
 
-        @media (max-width: 480px) {
-            .products-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .main-image {
-                height: 250px;
-            }
-
-            .thumbnail-container {
-                gap: 10px;
-            }
-
-            .thumbnail {
-                width: 50px;
-                height: 50px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -451,24 +441,25 @@
     </div>
 
     <!-- Image Gallery Modal -->
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-                <h2 class="modal-title" id="modalTitle">معرض الصور</h2>
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title" id="modalTitle">معرض الصور</h2>
+        </div>
+        <div class="gallery-container">
+            <div style="text-align: center; position: relative;">
+                <img id="mainImage" class="main-image" src="" alt="صورة المنتج">
+                <!-- Navigation buttons will be shown if product has multiple images -->
+                <button class="navigation-btn prev-btn" onclick="changeImage(-1)" style="display: none;">‹</button>
+                <button class="navigation-btn next-btn" onclick="changeImage(1)" style="display: none;">›</button>
             </div>
-            <div class="gallery-container">
-                <div style="text-align: center; position: relative;">
-                    <img id="mainImage" class="main-image" src="" alt="صورة المنتج">
-                    <button class="navigation-btn prev-btn" onclick="changeImage(-1)">‹</button>
-                    <button class="navigation-btn next-btn" onclick="changeImage(1)">›</button>
-                </div>
-                <div class="thumbnail-container" id="thumbnailContainer">
-                    <!-- Thumbnails will be populated by JavaScript -->
-                </div>
+            <div class="thumbnail-container" id="thumbnailContainer">
+                <!-- Thumbnails will be populated by JavaScript -->
             </div>
         </div>
     </div>
+</div>
 
     <script>
         // Product images data from Laravel
