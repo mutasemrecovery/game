@@ -83,7 +83,8 @@
                                 <div class="col-md-6 offset-md-3">
                                     <label for="order_date" class="form-label fs-5">{{ __('messages.Order Date') }} &
                                         {{ __('messages.Time') }}</label>
-                                    <input type="text" id="order_date" name="date" class="form-control form-control-lg" required>
+                                    <input type="text" id="order_date" name="date"
+                                        class="form-control form-control-lg" required>
 
                                     @error('date')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -276,23 +277,23 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    flatpickr("#order_date", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        disableMobile: true, 
-        locale: {
-            weekdays: {
-                shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            },
-            months: {
-                shorthand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-                longhand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-            },
-        }
-    });
-</script>
+    <script>
+        flatpickr("#order_date", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            disableMobile: true,
+            locale: {
+                weekdays: {
+                    shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                    longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                },
+                months: {
+                    shorthand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+                    longhand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+                },
+            }
+        });
+    </script>
     <script>
         let selectedProducts = {};
         let currentStep = 1;
@@ -316,7 +317,7 @@
                 } else {
                     $('#products-container').html(
                         '<div class="alert alert-info">{{ __('messages.Please select a date first') }}</div>'
-                        );
+                    );
                 }
             });
 
@@ -457,7 +458,7 @@
             if (products.length === 0) {
                 container.html(
                     '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p>{{ __('messages.No products available for the selected date') }}</p></div>'
-                    );
+                );
                 return;
             }
 
@@ -467,29 +468,33 @@
 
                 const productCard = `
             <div class="product-card ${!selectable ? 'not-selectable' : ''}" data-product-id="${product.id}" ${selectable ? `onclick="toggleProduct(${product.id})"` : ''}>
+                 
                 <div class="product-image-container">
+                    <button type="button" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
+
                     <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="product-image">
                     ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-                    <button type="button" class="view-image-btn" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
                         <i class="fas fa-search-plus"></i>
-                    </button>
+                        </button>
                 </div>
+               
                 <div class="product-info">
                     <h5 class="product-name">${product.name_en || product.name_ar}</h5>
                     <div class="product-prices">
                         ${product.offer_price ? 
                             `<span class="price-original">JD ${product.selling_price}</span>
-                                 <span class="price-offer">JD ${product.offer_price}</span>` :
+                                     <span class="price-offer">JD ${product.offer_price}</span>` :
                             `<span class="price-current">JD ${product.selling_price}</span>`
                         }
                     </div>
                 </div>
                 ${selectable ? `
-                    <div class="selected-overlay">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    ` : ''}
+                        <div class="selected-overlay">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        ` : ''}
             </div>
+              
         `;
 
                 container.append(productCard);
@@ -543,7 +548,7 @@
             if (Object.keys(selectedProducts).length === 0) {
                 container.html(
                     '<div class="empty-state"><i class="fas fa-shopping-cart fa-3x mb-3"></i><p>{{ __('messages.Your cart is empty') }}</p></div>'
-                    );
+                );
                 return;
             }
 
@@ -556,7 +561,7 @@
                         <p class="mb-0 text-muted">
                             ${product.offer_price ? 
                                 `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
-                                     <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
+                                         <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
                                 `<span>JD ${product.selling_price}</span>`
                             }
                         </p>

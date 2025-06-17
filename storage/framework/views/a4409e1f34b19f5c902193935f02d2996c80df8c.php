@@ -330,6 +330,7 @@ unset($__errorArgs, $__bag); ?>
     flatpickr("#order_date", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
+        disableMobile: true, 
         locale: {
             weekdays: {
                 shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
@@ -516,13 +517,16 @@ unset($__errorArgs, $__bag); ?>
 
                 const productCard = `
             <div class="product-card ${!selectable ? 'not-selectable' : ''}" data-product-id="${product.id}" ${selectable ? `onclick="toggleProduct(${product.id})"` : ''}>
+                 
                 <div class="product-image-container">
+                                                        <button type="button" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
+
                     <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="product-image">
                     ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-                    <button type="button" class="view-image-btn" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
                         <i class="fas fa-search-plus"></i>
-                    </button>
+                        </button>
                 </div>
+               
                 <div class="product-info">
                     <h5 class="product-name">${product.name_en || product.name_ar}</h5>
                     <div class="product-prices">
@@ -539,6 +543,7 @@ unset($__errorArgs, $__bag); ?>
                     </div>
                     ` : ''}
             </div>
+              
         `;
 
                 container.append(productCard);

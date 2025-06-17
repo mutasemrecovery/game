@@ -25,16 +25,26 @@ class HomeController extends Controller
         return view('layouts.user',compact('deliveries'));
     }
 
-
-     public function showProductsToUser()
+    public function showProductsToUser(Request $request)
     {
+        $search = $request->get('search');
+        
         $products = Product::with('productImages')
             ->where('status', 1)
             ->whereNull('deleted_at')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name_ar', 'LIKE', "%{$search}%")
+                    ->orWhere('name_en', 'LIKE', "%{$search}%")
+                    ->orWhere('description_ar', 'LIKE', "%{$search}%")
+                    ->orWhere('description_en', 'LIKE', "%{$search}%")
+                    ->orWhere('number', 'LIKE', "%{$search}%");
+                });
+            })
             ->orderBy('created_at', 'desc')
             ->get();
             
-        return view('layouts.product', compact('products'));
+        return view('layouts.product', compact('products', 'search'));
     }
    
 
