@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="utf-8">
@@ -84,7 +84,8 @@
                                 <div class="col-md-6 offset-md-3">
                                     <label for="order_date" class="form-label fs-5"><?php echo e(__('messages.Order Date')); ?> &
                                         <?php echo e(__('messages.Time')); ?></label>
-                                    <input type="text" id="order_date" name="date" class="form-control form-control-lg" required>
+                                    <input type="text" id="order_date" name="date"
+                                        class="form-control form-control-lg" required>
 
                                     <?php $__errorArgs = ['date'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -326,23 +327,23 @@ unset($__errorArgs, $__bag); ?>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    flatpickr("#order_date", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        disableMobile: true, 
-        locale: {
-            weekdays: {
-                shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            },
-            months: {
-                shorthand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-                longhand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-            },
-        }
-    });
-</script>
+    <script>
+        flatpickr("#order_date", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            disableMobile: true,
+            locale: {
+                weekdays: {
+                    shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                    longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                },
+                months: {
+                    shorthand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+                    longhand: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+                },
+            }
+        });
+    </script>
     <script>
         let selectedProducts = {};
         let currentStep = 1;
@@ -366,7 +367,7 @@ unset($__errorArgs, $__bag); ?>
                 } else {
                     $('#products-container').html(
                         '<div class="alert alert-info"><?php echo e(__('messages.Please select a date first')); ?></div>'
-                        );
+                    );
                 }
             });
 
@@ -507,7 +508,7 @@ unset($__errorArgs, $__bag); ?>
             if (products.length === 0) {
                 container.html(
                     '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p><?php echo e(__('messages.No products available for the selected date')); ?></p></div>'
-                    );
+                );
                 return;
             }
 
@@ -519,7 +520,7 @@ unset($__errorArgs, $__bag); ?>
             <div class="product-card ${!selectable ? 'not-selectable' : ''}" data-product-id="${product.id}" ${selectable ? `onclick="toggleProduct(${product.id})"` : ''}>
                  
                 <div class="product-image-container">
-                                                        <button type="button" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
+                    <button type="button" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
 
                     <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="product-image">
                     ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
@@ -528,20 +529,25 @@ unset($__errorArgs, $__bag); ?>
                 </div>
                
                 <div class="product-info">
-                    <h5 class="product-name">${product.name_en || product.name_ar}</h5>
-                    <div class="product-prices">
-                        ${product.offer_price ? 
-                            `<span class="price-original">JD ${product.selling_price}</span>
-                                 <span class="price-offer">JD ${product.offer_price}</span>` :
-                            `<span class="price-current">JD ${product.selling_price}</span>`
-                        }
+                    <div class="info-row">
+                        <div>
+                        <h5 class="product-name">${product.name_en || product.name_ar}</h5>
+                        <div class="product-prices">
+                            ${product.offer_price ? 
+                                `<span class="price-original">JD ${product.selling_price}</span>
+                                <span class="price-offer">JD ${product.offer_price}</span>` :
+                                `<span class="price-current">JD ${product.selling_price}</span>`
+                            }
+                        </div>
+                        </div>
+                        <button type="button" class="select-button">select</button>
                     </div>
                 </div>
                 ${selectable ? `
-                    <div class="selected-overlay">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    ` : ''}
+                        <div class="selected-overlay">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        ` : ''}
             </div>
               
         `;
@@ -597,7 +603,7 @@ unset($__errorArgs, $__bag); ?>
             if (Object.keys(selectedProducts).length === 0) {
                 container.html(
                     '<div class="empty-state"><i class="fas fa-shopping-cart fa-3x mb-3"></i><p><?php echo e(__('messages.Your cart is empty')); ?></p></div>'
-                    );
+                );
                 return;
             }
 
@@ -610,7 +616,7 @@ unset($__errorArgs, $__bag); ?>
                         <p class="mb-0 text-muted">
                             ${product.offer_price ? 
                                 `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
-                                     <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
+                                         <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
                                 `<span>JD ${product.selling_price}</span>`
                             }
                         </p>

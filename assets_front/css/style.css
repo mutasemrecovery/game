@@ -193,6 +193,30 @@
   .product-card.selected .selected-overlay {
       display: flex;
   }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.select-button {
+    background-color: #667eea;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.select-button:hover {
+    background-color: #556cd6;
+}
+
   
   .checkout-summary {
       background: #f9fafb;

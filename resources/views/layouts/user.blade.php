@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="utf-8">
@@ -479,13 +479,18 @@
                 </div>
                
                 <div class="product-info">
-                    <h5 class="product-name">${product.name_en || product.name_ar}</h5>
-                    <div class="product-prices">
-                        ${product.offer_price ? 
-                            `<span class="price-original">JD ${product.selling_price}</span>
-                                     <span class="price-offer">JD ${product.offer_price}</span>` :
-                            `<span class="price-current">JD ${product.selling_price}</span>`
-                        }
+                    <div class="info-row">
+                        <div>
+                        <h5 class="product-name">${product.name_en || product.name_ar}</h5>
+                        <div class="product-prices">
+                            ${product.offer_price ? 
+                                `<span class="price-original">JD ${product.selling_price}</span>
+                                <span class="price-offer">JD ${product.offer_price}</span>` :
+                                `<span class="price-current">JD ${product.selling_price}</span>`
+                            }
+                        </div>
+                        </div>
+                        <button type="button" class="select-button">select</button>
                     </div>
                 </div>
                 ${selectable ? `
