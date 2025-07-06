@@ -36,6 +36,17 @@
                             @enderror
                         </div>
                     </div>
+                 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="address">{{ __('messages.Address') }}</label>
+                            <input type="text" class="form-control" id="address" name="address" 
+                                value="{{ old('address') }}" required>
+                            @error('address')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
 
                     <!-- Customer Selection -->
                     <div class="col-md-6">

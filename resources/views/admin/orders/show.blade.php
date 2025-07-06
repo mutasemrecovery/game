@@ -370,7 +370,7 @@
                 <div class="col-6">
                     <div class="delivery-info">
                         <h4>{{ __('messages.delivery_information') }}:</h4>
-                        <p><strong>{{ __('messages.delivery_place') }}:</strong> {{ $order->delivery->place }}</p>
+                        <p><strong>{{ __('messages.delivery_place') }}:</strong> {{ $order->delivery->place }} <br>{{ $order->address }}</p>
                         <p><strong>{{ __('messages.payment_type') }}:</strong> {{ ucfirst($order->payment_type) }}</p>
                         <p><strong>{{ __('messages.payment_status') }}:</strong> 
                             <span class="payment-status payment-{{ $order->payment_status }}">

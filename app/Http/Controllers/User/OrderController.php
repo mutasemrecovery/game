@@ -25,6 +25,7 @@ class OrderController extends Controller
         $validatedData = $request->validate([
             'date' => 'required|date',
             'name' => 'required',
+            'address' => 'required',
             'phone' => 'required',
             'delivery_id' => 'nullable|exists:deliveries,id',
             'payment_type' => 'required|string',
@@ -53,6 +54,7 @@ class OrderController extends Controller
                 'order_status' => 1, // Pending
                 'date' => $validatedData['date'],
                 'user_id' => $user->id,
+                'address' => $validatedData['address'],
                 'delivery_id' => $validatedData['delivery_id'],
                 'delivery_fee' => $delivery ? $delivery->price : 0, 
                 'payment_type' => $validatedData['payment_type'],

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('payment_type');
             $table->tinyInteger('payment_status')->default(2); // 1 Paid   // 2 Unpaid
             $table->dateTime('date');
+            $table->text('address')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('delivery_id')->nullable();
