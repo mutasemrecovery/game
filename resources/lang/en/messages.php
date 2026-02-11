@@ -134,19 +134,19 @@ return [
  // website
      // Header and Page Title
      'Create Your Order' => 'Create an initial reservation',
-    
+
      // Step Titles
      'Date & Time' => 'Date & Time',
      'Select Products' => 'Select Products',
      'Review Cart' => 'Selected Characters Review',
      'Checkout' => 'Reservation',
-     
+
      // Step 1 - Date & Time
      'Select Order Date' => 'Select reservation Date',
      'Time' => 'Time',
      'Order Date' => 'Order Date',
      'Continue to Products' => 'Continue to Products',
-     
+
      // Step 2 - Product Selection
      'Select Your Products' => 'Select Your Products',
      'Loading products...' => 'Loading products...',
@@ -155,13 +155,13 @@ return [
      'Please select at least one product' => 'Please select at least one product',
      'No products available for the selected date' => 'No products available for the selected date',
      'Error loading products. Please try again' => 'Error loading products. Please try again',
-     
+
      // Step 3 - Review Cart
      'Review Your Cart' => 'Review Your Cart',
      'Your cart is empty' => 'Your cart is empty',
      'Back to Products' => 'Back to Products',
      'Proceed to Checkout' => 'Proceed to Booking',
-     
+
      // Step 4 - Checkout
      'Complete Your Order' => 'Initial reservation',
      'Customer Name' => 'Customer Name',
@@ -172,14 +172,14 @@ return [
      'Select Payment Type' => 'Select Payment Type',
      'Cash' => 'Cash',
      'Place Order' => 'Place Order',
-     
+
      // Order Summary
      'Order Summary' => 'Order Summary',
      'Subtotal' => 'Subtotal',
      'Discount' => 'Discount',
      'Delivery Fee' => 'Delivery Fee',
      'Total' => 'Total',
-     
+
      // Success/Error Messages
      'Order created successfully' => 'Order created successfully',
      'Error creating order: ' => 'Error creating order: ',
@@ -326,7 +326,7 @@ return [
     'paid' => 'Paid',
     'unpaid' => 'Unpaid',
 
-    ""=>"",
+    "Display All Products"=>"Display All Products",
     ""=>"",
     ""=>"",
     ""=>"",

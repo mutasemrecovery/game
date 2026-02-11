@@ -142,22 +142,22 @@ return [
     "Pages"=>"الصفحات",
     "productsImport"=>"استيراد السلع",
     "Wallet"=>"المحفظة",
-   
+
      // Header and Page Title
      'Create Your Order' => 'إنشاء حجز مبدأي',
-    
+
      // Step Titles
      'Date & Time' => 'التاريخ والوقت',
      'Select Products' => 'اختيار المنتجات',
      'Review Cart' => 'مراجعة الشخصيات المختارة',
      'Checkout' => 'الحجز',
-     
+
      // Step 1 - Date & Time
      'Select Order Date' => 'حدد تاريخ الحجز',
      'Time' => 'الوقت',
      'Order Date' => 'تاريخ الطلب',
      'Continue to Products' => 'الانتقال إلى المنتجات',
-     
+
      // Step 2 - Product Selection
      'Select Your Products' => 'اختر منتجاتك',
      'Loading products...' => 'جارٍ تحميل المنتجات...',
@@ -166,13 +166,13 @@ return [
      'Please select at least one product' => 'الرجاء اختيار منتج واحد على الأقل',
      'No products available for the selected date' => 'لا توجد منتجات متاحة للتاريخ المحدد',
      'Error loading products. Please try again' => 'خطأ في تحميل المنتجات. يرجى المحاولة مرة أخرى',
-     
+
      // Step 3 - Review Cart
      'Review Your Cart' => 'مراجعة سلتك',
      'Your cart is empty' => 'سلتك فارغة',
      'Back to Products' => 'العودة إلى المنتجات',
      'Proceed to Checkout' => 'المتابعة إلى تثبيث الحجز',
-     
+
      // Step 4 - Checkout
      'Complete Your Order' => 'الحجز المبدأي',
      'Customer Name' => 'اسم العميل',
@@ -183,14 +183,14 @@ return [
      'Select Payment Type' => 'اختر طريقة الدفع',
      'Cash' => 'نقداً',
      'Place Order' => 'إرسال الطلب',
-     
+
      // Order Summary
      'Order Summary' => 'ملخص الطلب',
      'Subtotal' => 'المجموع الفرعي',
      'Discount' => 'الخصم',
      'Delivery Fee' => 'رسوم التوصيل',
      'Total' => 'الإجمالي',
-     
+
      // Success/Error Messages
      'Order created successfully' => 'تم إنشاء الطلب بنجاح',
      'Error creating order: ' => 'خطأ في إنشاء الطلب: ',
@@ -329,7 +329,7 @@ return [
     "Percentage"=>"نسبة",
     "Fixed Amount"=>"ثابت",
     "Additional Discount"=>"الخصومات",
-    ""=>"",
+    "Display All Products"=>"عرض جميع المنتجات",
     ""=>"",
 
 

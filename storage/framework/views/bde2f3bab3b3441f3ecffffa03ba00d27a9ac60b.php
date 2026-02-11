@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>@yield('title')</title>
+    <title><?php echo $__env->yieldContent('title'); ?></title>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- jQuery UI -->
@@ -15,23 +15,23 @@
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('assets/admin/plugins/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/plugins/fontawesome-free/css/all.min.css')); ?>">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('assets/admin/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/dist/css/adminlte.min.css')); ?>">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="{{ asset('assets/admin/fonts/SansPro/SansPro.min.css') }}">
-    @if (App::getLocale() == 'ar')
-        <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/custom_rtl.css') }}">
-    @endif
-    <link rel="stylesheet" href="{{ asset('assets_front/css/style.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/fonts/SansPro/SansPro.min.css')); ?>">
+    <?php if(App::getLocale() == 'ar'): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/bootstrap_rtl-v4.2.1/bootstrap.min.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/bootstrap_rtl-v4.2.1/custom_rtl.css')); ?>">
+    <?php endif; ?>
+    <link rel="stylesheet" href="<?php echo e(asset('assets_front/css/style.css')); ?>">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-    @yield('css')
+    <?php echo $__env->yieldContent('css'); ?>
 </head>
 
 
@@ -40,7 +40,7 @@
 
     <div class="steps-header">
         <div class="container">
-            <h1 class="text-center mb-0">{{ __('messages.Create Your Order') }}</h1>
+            <h1 class="text-center mb-0"><?php echo e(__('messages.Create Your Order')); ?></h1>
         </div>
     </div>
 
@@ -50,59 +50,67 @@
             <div class="row">
                 <div class="col-md-3 col-6 step active">
                     <div class="step-number">1</div>
-                    <div class="step-title">{{ __('messages.Date & Time') }}</div>
+                    <div class="step-title"><?php echo e(__('messages.Date & Time')); ?></div>
                 </div>
                 <div class="col-md-3 col-6 step">
                     <div class="step-number">2</div>
-                    <div class="step-title">{{ __('messages.Select Products') }}</div>
+                    <div class="step-title"><?php echo e(__('messages.Select Products')); ?></div>
                 </div>
                 <div class="col-md-3 col-6 step">
                     <div class="step-number">3</div>
-                    <div class="step-title">{{ __('messages.Review Cart') }}</div>
+                    <div class="step-title"><?php echo e(__('messages.Review Cart')); ?></div>
                 </div>
                 <div class="col-md-3 col-6 step">
                     <div class="step-number">4</div>
-                    <div class="step-title">{{ __('messages.Checkout') }}</div>
+                    <div class="step-title"><?php echo e(__('messages.Checkout')); ?></div>
                 </div>
             </div>
         </div>
 
-        <form action="{{ route('userOrders.store') }}" method="post" enctype='multipart/form-data'>
-            @csrf
+        <form action="<?php echo e(route('userOrders.store')); ?>" method="post" enctype='multipart/form-data'>
+            <?php echo csrf_field(); ?>
 
             <!-- Step 1: Date & Time -->
             <div class="step-content active" id="step1">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Select Order Date') }} & {{ __('messages.Time') }}
+                        <h3 class="text-center"><?php echo e(__('messages.Select Order Date')); ?> & <?php echo e(__('messages.Time')); ?>
+
                         </h3>
-                        <div class="text-center mt-4">
-                            <a class="text-center" href="{{ route('showProducts') }}"> <button type="button"
-                                    class="btn btn-outline-primary">
-                                    {{ __('messages.Display All Products') }}
-                                </button>
-                            </a>
-                        </div>
+                           <div class="text-center mt-4">
+                        <a class="text-center" href="<?php echo e(route('showProducts')); ?>"> <button type="button" class="btn btn-outline-primary">
+                                    <?php echo e(__('messages.Display All Products')); ?>
+
+                      </button>
+                      </a>
+                           </div>
                     </div>
 
                     <div class="card-body">
                         <div class="date-time-picker">
                             <div class="row">
                                 <div class="col-md-6 offset-md-3">
-                                    <label for="order_date" class="form-label fs-5">{{ __('messages.Order Date') }} &
-                                        {{ __('messages.Time') }}</label>
+                                    <label for="order_date" class="form-label fs-5"><?php echo e(__('messages.Order Date')); ?> &
+                                        <?php echo e(__('messages.Time')); ?></label>
                                     <input type="text" id="order_date" name="date"
                                         class="form-control form-control-lg" required>
 
-                                    @error('date')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                    <?php $__errorArgs = ['date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                 </div>
 
                             </div>
                             <div class="text-center mt-4">
                                 <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(1)">
-                                    {{ __('messages.Continue to Products') }} <i class="fas fa-arrow-right ms-2"></i>
+                                    <?php echo e(__('messages.Continue to Products')); ?> <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
                         </div>
@@ -116,15 +124,17 @@
                 <div class="custom-card card">
 
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Select Your Products') }}</h3>
+                        <h3 class="text-center"><?php echo e(__('messages.Select Your Products')); ?></h3>
                         <div class="d-flex justify-content-center mt-3">
                             <div class="btn-group" role="group" aria-label="Display mode">
                                 <button type="button" class="btn btn-outline-primary active"
                                     id="available-products-btn">
-                                    {{ __('messages.Available Products') }}
+                                    <?php echo e(__('messages.Available Products')); ?>
+
                                 </button>
                                 <button type="button" class="btn btn-outline-primary" id="all-products-btn">
-                                    {{ __('messages.All Products') }}
+                                    <?php echo e(__('messages.All Products')); ?>
+
                                 </button>
                             </div>
                         </div>
@@ -132,9 +142,9 @@
                     <div class="card-body">
                         <div id="products-loading" class="text-center py-5">
                             <div class="spinner-border" role="status">
-                                <span class="visually-hidden">{{ __('messages.Loading products...') }}</span>
+                                <span class="visually-hidden"><?php echo e(__('messages.Loading products...')); ?></span>
                             </div>
-                            <p class="mt-2 text-muted">{{ __('messages.Loading available products...') }}</p>
+                            <p class="mt-2 text-muted"><?php echo e(__('messages.Loading available products...')); ?></p>
                         </div>
 
                         <div id="products-container" class="product-grid" style="display: none;">
@@ -143,11 +153,12 @@
 
                         <div class="text-center mt-4">
                             <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
-                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                                <i class="fas fa-arrow-left me-2"></i> <?php echo e(__('messages.Back')); ?>
+
                             </button>
                             <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)" disabled
                                 id="review-cart-btn">
-                                {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
+                                <?php echo e(__('messages.Review Cart')); ?> <i class="fas fa-arrow-right ms-2"></i>
                             </button>
                         </div>
                     </div>
@@ -158,7 +169,7 @@
             <div class="step-content" id="step3">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Review Your Cart') }}</h3>
+                        <h3 class="text-center"><?php echo e(__('messages.Review Your Cart')); ?></h3>
                     </div>
                     <div class="card-body">
                         <div id="cart-items">
@@ -167,10 +178,11 @@
 
                         <div class="text-center mt-4">
                             <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(3)">
-                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back to Products') }}
+                                <i class="fas fa-arrow-left me-2"></i> <?php echo e(__('messages.Back to Products')); ?>
+
                             </button>
                             <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(3)">
-                                {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-right ms-2"></i>
+                                <?php echo e(__('messages.Proceed to Checkout')); ?> <i class="fas fa-arrow-right ms-2"></i>
                             </button>
                         </div>
                     </div>
@@ -183,73 +195,107 @@
                     <div class="col-md-7">
                         <div class="custom-card card">
                             <div class="card-header bg-transparent border-0 pt-4">
-                                <h3>{{ __('messages.Complete Your Order') }}</h3>
+                                <h3><?php echo e(__('messages.Complete Your Order')); ?></h3>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="customer_name"
-                                            class="form-label">{{ __('messages.Customer Name') }}</label>
+                                            class="form-label"><?php echo e(__('messages.Customer Name')); ?></label>
                                         <input type="text" class="form-control" id="name" name="name"
-                                            value="{{ old('name') }}" required>
-                                        @error('name')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            value="<?php echo e(old('name')); ?>" required>
+                                        <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label for="phone"
-                                            class="form-label">{{ __('messages.Customer Phone') }}</label>
+                                            class="form-label"><?php echo e(__('messages.Customer Phone')); ?></label>
                                         <input type="tel" class="form-control" id="phone" name="phone"
-                                            value="{{ old('phone') }}" required>
-                                        @error('phone')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            value="<?php echo e(old('phone')); ?>" required>
+                                        <?php $__errorArgs = ['phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label for="phone"
-                                            class="form-label">{{ __('messages.Customer Address') }}</label>
+                                            class="form-label"><?php echo e(__('messages.Customer Address')); ?></label>
                                         <input type="text" class="form-control" id="address" name="address"
-                                            value="{{ old('address') }}" required>
-                                        @error('address')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            value="<?php echo e(old('address')); ?>" required>
+                                        <?php $__errorArgs = ['address'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label for="delivery_id"
-                                            class="form-label">{{ __('messages.Delivery') }}</label>
-                                        <select class="form-select select2" id="delivery_id" name="delivery_id"
-                                            required>
-                                            <option value="" disabled selected>
-                                                {{ __('messages.Select Delivery') }}</option>
+                                            class="form-label"><?php echo e(__('messages.Delivery')); ?></label>
+                                        <select class="form-select select2" id="delivery_id" name="delivery_id" required>
+                                            <option value="" disabled selected><?php echo e(__('messages.Select Delivery')); ?></option>
 
-                                            @foreach ($deliveries as $delivery)
-                                                <option value="{{ $delivery->id }}"
-                                                    data-price="{{ $delivery->price }}"
-                                                    {{ old('delivery_id') == $delivery->id ? 'selected' : '' }}>
-                                                    {{ $delivery->place }}
+                                            <?php $__currentLoopData = $deliveries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $delivery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($delivery->id); ?>"
+                                                    data-price="<?php echo e($delivery->price); ?>"
+                                                    <?php echo e(old('delivery_id') == $delivery->id ? 'selected' : ''); ?>>
+                                                    <?php echo e($delivery->place); ?>
+
                                                 </option>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
-                                        @error('delivery_id')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                        <?php $__errorArgs = ['delivery_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label for="payment_type"
-                                            class="form-label">{{ __('messages.Payment Type') }}</label>
+                                            class="form-label"><?php echo e(__('messages.Payment Type')); ?></label>
                                         <select class="form-control" id="payment_type" name="payment_type" required>
-                                            <option value="">{{ __('messages.Select Payment Type') }}</option>
+                                            <option value=""><?php echo e(__('messages.Select Payment Type')); ?></option>
                                             <option value="cash"
-                                                {{ old('payment_type') == 'cash' ? 'selected' : '' }}>
-                                                {{ __('messages.Cash') }}</option>
+                                                <?php echo e(old('payment_type') == 'cash' ? 'selected' : ''); ?>>
+                                                <?php echo e(__('messages.Cash')); ?></option>
                                         </select>
-                                        @error('payment_type')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                        <?php $__errorArgs = ['payment_type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
 
@@ -258,10 +304,12 @@
                                 <div class="text-center mt-4">
                                     <button type="button" class="btn btn-secondary btn-lg me-3"
                                         onclick="previousStep(4)">
-                                        <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                                        <i class="fas fa-arrow-left me-2"></i> <?php echo e(__('messages.Back')); ?>
+
                                     </button>
                                     <button type="submit" class="btn btn-success btn-lg">
-                                        <i class="fas fa-check me-2"></i> {{ __('messages.Place Order') }}
+                                        <i class="fas fa-check me-2"></i> <?php echo e(__('messages.Place Order')); ?>
+
                                     </button>
                                 </div>
                             </div>
@@ -270,7 +318,7 @@
 
                     <div class="col-md-5">
                         <div class="checkout-summary">
-                            <h4 class="mb-3">{{ __('messages.Order Summary') }}</h4>
+                            <h4 class="mb-3"><?php echo e(__('messages.Order Summary')); ?></h4>
                             <div id="checkout-summary-content">
                                 <!-- Summary content will be populated here -->
                             </div>
@@ -329,7 +377,7 @@
                     fetchAvailableProducts($('#order_date').val());
                 } else {
                     $('#products-container').html(
-                        '<div class="alert alert-info">{{ __('messages.Please select a date first') }}</div>'
+                        '<div class="alert alert-info"><?php echo e(__('messages.Please select a date first')); ?></div>'
                     );
                 }
             });
@@ -377,13 +425,13 @@
 
             // Don't proceed if in All Products mode and trying to go past step 2
             if (step === 2 && $('#all-products-btn').hasClass('active')) {
-                alert('{{ __('messages.Please switch to Available Products mode to select items for purchase') }}');
+                alert('<?php echo e(__('messages.Please switch to Available Products mode to select items for purchase')); ?>');
                 return;
             }
 
             if (step === 2) {
                 if (Object.keys(selectedProducts).length === 0) {
-                    alert('{{ __('messages.Please select at least one product') }}');
+                    alert('<?php echo e(__('messages.Please select at least one product')); ?>');
                     return;
                 }
                 updateCartDisplay();
@@ -425,7 +473,7 @@
             $('#products-container').hide();
 
             $.ajax({
-                url: '{{ route('user.orders.available-products') }}',
+                url: '<?php echo e(route('user.orders.available-products')); ?>',
                 method: 'GET',
                 data: {
                     date: orderDate
@@ -438,7 +486,7 @@
                 },
                 error: function(xhr) {
                     $('#products-loading').hide();
-                    alert('{{ __('messages.Error loading products. Please try again') }}');
+                    alert('<?php echo e(__('messages.Error loading products. Please try again')); ?>');
                 }
             });
         }
@@ -449,7 +497,7 @@
             $('#products-container').hide();
 
             $.ajax({
-                url: '{{ route('user.orders.all-products') }}',
+                url: '<?php echo e(route('user.orders.all-products')); ?>',
                 method: 'GET',
                 success: function(response) {
                     // Display products as non-selectable
@@ -459,7 +507,7 @@
                 },
                 error: function(xhr) {
                     $('#products-loading').hide();
-                    alert('{{ __('messages.Error loading products. Please try again') }}');
+                    alert('<?php echo e(__('messages.Error loading products. Please try again')); ?>');
                 }
             });
         }
@@ -470,7 +518,7 @@
 
             if (products.length === 0) {
                 container.html(
-                    '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p>{{ __('messages.No products available for the selected date') }}</p></div>'
+                    '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p><?php echo e(__('messages.No products available for the selected date')); ?></p></div>'
                 );
                 return;
             }
@@ -498,7 +546,7 @@
                         <div class="product-prices">
                             ${product.offer_price ?
                                 `<span class="price-original">JD ${product.selling_price}</span>
-                                    <span class="price-offer">JD ${product.offer_price}</span>` :
+                                <span class="price-offer">JD ${product.offer_price}</span>` :
                                 `<span class="price-current">JD ${product.selling_price}</span>`
                             }
                         </div>
@@ -507,10 +555,10 @@
                     </div>
                 </div>
                 ${selectable ? `
-                            <div class="selected-overlay">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            ` : ''}
+                        <div class="selected-overlay">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        ` : ''}
             </div>
 
         `;
@@ -552,10 +600,10 @@
 
             if (count > 0) {
                 button.prop('disabled', false);
-                button.html(`{{ __('messages.Review Cart') }} (${count}) <i class="fas fa-arrow-right ms-2"></i>`);
+                button.html(`<?php echo e(__('messages.Review Cart')); ?> (${count}) <i class="fas fa-arrow-right ms-2"></i>`);
             } else {
                 button.prop('disabled', true);
-                button.html('{{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>');
+                button.html('<?php echo e(__('messages.Review Cart')); ?> <i class="fas fa-arrow-right ms-2"></i>');
             }
         }
 
@@ -565,7 +613,7 @@
 
             if (Object.keys(selectedProducts).length === 0) {
                 container.html(
-                    '<div class="empty-state"><i class="fas fa-shopping-cart fa-3x mb-3"></i><p>{{ __('messages.Your cart is empty') }}</p></div>'
+                    '<div class="empty-state"><i class="fas fa-shopping-cart fa-3x mb-3"></i><p><?php echo e(__('messages.Your cart is empty')); ?></p></div>'
                 );
                 return;
             }
@@ -579,7 +627,7 @@
                         <p class="mb-0 text-muted">
                             ${product.offer_price ?
                                 `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
-                                             <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
+                                         <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
                                 `<span>JD ${product.selling_price}</span>`
                             }
                         </p>
@@ -633,19 +681,19 @@
 
             const summary = `
             <div class="summary-item">
-                <span>{{ __('messages.Subtotal') }}:</span>
+                <span><?php echo e(__('messages.Subtotal')); ?>:</span>
                 <span>JD ${subtotal.toFixed(2)}</span>
             </div>
             <div class="summary-item text-success">
-                <span>{{ __('messages.Discount') }}:</span>
+                <span><?php echo e(__('messages.Discount')); ?>:</span>
                 <span>-JD ${totalDiscount.toFixed(2)}</span>
             </div>
             <div class="summary-item">
-                <span>{{ __('messages.Delivery Fee') }}:</span>
+                <span><?php echo e(__('messages.Delivery Fee')); ?>:</span>
                 <span>JD ${deliveryFee.toFixed(2)}</span>
             </div>
             <div class="summary-item total">
-                <span>{{ __('messages.Total') }}:</span>
+                <span><?php echo e(__('messages.Total')); ?>:</span>
                 <span>JD ${total.toFixed(2)}</span>
             </div>
         `;
@@ -761,3 +809,4 @@
 </body>
 
 </html>
+<?php /**PATH C:\xampp\htdocs\game\resources\views/layouts/user.blade.php ENDPATH**/ ?>
