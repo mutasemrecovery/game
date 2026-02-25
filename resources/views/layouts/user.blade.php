@@ -118,15 +118,15 @@
                     <div class="card-header bg-transparent border-0 pt-4">
                         <h3 class="text-center">{{ __('messages.Select Your Products') }}</h3>
                         <div class="d-flex justify-content-center mt-3">
-                                    <div style="max-width: 400px; width: 100%;">
-                                        <input type="text" id="product-search" class="form-control"
-                                            placeholder="{{ __('messages.Search') }}">
-                                    </div>
-                                </div>
+                            <div style="max-width: 400px; width: 100%;">
+                                <input type="text" id="product-search" class="form-control"
+                                    placeholder="{{ __('messages.Search') }}">
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-center mt-3">
-                             
+
                             <div class="btn-group" role="group" aria-label="Display mode">
-                               
+
                                 <button type="button" class="btn btn-outline-primary active"
                                     id="available-products-btn">
                                     {{ __('messages.Available Products') }}
@@ -149,14 +149,15 @@
                             <!-- Products will be loaded here -->
                         </div>
 
-                       <div class="step2-fixed-nav" id="step2-nav">
-    <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
-        <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
-    </button>
-    <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)" disabled id="review-cart-btn">
-        {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
-    </button>
-</div>
+                        <div class="step2-fixed-nav" id="step2-nav">
+                            <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
+                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                            </button>
+                            <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)" disabled
+                                id="review-cart-btn">
+                                {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -425,14 +426,12 @@
         function showStep(step) {
             $('.step-content').removeClass('active');
             $(`#step${step}`).addClass('active');
-            
-            // Show fixed nav only on step 2
+
             if (step === 2) {
-                $('#step2-nav').show();
-                // Add bottom padding so content isn't hidden behind fixed bar
-                $('.container').css('padding-bottom', '80px');
+                $('#step2-nav').css('display', 'block'); // use css() instead of show()
+                $('.container').css('padding-bottom', '100px');
             } else {
-                $('#step2-nav').hide();
+                $('#step2-nav').css('display', 'none'); // use css() instead of hide()
                 $('.container').css('padding-bottom', '20px');
             }
         }
@@ -537,7 +536,7 @@
                         <div class="product-prices">
                             ${product.offer_price ?
                                 `<span class="price-original">JD ${product.selling_price}</span>
-                                        <span class="price-offer">JD ${product.offer_price}</span>` :
+                                            <span class="price-offer">JD ${product.offer_price}</span>` :
                                 `<span class="price-current">JD ${product.selling_price}</span>`
                             }
                         </div>
@@ -546,10 +545,10 @@
                     </div>
                 </div>
                 ${selectable ? `
-                                <div class="selected-overlay">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                ` : ''}
+                                    <div class="selected-overlay">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    ` : ''}
             </div>
 
         `;
@@ -618,7 +617,7 @@
                         <p class="mb-0 text-muted">
                             ${product.offer_price ?
                                 `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
-                                                 <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
+                                                     <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
                                 `<span>JD ${product.selling_price}</span>`
                             }
                         </p>
