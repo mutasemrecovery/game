@@ -30,38 +30,47 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
+        // If new filter submitted, save to session
+        if ($request->isMethod('get') && $request->anyFilled(['from_date', 'to_date', 'number', 'user_name', 'delivery_place'])) {
+            session(['orders_filters' => $request->only(['from_date', 'to_date', 'number', 'user_name', 'delivery_place'])]);
+        }
+
+        // If reset button clicked, clear session
+        if ($request->has('reset')) {
+            session()->forget('orders_filters');
+        }
+
+        // Merge session filters with current request
+        $filters = session('orders_filters', []);
+        $request->mergeIfMissing($filters);
+
         $query = Order::query()->latest();
 
-        // Optional date filter
         if ($request->filled('from_date') && $request->filled('to_date')) {
             $query->whereDate('date', '>=', $request->from_date)
                 ->whereDate('date', '<=', $request->to_date);
         }
 
-        // Filter by order number
         if ($request->filled('number')) {
             $query->where('number', 'like', '%' . $request->number . '%');
         }
 
-        // Filter by user name
         if ($request->filled('user_name')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->user_name . '%');
             });
         }
 
-        // Filter by delivery place
         if ($request->filled('delivery_place')) {
             $query->whereHas('delivery', function ($q) use ($request) {
                 $q->where('place', 'like', '%' . $request->delivery_place . '%');
             });
         }
 
-        $deliveries = Delivery::all(); // for the dropdown
-
+        $deliveries = Delivery::all();
         $data = $query->paginate(PAGINATION_COUNT);
 
-        return view('admin.orders.index', compact('data','deliveries'));
+        return view('admin.orders.index', compact('data', 'deliveries', 'filters'));
     }
 
 

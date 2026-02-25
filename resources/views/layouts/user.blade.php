@@ -118,7 +118,15 @@
                     <div class="card-header bg-transparent border-0 pt-4">
                         <h3 class="text-center">{{ __('messages.Select Your Products') }}</h3>
                         <div class="d-flex justify-content-center mt-3">
+                                    <div style="max-width: 400px; width: 100%;">
+                                        <input type="text" id="product-search" class="form-control"
+                                            placeholder="{{ __('messages.Search') }}">
+                                    </div>
+                                </div>
+                        <div class="d-flex justify-content-center mt-3">
+                             
                             <div class="btn-group" role="group" aria-label="Display mode">
+                               
                                 <button type="button" class="btn btn-outline-primary active"
                                     id="available-products-btn">
                                     {{ __('messages.Available Products') }}
@@ -141,15 +149,14 @@
                             <!-- Products will be loaded here -->
                         </div>
 
-                        <div class="text-center mt-4">
-                            <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
-                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
-                            </button>
-                            <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)" disabled
-                                id="review-cart-btn">
-                                {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
-                            </button>
-                        </div>
+                       <div class="step2-fixed-nav" id="step2-nav">
+    <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
+        <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+    </button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)" disabled id="review-cart-btn">
+        {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
+    </button>
+</div>
                     </div>
                 </div>
             </div>
@@ -418,6 +425,16 @@
         function showStep(step) {
             $('.step-content').removeClass('active');
             $(`#step${step}`).addClass('active');
+            
+            // Show fixed nav only on step 2
+            if (step === 2) {
+                $('#step2-nav').show();
+                // Add bottom padding so content isn't hidden behind fixed bar
+                $('.container').css('padding-bottom', '80px');
+            } else {
+                $('#step2-nav').hide();
+                $('.container').css('padding-bottom', '20px');
+            }
         }
 
         function fetchAvailableProducts(orderDate) {
@@ -464,7 +481,29 @@
             });
         }
 
+        $(document).on('input', '#product-search', function() {
+            const searchTerm = $(this).val().toLowerCase().trim();
+
+            $('.product-card').each(function() {
+                const productId = $(this).data('product-id');
+                const product = productsData.find(p => p.id === productId);
+                if (!product) return;
+
+                const nameAr = (product.name_ar || '').toLowerCase();
+                const nameEn = (product.name_en || '').toLowerCase();
+                const description = (product.description_ar || product.description_en || '').toLowerCase();
+
+                if (!searchTerm || nameAr.includes(searchTerm) || nameEn.includes(searchTerm) || description
+                    .includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
         function displayProducts(products, selectable = true) {
+            $('#product-search').val('');
             const container = $('#products-container');
             container.empty();
 
@@ -498,7 +537,7 @@
                         <div class="product-prices">
                             ${product.offer_price ?
                                 `<span class="price-original">JD ${product.selling_price}</span>
-                                    <span class="price-offer">JD ${product.offer_price}</span>` :
+                                        <span class="price-offer">JD ${product.offer_price}</span>` :
                                 `<span class="price-current">JD ${product.selling_price}</span>`
                             }
                         </div>
@@ -507,10 +546,10 @@
                     </div>
                 </div>
                 ${selectable ? `
-                            <div class="selected-overlay">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            ` : ''}
+                                <div class="selected-overlay">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                ` : ''}
             </div>
 
         `;
@@ -579,7 +618,7 @@
                         <p class="mb-0 text-muted">
                             ${product.offer_price ?
                                 `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
-                                             <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
+                                                 <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
                                 `<span>JD ${product.selling_price}</span>`
                             }
                         </p>

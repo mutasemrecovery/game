@@ -670,22 +670,15 @@
 
     <script>
         // Product images data from Laravel
-        const productImages = {
-            @foreach ($products as $product)
-                {{ $product->id }}: [
-                    @if (is_object($product->productImages))
-                        // Single image relationship
-                        '{{ asset('assets/admin/uploads/' . $product->productImages->first()->photo) }}'
-                    @elseif (is_iterable($product->productImages))
-                        // Multiple images relationship
-                        @foreach ($product->productImages as $image)
-                            '{{ asset('assets/admin/uploads/' . $image->photo) }}'
-                            {{ !$loop->last ? ',' : '' }}
-                        @endforeach
-                    @endif
-                ] {{ !$loop->last ? ',' : '' }}
+       const productImages = {
+    @foreach ($products as $product)
+        {{ $product->id }}: [
+            @foreach ($product->productImages as $image)
+                '{{ asset('assets/admin/uploads/' . $image->photo) }}'{{ !$loop->last ? ',' : '' }}
             @endforeach
-        };
+        ]{{ !$loop->last ? ',' : '' }}
+    @endforeach
+};
 
         let currentProduct = null;
         let currentImageIndex = 0;

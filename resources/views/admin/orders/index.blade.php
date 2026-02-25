@@ -19,41 +19,48 @@
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-                   <form method="GET" action="{{ route('orders.index') }}">
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label>{{ __('messages.from_date') }}</label>
-                                <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label>{{ __('messages.to_date') }}</label>
-                                <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
-                            </div>
-                            <div class="col-md-2">
-                                <label>{{ __('messages.Number') }}</label>
-                                <input type="text" name="number" class="form-control" placeholder="Search #" value="{{ request('number') }}">
-                            </div>
-                            <div class="col-md-2">
-                                <label>{{ __('messages.User') }}</label>
-                                <input type="text" name="user_name" class="form-control" placeholder="User Name" value="{{ request('user_name') }}">
-                            </div>
-                            <div class="col-md-2">
-                                <label>{{ __('messages.delivery_place') }}</label>
-                                <select name="delivery_place" class="form-control">
-                                    <option value="">{{ __('messages.choose') }}</option>
-                                    @foreach ($deliveries as $delivery)
-                                        <option value="{{ $delivery->place }}" {{ request('delivery_place') == $delivery->place ? 'selected' : '' }}>
-                                            {{ $delivery->place }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end gap-1">
-                                <button type="submit" class="btn btn-primary w-100">{{ __('messages.Search') }}</button>
-                                <a href="{{ route('orders.index') }}" class="btn btn-secondary w-100">{{ __('messages.reset') }}</a>
-                            </div>
-                        </div>
-                    </form>
+            <form method="GET" action="{{ route('orders.index') }}">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label>{{ __('messages.from_date') }}</label>
+                        <input type="date" name="from_date" class="form-control"
+                            value="{{ request('from_date', $filters['from_date'] ?? '') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>{{ __('messages.to_date') }}</label>
+                        <input type="date" name="to_date" class="form-control"
+                            value="{{ request('to_date', $filters['to_date'] ?? '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('messages.Number') }}</label>
+                        <input type="text" name="number" class="form-control" placeholder="Search #"
+                            value="{{ request('number', $filters['number'] ?? '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('messages.User') }}</label>
+                        <input type="text" name="user_name" class="form-control" placeholder="User Name"
+                            value="{{ request('user_name', $filters['user_name'] ?? '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('messages.delivery_place') }}</label>
+                        <select name="delivery_place" class="form-control">
+                            <option value="">{{ __('messages.choose') }}</option>
+                            @foreach ($deliveries as $delivery)
+                                <option value="{{ $delivery->place }}"
+                                    {{ request('delivery_place', $filters['delivery_place'] ?? '') == $delivery->place ? 'selected' : '' }}>
+                                    {{ $delivery->place }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end gap-1">
+                        <button type="submit" class="btn btn-primary w-100">{{ __('messages.Search') }}</button>
+                        <a href="{{ route('orders.index', ['reset' => 1]) }}" class="btn btn-secondary w-100">
+                            {{ __('messages.reset') }}
+                        </a>
+                    </div>
+                </div>
+            </form>
 
 
 
@@ -72,6 +79,8 @@
                                 <th>{{ __('messages.user') }}</th>
                                 <th>{{ __('messages.delivery') }}</th>
                                 <th>{{ __('messages.date') }}</th>
+                                <th>{{ __('messages.Phone') }}</th>
+                                <th>{{ __('messages.products') }}</th>
                                 <th>{{ __('messages.Action') }}</th>
                             </thead>
                             <tbody>
@@ -99,6 +108,12 @@
                                         <td>{{ $info->user->name }}</td>
                                         <td>{{ $info->delivery->place ?? null }}<br>{{ $info->address }}</td>
                                         <td>{{ $info->date }}</td>
+                                        <td>{{ $info->user->phone ?? '-' }}</td>
+<td>
+    @foreach($info->orderProducts as $item)
+        <small>{{ $item->product->name_ar }} ({{ $item->quantity }})</small><br>
+    @endforeach
+</td>
 
                                         <td>
                                             @if ($info->order_status != 6 && $info->order_status != 3)
@@ -108,10 +123,10 @@
                                                 @endcan
                                             @endif
 
-                                             @can('order-table')
-                                                    <a href="{{ route('orders.show', $info->id) }}"
-                                                        class="btn btn-sm btn-secondary">{{ __('messages.Show') }}</a>
-                                             @endcan
+                                            @can('order-table')
+                                                <a href="{{ route('orders.show', $info->id) }}"
+                                                    class="btn btn-sm btn-secondary">{{ __('messages.Show') }}</a>
+                                            @endcan
 
                                         </td>
                                     </tr>
@@ -119,8 +134,7 @@
                             </tbody>
                         </table>
                         <br>
-                       {{ $data->appends(request()->query())->links() }}
-
+                        {{ $data->appends(request()->query())->links() }}
                     @else
                         <div class="alert alert-danger">
                             {{ __('messages.No_data') }} </div>

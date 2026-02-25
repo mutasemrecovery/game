@@ -670,24 +670,17 @@
 
     <script>
         // Product images data from Laravel
-        const productImages = {
-            <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <?php echo e($product->id); ?>: [
-                    <?php if(is_object($product->productImages)): ?>
-                        // Single image relationship
-                        '<?php echo e(asset('assets/admin/uploads/' . $product->productImages->first()->photo)); ?>'
-                    <?php elseif(is_iterable($product->productImages)): ?>
-                        // Multiple images relationship
-                        <?php $__currentLoopData = $product->productImages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            '<?php echo e(asset('assets/admin/uploads/' . $image->photo)); ?>'
-                            <?php echo e(!$loop->last ? ',' : ''); ?>
-
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    <?php endif; ?>
-                ] <?php echo e(!$loop->last ? ',' : ''); ?>
+       const productImages = {
+    <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php echo e($product->id); ?>: [
+            <?php $__currentLoopData = $product->productImages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                '<?php echo e(asset('assets/admin/uploads/' . $image->photo)); ?>'<?php echo e(!$loop->last ? ',' : ''); ?>
 
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        };
+        ]<?php echo e(!$loop->last ? ',' : ''); ?>
+
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+};
 
         let currentProduct = null;
         let currentImageIndex = 0;
