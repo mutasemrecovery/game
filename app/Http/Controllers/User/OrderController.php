@@ -44,10 +44,11 @@ class OrderController extends Controller
 
             $delivery = Delivery::find($validatedData['delivery_id']);
 
-            $user = User::create([
-                'name' => $validatedData['name'],
-                'phone' => $validatedData['phone'],
-            ]);
+           // AFTER
+            $user = User::firstOrCreate(
+                ['phone' => $validatedData['phone']],  // search by phone
+                ['name'  => $validatedData['name']]    // only set name if creating new
+            );
             // Create order
             $order = Order::create([
                 'number' => $orderNumber,
