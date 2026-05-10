@@ -55,9 +55,19 @@
                       <div class="col-md-6">
                         <div class="form-group">
                             <label for="address">{{ __('messages.Address') }}</label>
-                            <input type="text" class="form-control" id="address" name="address" 
+                            <input type="text" class="form-control" id="address" name="address"
                                 value="{{ old('address',$order->address) }}" required>
                             @error('address')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="note">{{ __('messages.Note') }}</label>
+                            <textarea class="form-control" id="note" name="note" rows="3">{{ old('note', $order->note) }}</textarea>
+                            @error('note')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

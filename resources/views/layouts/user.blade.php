@@ -31,10 +31,64 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    <style>
+        .booked-product {
+            pointer-events: none;
+            opacity: 0.6;
+            position: relative;
+        }
+        .booked-product .product-image-container button {
+            pointer-events: auto;
+        }
+        .booked-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: inherit;
+        }
+        .booked-overlay span {
+            background: #dc3545;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 6px 22px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+        .product-card {
+            position: relative;
+        }
+        .step1-fixed-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #dee2e6;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+        }
+        .products-section-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #333;
+        }
+        #modalMainImg {
+            max-height: 75vh;
+            object-fit: contain;
+        }
+    </style>
+
     @yield('css')
 </head>
-
-
 
 <body>
 
@@ -44,140 +98,94 @@
         </div>
     </div>
 
-    <div class="container">
-        <!-- Step Indicator -->
-        <div class="step-indicator">
-            <div class="row">
-                <div class="col-md-3 col-6 step active">
-                    <div class="step-number">1</div>
-                    <div class="step-title">{{ __('messages.Date & Time') }}</div>
-                </div>
-                <div class="col-md-3 col-6 step">
-                    <div class="step-number">2</div>
-                    <div class="step-title">{{ __('messages.Select Products') }}</div>
-                </div>
-                <div class="col-md-3 col-6 step">
-                    <div class="step-number">3</div>
-                    <div class="step-title">{{ __('messages.Review Cart') }}</div>
-                </div>
-                <div class="col-md-3 col-6 step">
-                    <div class="step-number">4</div>
-                    <div class="step-title">{{ __('messages.Checkout') }}</div>
-                </div>
-            </div>
-        </div>
+    <div class="container" id="main-container">
 
         <form action="{{ route('userOrders.store') }}" method="post" enctype='multipart/form-data'>
             @csrf
 
-            <!-- Step 1: Date & Time -->
+            <!-- Step 1: Date & Products -->
             <div class="step-content active" id="step1">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Select Order Date') }} & {{ __('messages.Time') }}
-                        </h3>
-                        <div class="text-center mt-4">
-                            <a class="text-center" href="{{ route('showProducts') }}"> <button type="button"
-                                    class="btn btn-outline-primary">
-                                    {{ __('messages.Display All Products') }}
-                                </button>
-                            </a>
-                        </div>
+                        <h3 class="text-center">{{ __('messages.Select Order Date') }}</h3>
                     </div>
 
                     <div class="card-body">
-                        <div class="date-time-picker">
-                            <div class="row">
-                                <div class="col-md-6 offset-md-3">
-                                    <label for="order_date" class="form-label fs-5">{{ __('messages.Order Date') }} &
-                                        {{ __('messages.Time') }}</label>
-                                    <input type="text" id="order_date" name="date"
-                                        class="form-control form-control-lg" required>
+                        <!-- Date picker -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 offset-md-3">
+                                <label for="order_date" class="form-label fs-5">{{ __('messages.Order Date') }}</label>
+                                <input type="text" id="order_date" name="date"
+                                    class="form-control form-control-lg" required>
 
-                                    @error('date')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                @error('date')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Products section -->
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                <span class="products-section-title">{{ __('messages.Select Your Products') }}</span>
+                                <div style="max-width: 320px; width: 100%;">
+                                    <input type="text" id="product-search" class="form-control"
+                                        placeholder="{{ __('messages.Search') }}">
                                 </div>
-
                             </div>
-                            <div class="text-center mt-4">
-                                <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(1)">
-                                    {{ __('messages.Continue to Products') }} <i class="fas fa-arrow-right ms-2"></i>
+
+                            <div id="products-loading" class="text-center py-5">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">{{ __('messages.Loading products...') }}</span>
+                                </div>
+                                <p class="mt-2 text-muted">{{ __('messages.Loading available products...') }}</p>
+                            </div>
+
+                            <div id="products-container" class="product-grid" style="display: none;">
+                                <!-- Products loaded here -->
+                            </div>
+
+                            <!-- Inline notice shown when user tries to select without a date -->
+                            <div id="no-date-notice" style="display:none;"
+                                 class="alert alert-warning mt-3 text-center">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                {{ __('messages.Please select a date first to check availability') }}
+                                <button type="button" class="btn btn-sm btn-primary ms-3" onclick="openDatePicker()">
+                                    {{ __('messages.Select Date') }}
                                 </button>
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- Fixed bottom nav for step 1 -->
+                <div class="step1-fixed-nav" id="step1-nav">
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">
+                        <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="goToCart()" disabled
+                        id="review-cart-btn">
+                        {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- Step 2: Product Selection -->
+            <!-- Step 2: Review Cart -->
             <div class="step-content" id="step2">
-                <div class="custom-card card">
-
-                    <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Select Your Products') }}</h3>
-                        <div class="d-flex justify-content-center mt-3">
-                            <div style="max-width: 400px; width: 100%;">
-                                <input type="text" id="product-search" class="form-control"
-                                    placeholder="{{ __('messages.Search') }}">
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center mt-3">
-
-                            <div class="btn-group" role="group" aria-label="Display mode">
-
-                                <button type="button" class="btn btn-outline-primary active"
-                                    id="available-products-btn">
-                                    {{ __('messages.Available Products') }}
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" id="all-products-btn">
-                                    {{ __('messages.All Products') }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="products-loading" class="text-center py-5">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">{{ __('messages.Loading products...') }}</span>
-                            </div>
-                            <p class="mt-2 text-muted">{{ __('messages.Loading available products...') }}</p>
-                        </div>
-
-                        <div id="products-container" class="product-grid" style="display: none;">
-                            <!-- Products will be loaded here -->
-                        </div>
-
-                        <div class="step2-fixed-nav" id="step2-nav">
-                            <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
-                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
-                            </button>
-                            <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)" disabled
-                                id="review-cart-btn">
-                                {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3: Review Cart -->
-            <div class="step-content" id="step3">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
                         <h3 class="text-center">{{ __('messages.Review Your Cart') }}</h3>
                     </div>
                     <div class="card-body">
                         <div id="cart-items">
-                            <!-- Cart items will be displayed here -->
+                            <!-- Cart items displayed here -->
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(3)">
-                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back to Products') }}
+                            <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
+                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
                             </button>
-                            <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(3)">
+                            <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)">
                                 {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-right ms-2"></i>
                             </button>
                         </div>
@@ -185,8 +193,8 @@
                 </div>
             </div>
 
-            <!-- Step 4: Checkout -->
-            <div class="step-content" id="step4">
+            <!-- Step 3: Checkout -->
+            <div class="step-content" id="step3">
                 <div class="row">
                     <div class="col-md-7">
                         <div class="custom-card card">
@@ -196,8 +204,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="customer_name"
-                                            class="form-label">{{ __('messages.Customer Name') }}</label>
+                                        <label for="name" class="form-label">{{ __('messages.Customer Name') }}</label>
                                         <input type="text" class="form-control" id="name" name="name"
                                             value="{{ old('name') }}" required>
                                         @error('name')
@@ -206,8 +213,7 @@
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="phone"
-                                            class="form-label">{{ __('messages.Customer Phone') }}</label>
+                                        <label for="phone" class="form-label">{{ __('messages.Customer Phone') }}</label>
                                         <input type="tel" class="form-control" id="phone" name="phone"
                                             value="{{ old('phone') }}" required>
                                         @error('phone')
@@ -216,8 +222,7 @@
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="phone"
-                                            class="form-label">{{ __('messages.Customer Address') }}</label>
+                                        <label for="address" class="form-label">{{ __('messages.Customer Address') }}</label>
                                         <input type="text" class="form-control" id="address" name="address"
                                             value="{{ old('address') }}" required>
                                         @error('address')
@@ -226,10 +231,8 @@
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="delivery_id"
-                                            class="form-label">{{ __('messages.Delivery') }}</label>
-                                        <select class="form-select select2" id="delivery_id" name="delivery_id"
-                                            required>
+                                        <label for="delivery_id" class="form-label">{{ __('messages.Delivery') }}</label>
+                                        <select class="form-select select2" id="delivery_id" name="delivery_id" required>
                                             <option value="" disabled selected>
                                                 {{ __('messages.Select Delivery') }}</option>
 
@@ -246,29 +249,48 @@
                                         @enderror
                                     </div>
 
+                                    <!-- Time picker -->
                                     <div class="col-md-6 mb-3">
-                                        <label for="payment_type"
-                                            class="form-label">{{ __('messages.Payment Type') }}</label>
-                                        <select class="form-control" id="payment_type" name="payment_type" required>
-                                            <option value="">{{ __('messages.Select Payment Type') }}</option>
-                                            <option value="cash"
-                                                {{ old('payment_type') == 'cash' ? 'selected' : '' }}>
-                                                {{ __('messages.Cash') }}</option>
-                                        </select>
-                                        @error('payment_type')
+                                        <label class="form-label">{{ __('messages.Order Time') }}</label>
+                                        <div class="d-flex gap-2">
+                                            <select id="time_hour" class="form-control" >
+                                                @for($h = 1; $h <= 12; $h++)
+                                                    <option value="{{ $h }}">{{ $h }}</option>
+                                                @endfor
+                                            </select>
+                                            <select id="time_minute" class="form-control" >
+                                                <option value="00">00</option>
+                                                <option value="15">15</option>
+                                                <option value="30">30</option>
+                                                <option value="45">45</option>
+                                            </select>
+                                            <select id="time_period" class="form-control">
+                                                <option value="AM">ص</option>
+                                                <option value="PM">م</option>
+                                            </select>
+                                        </div>
+                                        <input type="hidden" name="order_time" id="order_time">
+                                    </div>
+
+                                    <!-- Note field -->
+                                    <div class="col-md-12 mb-3">
+                                        <label for="note" class="form-label">{{ __('messages.Note') }}</label>
+                                        <textarea class="form-control" id="note" name="note" rows="3"
+                                            placeholder="{{ __('messages.Optional note') }}">{{ old('note') }}</textarea>
+                                        @error('note')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
                                     </div>
-
 
                                 </div>
 
                                 <div class="text-center mt-4">
                                     <button type="button" class="btn btn-secondary btn-lg me-3"
-                                        onclick="previousStep(4)">
+                                        onclick="previousStep(3)">
                                         <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
                                     </button>
-                                    <button type="submit" class="btn btn-success btn-lg">
+                                    <button type="submit" class="btn btn-success btn-lg"
+                                        onclick="combineOrderTime()">
                                         <i class="fas fa-check me-2"></i> {{ __('messages.Place Order') }}
                                     </button>
                                 </div>
@@ -280,14 +302,14 @@
                         <div class="checkout-summary">
                             <h4 class="mb-3">{{ __('messages.Order Summary') }}</h4>
                             <div id="checkout-summary-content">
-                                <!-- Summary content will be populated here -->
+                                <!-- Summary populated here -->
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Hidden fields for calculated values -->
+            <!-- Hidden fields -->
             <input type="hidden" name="total_prices" id="hidden_total_prices">
             <input type="hidden" name="total_discounts" id="hidden_total_discounts">
             <input type="hidden" name="products_data" id="hidden_products_data">
@@ -295,13 +317,43 @@
         </form>
     </div>
 
+    <!-- Photo Gallery Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="padding:10px 15px;">
+                    <h5 class="modal-title" id="imageModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0" style="background:#111; position:relative; min-height:200px; display:flex; align-items:center; justify-content:center;">
+                    <img id="modalMainImg" src="" alt=""
+                         style="display:block; max-height:75vh; max-width:100%; width:100%; object-fit:contain;">
+                    <!-- prev -->
+                    <button id="modalPrevBtn" type="button" onclick="changeModalPhoto(-1)"
+                            style="display:none; position:absolute; left:0; top:0; bottom:0; background:rgba(0,0,0,0.35); border:none; color:#fff; padding:0 14px; font-size:1.4rem; cursor:pointer;">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <!-- next -->
+                    <button id="modalNextBtn" type="button" onclick="changeModalPhoto(1)"
+                            style="display:none; position:absolute; right:0; top:0; bottom:0; background:rgba(0,0,0,0.35); border:none; color:#fff; padding:0 14px; font-size:1.4rem; cursor:pointer;">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <!-- counter -->
+                    <span id="photoCounter"
+                          style="display:none; position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.55); color:#fff; padding:2px 10px; border-radius:12px; font-size:0.85rem;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script>
         flatpickr("#order_date", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
+            enableTime: false,
+            dateFormat: "Y-m-d",
             disableMobile: true,
             locale: {
                 weekdays: {
@@ -315,193 +367,147 @@
             }
         });
     </script>
+
     <script>
         let selectedProducts = {};
         let currentStep = 1;
         let productsData = [];
 
-        $(document).ready(function() {
-            // Initialize Select2
-            $('.select2').select2({
-                theme: 'bootstrap-5'
-            });
+        $(document).ready(function () {
+            $('.select2').select2({ theme: 'bootstrap-5' });
 
-            $('#available-products-btn').on('click', function() {
-                $(this).addClass('active');
-                $('#all-products-btn').removeClass('active');
+            // Load all products on page start so user can browse
+            fetchAllProducts();
 
-                // Show Review Cart button
-                $('#review-cart-btn').show();
-
-                if ($('#order_date').val()) {
-                    fetchAvailableProducts($('#order_date').val());
+            // When date changes, reload products with availability info
+            $('#order_date').on('change', function () {
+                const date = $(this).val();
+                $('#no-date-notice').hide();
+                if (date) {
+                    fetchAvailableProducts(date);
                 } else {
-                    $('#products-container').html(
-                        '<div class="alert alert-info">{{ __('messages.Please select a date first') }}</div>'
-                    );
+                    fetchAllProducts();
                 }
             });
 
-            $('#all-products-btn').on('click', function() {
-                $(this).addClass('active');
-                $('#available-products-btn').removeClass('active');
-
-                // Hide Review Cart button
-                $('#review-cart-btn').hide();
-
-                fetchAllProducts();
-            });
-
-            // When order date changes, fetch available products
-            $('#order_date').on('change', function() {
-                var orderDate = $(this).val();
-                if (orderDate) {
-                    fetchAvailableProducts(orderDate);
-                }
-            });
-
-            // When delivery changes, update totals
-            $('#delivery_id').on('change', function() {
+            $('#delivery_id').on('change', function () {
                 updateCheckoutSummary();
             });
         });
 
-        function nextStep(step) {
-            if (step === 1) {
-                if (!$('#order_date').val() && $('#available-products-btn').hasClass('active')) {
-                    $('#order_date').addClass('is-invalid');
-                    return;
-                }
-                $('#order_date').removeClass('is-invalid');
+        // ── Navigation ──────────────────────────────────────────────
 
-                // If switching to step 2 and "Available Products" is active, load them
-                if ($('#available-products-btn').hasClass('active') && $('#order_date').val()) {
-                    fetchAvailableProducts($('#order_date').val());
-                } else if ($('#all-products-btn').hasClass('active')) {
-                    // If "All Products" is active, load all products as non-selectable
-                    fetchAllProducts();
-                }
-            }
-
-            // Don't proceed if in All Products mode and trying to go past step 2
-            if (step === 2 && $('#all-products-btn').hasClass('active')) {
-                alert('{{ __('messages.Please switch to Available Products mode to select items for purchase') }}');
+        function goToCart() {
+            if (!$('#order_date').val()) {
+                $('#order_date').addClass('is-invalid');
                 return;
             }
+            $('#order_date').removeClass('is-invalid');
 
+            if (Object.keys(selectedProducts).length === 0) {
+                alert('{{ __('messages.Please select at least one product') }}');
+                return;
+            }
+            updateCartDisplay();
+            currentStep = 2;
+            showStep(2);
+        }
+
+        function nextStep(step) {
             if (step === 2) {
-                if (Object.keys(selectedProducts).length === 0) {
-                    alert('{{ __('messages.Please select at least one product') }}');
-                    return;
-                }
-                updateCartDisplay();
-            }
-
-            if (step === 3) {
                 updateCheckoutSummary();
+                currentStep = 3;
+                showStep(3);
             }
-
-            currentStep = step + 1;
-            updateStepIndicator();
-            showStep(currentStep);
         }
 
         function previousStep(step) {
             currentStep = step - 1;
-            updateStepIndicator();
             showStep(currentStep);
-        }
-
-        function updateStepIndicator() {
-            $('.step').removeClass('active completed');
-            for (let i = 1; i <= 4; i++) {
-                if (i < currentStep) {
-                    $(`.step:nth-child(${i})`).addClass('completed');
-                } else if (i === currentStep) {
-                    $(`.step:nth-child(${i})`).addClass('active');
-                }
-            }
         }
 
         function showStep(step) {
             $('.step-content').removeClass('active');
-            $(`#step${step}`).addClass('active');
+            $('#step' + step).addClass('active');
 
-            if (step === 2) {
-                $('#step2-nav').css('display', 'block'); // use css() instead of show()
-                $('.container').css('padding-bottom', '100px');
+            if (step === 1) {
+                $('#step1-nav').show();
+                $('#main-container').css('padding-bottom', '90px');
             } else {
-                $('#step2-nav').css('display', 'none'); // use css() instead of hide()
-                $('.container').css('padding-bottom', '20px');
+                $('#step1-nav').hide();
+                $('#main-container').css('padding-bottom', '20px');
             }
+
+            window.scrollTo(0, 0);
         }
 
-        function fetchAvailableProducts(orderDate) {
-            $('#products-loading').show();
-            $('#products-container').hide();
+        // ── Product loading ──────────────────────────────────────────
 
-            $.ajax({
-                url: '{{ route('user.orders.available-products') }}',
-                method: 'GET',
-                data: {
-                    date: orderDate
-                },
-                success: function(response) {
-                    productsData = response.products;
-                    displayProducts(response.products);
-                    $('#products-loading').hide();
-                    $('#products-container').show();
-                },
-                error: function(xhr) {
-                    $('#products-loading').hide();
-                    alert('{{ __('messages.Error loading products. Please try again') }}');
-                }
-            });
-        }
-
-        // Add this function to fetch all products
         function fetchAllProducts() {
-            $('#products-loading').show();
-            $('#products-container').hide();
-
+            showProductsLoading();
             $.ajax({
                 url: '{{ route('user.orders.all-products') }}',
                 method: 'GET',
-                success: function(response) {
-                    // Display products as non-selectable
-                    displayProducts(response.products, false);
-                    $('#products-loading').hide();
-                    $('#products-container').show();
+                success: function (response) {
+                    productsData = response.products;
+                    displayProducts(response.products);
                 },
-                error: function(xhr) {
-                    $('#products-loading').hide();
+                error: function () {
+                    hideProductsLoading();
                     alert('{{ __('messages.Error loading products. Please try again') }}');
                 }
             });
         }
 
-        $(document).on('input', '#product-search', function() {
-            const searchTerm = $(this).val().toLowerCase().trim();
-
-            $('.product-card').each(function() {
-                const productId = $(this).data('product-id');
-                const product = productsData.find(p => p.id === productId);
-                if (!product) return;
-
-                const nameAr = (product.name_ar || '').toLowerCase();
-                const nameEn = (product.name_en || '').toLowerCase();
-                const description = (product.description_ar || product.description_en || '').toLowerCase();
-
-                if (!searchTerm || nameAr.includes(searchTerm) || nameEn.includes(searchTerm) || description
-                    .includes(searchTerm)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
+        function fetchAvailableProducts(date) {
+            showProductsLoading();
+            $.ajax({
+                url: '{{ route('user.orders.available-products') }}',
+                method: 'GET',
+                data: { date: date },
+                success: function (response) {
+                    productsData = response.products;
+                    displayProducts(response.products);
+                },
+                error: function () {
+                    hideProductsLoading();
+                    alert('{{ __('messages.Error loading products. Please try again') }}');
                 }
+            });
+        }
+
+        function showProductsLoading() {
+            $('#products-loading').show();
+            $('#products-container').hide();
+        }
+
+        function hideProductsLoading() {
+            $('#products-loading').hide();
+            $('#products-container').show();
+        }
+
+        // ── Search ───────────────────────────────────────────────────
+
+        $(document).on('input', '#product-search', function () {
+            const term = $(this).val().toLowerCase().trim();
+            $('.product-card').each(function () {
+                const pid = $(this).data('product-id');
+                const p = productsData.find(x => x.id === pid);
+                if (!p) return;
+                const match = !term
+                    || (p.name_ar || '').toLowerCase().includes(term)
+                    || (p.name_en || '').toLowerCase().includes(term)
+                    || (p.description_ar || p.description_en || '').toLowerCase().includes(term);
+                $(this).toggle(match);
             });
         });
 
-        function displayProducts(products, selectable = true) {
+        // ── Display products ─────────────────────────────────────────
+
+        function displayProducts(products) {
+            // Booked products appear first
+            products = [...products].sort((a, b) => (b.booked ? 1 : 0) - (a.booked ? 1 : 0));
+
             $('#product-search').val('');
             const container = $('#products-container');
             container.empty();
@@ -510,92 +516,109 @@
                 container.html(
                     '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p>{{ __('messages.No products available for the selected date') }}</p></div>'
                 );
+                hideProductsLoading();
                 return;
             }
 
-            products.forEach(function(product) {
-                const discount = product.offer_price ? ((product.selling_price - product.offer_price) / product
-                    .selling_price * 100).toFixed(0) : 0;
+            products.forEach(function (product) {
+                const discount = product.offer_price
+                    ? ((product.selling_price - product.offer_price) / product.selling_price * 100).toFixed(0)
+                    : 0;
+                const isBooked = product.booked === true;
+                const name = product.name_en || product.name_ar;
 
-                const productCard = `
-            <div class="product-card ${!selectable ? 'not-selectable' : ''}" data-product-id="${product.id}" ${selectable ? `onclick="toggleProduct(${product.id})"` : ''}>
+                const card = `
+                    <div class="product-card ${isBooked ? 'booked-product' : ''}"
+                         data-product-id="${product.id}"
+                         ${!isBooked ? `onclick="toggleProduct(${product.id})"` : ''}>
 
-                <div class="product-image-container">
-                    <button type="button" onclick="viewFullImage('${product.image}', '${product.name_en || product.name_ar}', event)">
+                        ${isBooked ? `<div class="booked-overlay"><span>{{ __('messages.Booked') }}</span></div>` : ''}
 
-                    <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="product-image">
-                    ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
-                        <i class="fas fa-search-plus"></i>
-                        </button>
-                </div>
-
-                <div class="product-info">
-                    <div class="info-row">
-                        <div>
-                        <h5 class="product-name">${product.name_en || product.name_ar}</h5>
-                        <div class="product-prices">
-                            ${product.offer_price ?
-                                `<span class="price-original">JD ${product.selling_price}</span>
-                                            <span class="price-offer">JD ${product.offer_price}</span>` :
-                                `<span class="price-current">JD ${product.selling_price}</span>`
-                            }
+                        <div class="product-image-container">
+                            <button type="button"
+                                    onclick="viewProductPhotos(${product.id}, event)">
+                                <img src="${product.image}" alt="${name}" class="product-image">
+                                ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
+                                <i class="fas fa-search-plus"></i>
+                            </button>
                         </div>
-                        </div>
-                        <button type="button" class="select-button">select</button>
-                    </div>
-                </div>
-                ${selectable ? `
-                                    <div class="selected-overlay">
-                                        <i class="fas fa-check-circle"></i>
+
+                        <div class="product-info">
+                            <div class="info-row">
+                                <div>
+                                    <h5 class="product-name">${name}</h5>
+                                    <div class="product-prices">
+                                        ${product.offer_price
+                                            ? `<span class="price-original">JD ${product.selling_price}</span>
+                                               <span class="price-offer">JD ${product.offer_price}</span>`
+                                            : `<span class="price-current">JD ${product.selling_price}</span>`
+                                        }
                                     </div>
-                                    ` : ''}
-            </div>
+                                </div>
+                                ${!isBooked ? `<button type="button" class="select-button">{{ __('messages.Select') }}</button>` : ''}
+                            </div>
+                        </div>
 
-        `;
-
-                container.append(productCard);
+                        ${!isBooked ? `<div class="selected-overlay"><i class="fas fa-check-circle"></i></div>` : ''}
+                    </div>
+                `;
+                container.append(card);
             });
 
-            // Restore selected state only if selectable
-            if (selectable) {
-                Object.keys(selectedProducts).forEach(productId => {
-                    $(`.product-card[data-product-id="${productId}"]`).addClass('selected');
-                });
-            }
+            // Restore previously selected state
+            Object.keys(selectedProducts).forEach(id => {
+                $(`.product-card[data-product-id="${id}"]`).addClass('selected');
+            });
+
+            hideProductsLoading();
         }
 
+        // ── Toggle selection ─────────────────────────────────────────
+
+        function openDatePicker() {
+            const fp = document.getElementById('order_date')._flatpickr;
+            document.getElementById('order_date').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (fp) fp.open();
+        }
 
         function toggleProduct(productId) {
-            const productCard = $(`.product-card[data-product-id="${productId}"]`);
+            if (!$('#order_date').val()) {
+                // Show inline notice and highlight the date field
+                $('#no-date-notice').show();
+                $('#order_date').addClass('is-invalid');
+                document.getElementById('order_date').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => $('#order_date').removeClass('is-invalid'), 2500);
+                return;
+            }
+            $('#no-date-notice').hide();
 
+            const card = $(`.product-card[data-product-id="${productId}"]`);
             if (selectedProducts[productId]) {
                 delete selectedProducts[productId];
-                productCard.removeClass('selected');
+                card.removeClass('selected');
             } else {
                 const product = productsData.find(p => p.id === productId);
-                selectedProducts[productId] = {
-                    ...product,
-                    quantity: 1
-                };
-                productCard.addClass('selected');
+                if (!product || product.booked) return;
+                selectedProducts[productId] = { ...product, quantity: 1 };
+                card.addClass('selected');
             }
-
             updateReviewCartButton();
             updateHiddenFields();
         }
 
         function updateReviewCartButton() {
-            const button = $('#review-cart-btn');
+            const btn = $('#review-cart-btn');
             const count = Object.keys(selectedProducts).length;
-
             if (count > 0) {
-                button.prop('disabled', false);
-                button.html(`{{ __('messages.Review Cart') }} (${count}) <i class="fas fa-arrow-right ms-2"></i>`);
+                btn.prop('disabled', false);
+                btn.html(`{{ __('messages.Review Cart') }} (${count}) <i class="fas fa-arrow-right ms-2"></i>`);
             } else {
-                button.prop('disabled', true);
-                button.html('{{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>');
+                btn.prop('disabled', true);
+                btn.html('{{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>');
             }
         }
+
+        // ── Cart display ─────────────────────────────────────────────
 
         function updateCartDisplay() {
             const container = $('#cart-items');
@@ -610,29 +633,29 @@
 
             Object.values(selectedProducts).forEach(product => {
                 const item = `
-                <div class="cart-item">
-                    <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="cart-item-image">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1">${product.name_en || product.name_ar}</h6>
-                        <p class="mb-0 text-muted">
-                            ${product.offer_price ?
-                                `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
-                                                     <span class="text-danger fw-bold">JD ${product.offer_price}</span>` :
-                                `<span>JD ${product.selling_price}</span>`
-                            }
-                        </p>
+                    <div class="cart-item">
+                        <img src="${product.image}" alt="${product.name_en || product.name_ar}" class="cart-item-image">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">${product.name_en || product.name_ar}</h6>
+                            <p class="mb-0 text-muted">
+                                ${product.offer_price
+                                    ? `<span class="text-decoration-line-through me-2">JD ${product.selling_price}</span>
+                                       <span class="text-danger fw-bold">JD ${product.offer_price}</span>`
+                                    : `<span>JD ${product.selling_price}</span>`
+                                }
+                            </p>
+                        </div>
+                        <div class="quantity-controls">
+                            <button type="button" class="quantity-btn" onclick="updateQuantity(${product.id}, -1)">-</button>
+                            <input type="number" class="quantity-input" value="${product.quantity}" min="1"
+                                onchange="updateQuantity(${product.id}, 0, this.value)">
+                            <button type="button" class="quantity-btn" onclick="updateQuantity(${product.id}, 1)">+</button>
+                        </div>
+                        <div class="ms-3">
+                            <strong>JD ${((product.offer_price || product.selling_price) * product.quantity).toFixed(2)}</strong>
+                        </div>
                     </div>
-                    <div class="quantity-controls">
-                        <button type="button" class="quantity-btn" onclick="updateQuantity(${product.id}, -1)">-</button>
-                        <input type="number" class="quantity-input" value="${product.quantity}" min="1"
-                            onchange="updateQuantity(${product.id}, 0, this.value)">
-                        <button type="button" class="quantity-btn" onclick="updateQuantity(${product.id}, 1)">+</button>
-                    </div>
-                    <div class="ms-3">
-                        <strong>JD ${((product.offer_price || product.selling_price) * product.quantity).toFixed(2)}</strong>
-                    </div>
-                </div>
-            `;
+                `;
                 container.append(item);
             });
         }
@@ -643,11 +666,12 @@
             } else {
                 selectedProducts[productId].quantity = Math.max(1, selectedProducts[productId].quantity + change);
             }
-
             updateCartDisplay();
             updateCheckoutSummary();
             updateHiddenFields();
         }
+
+        // ── Checkout summary ─────────────────────────────────────────
 
         function updateCheckoutSummary() {
             let subtotal = 0;
@@ -656,144 +680,110 @@
             Object.values(selectedProducts).forEach(product => {
                 const price = product.selling_price;
                 const offerPrice = product.offer_price || price;
-                const quantity = product.quantity;
-
-                subtotal += offerPrice * quantity;
-                totalDiscount += (price - offerPrice) * quantity;
+                subtotal += offerPrice * product.quantity;
+                totalDiscount += (price - offerPrice) * product.quantity;
             });
 
-            // Get delivery fee from selected option
-            const deliverySelect = $('#delivery_id');
-            const selectedOption = deliverySelect.find('option:selected');
-            const deliveryFee = selectedOption.data('price') || 0;
-
+            const deliveryFee = parseFloat($('#delivery_id').find('option:selected').data('price')) || 0;
             const total = subtotal + deliveryFee;
 
-            const summary = `
-            <div class="summary-item">
-                <span>{{ __('messages.Subtotal') }}:</span>
-                <span>JD ${subtotal.toFixed(2)}</span>
-            </div>
-            <div class="summary-item text-success">
-                <span>{{ __('messages.Discount') }}:</span>
-                <span>-JD ${totalDiscount.toFixed(2)}</span>
-            </div>
-            <div class="summary-item">
-                <span>{{ __('messages.Delivery Fee') }}:</span>
-                <span>JD ${deliveryFee.toFixed(2)}</span>
-            </div>
-            <div class="summary-item total">
-                <span>{{ __('messages.Total') }}:</span>
-                <span>JD ${total.toFixed(2)}</span>
-            </div>
-        `;
+            $('#checkout-summary-content').html(`
+                <div class="summary-item">
+                    <span>{{ __('messages.Subtotal') }}:</span>
+                    <span>JD ${subtotal.toFixed(2)}</span>
+                </div>
+                <div class="summary-item text-success">
+                    <span>{{ __('messages.Discount') }}:</span>
+                    <span>-JD ${totalDiscount.toFixed(2)}</span>
+                </div>
+                <div class="summary-item">
+                    <span>{{ __('messages.Delivery Fee') }}:</span>
+                    <span>JD ${deliveryFee.toFixed(2)}</span>
+                </div>
+                <div class="summary-item total">
+                    <span>{{ __('messages.Total') }}:</span>
+                    <span>JD ${total.toFixed(2)}</span>
+                </div>
+            `);
 
-            $('#checkout-summary-content').html(summary);
-
-            // Update hidden fields
             $('#hidden_total_prices').val(subtotal);
             $('#hidden_total_discounts').val(totalDiscount);
         }
 
         function updateHiddenFields() {
             const productIds = Object.keys(selectedProducts);
-            const productsDataArray = [];
-
-            Object.values(selectedProducts).forEach(product => {
+            const productsDataArray = Object.values(selectedProducts).map(product => {
                 const price = product.selling_price;
                 const offerPrice = product.offer_price || price;
                 const discount = price - offerPrice;
-                const discountPercentage = discount > 0 ? ((discount / price) * 100).toFixed(2) : 0;
-
-                productsDataArray.push({
+                return {
                     product_id: product.id,
                     quantity: product.quantity,
                     unit_price: price,
                     offer_price: offerPrice,
                     total_price: offerPrice * product.quantity,
-                    discount_percentage: discountPercentage,
+                    discount_percentage: discount > 0 ? ((discount / price) * 100).toFixed(2) : 0,
                     discount_value: discount * product.quantity
-                });
+                };
             });
 
             $('#hidden_products').val(JSON.stringify(productIds));
             $('#hidden_products_data').val(JSON.stringify(productsDataArray));
         }
 
-        // Updated function for Bootstrap 5
-        function viewFullImage(imageUrl, productName, event) {
-            // Prevent triggering the toggleProduct function
+        // ── Photo modal ──────────────────────────────────────────────
+
+        let _modalPhotos = [];
+        let _modalIndex  = 0;
+
+        function viewProductPhotos(productId, event) {
             event.stopPropagation();
 
-            // Create modal if it doesn't exist
-            if (!$('#imageModal').length) {
-                const modalHtml = `
-                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="imageModalLabel"></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <img src="" class="img-fluid" id="modalImage" alt="">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-                $('body').append(modalHtml);
-            }
+            const product = productsData.find(p => p.id === productId);
+            if (!product) return;
 
-            // Set modal content
-            $('#imageModal .modal-title').text(productName);
-            $('#modalImage').attr('src', imageUrl);
+            _modalPhotos = (product.photos && product.photos.length > 0)
+                ? product.photos
+                : [product.image];
+            _modalIndex = 0;
 
-            // Show modal using Bootstrap 5 syntax
-            const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-            imageModal.show();
+            _renderModalPhoto();
+
+            $('#imageModalLabel').text(product.name_en || product.name_ar);
+
+            const multi = _modalPhotos.length > 1;
+            $('#modalPrevBtn, #modalNextBtn, #photoCounter').toggle(multi);
+
+            const modalEl = document.getElementById('imageModal');
+            const existing = bootstrap.Modal.getInstance(modalEl);
+            (existing || new bootstrap.Modal(modalEl)).show();
         }
 
-        // Add these styles to your document
-        $(document).ready(function() {
-            // Add CSS for the view image button
-            $('head').append(`
-            <style>
-                .product-image-container {
-                    position: relative;
-                }
+        function changeModalPhoto(dir) {
+            _modalIndex = (_modalIndex + dir + _modalPhotos.length) % _modalPhotos.length;
+            _renderModalPhoto();
+        }
 
-                .view-image-btn {
-                    position: absolute;
-                    bottom: 10px;
-                    right: 10px;
-                    background-color: rgba(255, 255, 255, 0.8);
-                    border: none;
-                    border-radius: 50%;
-                    width: 32px;
-                    height: 32px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    opacity: 0.7;
-                    transition: opacity 0.3s;
-                    z-index: 5;
-                }
+        function _renderModalPhoto() {
+            document.getElementById('modalMainImg').src = _modalPhotos[_modalIndex];
+            $('#photoCounter').text((_modalIndex + 1) + ' / ' + _modalPhotos.length);
+        }
 
-                .view-image-btn:hover {
-                    opacity: 1;
-                }
+        // Combine 12-hour time selection into 24-hour hidden field before submit
+        function combineOrderTime() {
+            let hour = parseInt($('#time_hour').val());
+            const minute = $('#time_minute').val();
+            const period = $('#time_period').val();
 
-                .product-card:hover .view-image-btn {
-                    opacity: 1;
-                }
+            if (period === 'AM' && hour === 12) hour = 0;
+            if (period === 'PM' && hour !== 12) hour += 12;
 
-                #modalImage {
-                    max-height: 80vh;
-                }
-            </style>
-        `);
+            $('#order_time').val(String(hour).padStart(2, '0') + ':' + minute + ':00');
+        }
+
+        // Keep page bottom padding on initial load
+        $(document).ready(function () {
+            $('#main-container').css('padding-bottom', '90px');
         });
     </script>
 </body>

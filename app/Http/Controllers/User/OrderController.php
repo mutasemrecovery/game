@@ -24,42 +24,46 @@ class OrderController extends Controller
     {
         $validatedData = $request->validate([
             'date' => 'required|date',
+            'order_time' => 'nullable|string',
+            'note' => 'nullable|string|max:1000',
             'name' => 'required',
             'address' => 'required',
             'phone' => 'required',
             'delivery_id' => 'nullable|exists:deliveries,id',
-            'payment_type' => 'required|string',
             'total_prices' => 'required|numeric|min:0',
             'total_discounts' => 'required|numeric|min:0',
             'products' => 'required|array|min:1',
             'products_data' => 'required|string',
         ]);
 
+        // Combine date + time
+        $time = $request->order_time ?: '00:00:00';
+        $datetime = \Carbon\Carbon::parse($validatedData['date'] . ' ' . $time);
+
         try {
             DB::beginTransaction();
 
-            // Generate order number
             $lastOrder = Order::latest('id')->first();
             $orderNumber = $lastOrder ? $lastOrder->number + 1 : 1;
 
             $delivery = Delivery::find($validatedData['delivery_id']);
 
-           // AFTER
             $user = User::firstOrCreate(
-                ['phone' => $validatedData['phone']],  // search by phone
-                ['name'  => $validatedData['name']]    // only set name if creating new
+                ['phone' => $validatedData['phone']],
+                ['name'  => $validatedData['name']]
             );
-            // Create order
+
             $order = Order::create([
                 'number' => $orderNumber,
-                'order_status' => 1, // Pending
-                'date' => $validatedData['date'],
+                'order_status' => 1,
+                'date' => $datetime,
                 'user_id' => $user->id,
                 'address' => $validatedData['address'],
+                'note' => $validatedData['note'] ?? null,
                 'delivery_id' => $validatedData['delivery_id'],
-                'delivery_fee' => $delivery ? $delivery->price : 0, 
-                'payment_type' => $validatedData['payment_type'],
-                'payment_status' => $validatedData['payment_status'] ?? 2,
+                'delivery_fee' => $delivery ? $delivery->price : 0,
+                'payment_type' => 'cash',
+                'payment_status' => 2,
                 'total_prices' => $validatedData['total_prices'],
                 'total_discounts' => $validatedData['total_discounts'],
             ]);
@@ -93,76 +97,71 @@ class OrderController extends Controller
 
    public function getAllProducts()
     {
-        // Get current date for offers
         $currentDate = now();
-        
-        // Get all active products with their offers
-        $products = Product::where('status', 1) // Active products
+
+        $products = Product::where('status', 1)
             ->with(['offers' => function($query) use ($currentDate) {
                 $query->where('start_at', '<=', $currentDate)
                     ->where('expired_at', '>=', $currentDate);
-            }])
+            }, 'productImages'])
             ->get()
             ->map(function($product) {
                 $offer = $product->offers->first();
-                
+
                 return [
                     'id' => $product->id,
                     'name_en' => $product->name_en,
                     'name_ar' => $product->name_ar,
                     'selling_price' => $product->selling_price,
                     'image' => asset('assets/admin/uploads/' . $product->productImages->first()->photo),
+                    'photos' => $product->productImages->map(fn($img) => asset('assets/admin/uploads/' . $img->photo))->values()->toArray(),
                     'offer_price' => $offer ? $offer->price : null,
+                    'booked' => false,
                 ];
             });
 
-        return response()->json([
-            'products' => $products
-        ]);
+        return response()->json(['products' => $products]);
     }
+
     public function getAvailableProductsForUser(Request $request)
     {
         $selectedDate = Carbon::parse($request->date);
-        
-        // Define date range: one day before, selected day, one day after
+
         $startDate = $selectedDate->copy()->subDay()->startOfDay();
         $endDate = $selectedDate->copy()->addDay()->endOfDay();
 
-        // Get products that don't have pending orders in the date range
-        $unavailableProductIds = Order::where('order_status', 1) // Pending orders
+        $unavailableOrderIds = Order::where('order_status', 1)
             ->whereBetween('date', [$startDate, $endDate])
             ->pluck('id');
 
-        $unavailableProductIdsArray = OrderProduct::whereIn('order_id', $unavailableProductIds)
+        $bookedProductIds = OrderProduct::whereIn('order_id', $unavailableOrderIds)
             ->pluck('product_id')
             ->unique()
             ->toArray();
 
-        // Get available products with current offers
         $currentDate = now();
-        $products = Product::where('status', 1) // Active products
-            ->whereNotIn('id', $unavailableProductIdsArray)
+        $products = Product::where('status', 1)
             ->with(['offers' => function($query) use ($currentDate) {
                 $query->where('start_at', '<=', $currentDate)
                       ->where('expired_at', '>=', $currentDate);
-            }])
+            }, 'productImages'])
             ->get()
-            ->map(function($product) {
+            ->map(function($product) use ($bookedProductIds) {
                 $offer = $product->offers->first();
-                
+
                 return [
                     'id' => $product->id,
                     'name_en' => $product->name_en,
                     'name_ar' => $product->name_ar,
                     'selling_price' => $product->selling_price,
-                    'image' =>  asset('assets/admin/uploads/' . $product->productImages->first()->photo), 
+                    'image' => asset('assets/admin/uploads/' . $product->productImages->first()->photo),
+                    'photos' => $product->productImages->map(fn($img) => asset('assets/admin/uploads/' . $img->photo))->values()->toArray(),
                     'offer_price' => $offer ? $offer->price : null,
+                    'booked' => in_array($product->id, $bookedProductIds),
                 ];
             });
 
-        return response()->json([
-            'products' => $products
-        ]);
+        return response()->json(['products' => $products]);
     }
 
     public function orderSuccess($orderId)

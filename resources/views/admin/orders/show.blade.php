@@ -349,6 +349,10 @@
                     <div class="invoice-meta">
                         <p><strong>{{ __('messages.invoice_number') }}:</strong> #{{ $order->number }}</p>
                         <p><strong>{{ __('messages.date') }}:</strong> {{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}</p>
+                        <p><strong>{{ __('messages.Order Time') }}:</strong>
+                            {{ \Carbon\Carbon::parse($order->date)->format('g:i') }}
+                            {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
+                        </p>
                       
                     </div>
                 </div>
@@ -371,6 +375,9 @@
                     <div class="delivery-info">
                         <h4>{{ __('messages.delivery_information') }}:</h4>
                         <p><strong>{{ __('messages.delivery_place') }}:</strong> {{ $order->delivery->place }} <br>{{ $order->address }}</p>
+                        @if($order->note)
+                        <p><strong>{{ __('messages.Note') }}:</strong> {{ $order->note }}</p>
+                        @endif
                         <p><strong>{{ __('messages.payment_type') }}:</strong> {{ ucfirst($order->payment_type) }}</p>
                         <p><strong>{{ __('messages.payment_status') }}:</strong> 
                             <span class="payment-status payment-{{ $order->payment_status }}">
@@ -429,7 +436,10 @@
                     <div class="payment-info">
                         <h5>{{ __('messages.payment_information') }}</h5>
                         <p>{{ __('messages.payment_method') }}: {{ ucfirst($order->payment_type) }}</p>
-                        <p>{{ __('messages.order_date') }}: {{ \Carbon\Carbon::parse($order->date)->format('d/m/Y H:i') }}</p>
+                        <p>{{ __('messages.order_date') }}: {{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}
+                            {{ \Carbon\Carbon::parse($order->date)->format('g:i') }}
+                            {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
+                        </p>
                     </div>
                 </div>
                 <div class="col-6">

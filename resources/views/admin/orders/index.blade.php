@@ -107,7 +107,13 @@
                                         </td>
                                         <td>{{ $info->user->name }}</td>
                                         <td>{{ $info->delivery->place ?? null }}<br>{{ $info->address }}</td>
-                                        <td>{{ $info->date }}</td>
+                                        <td>
+                                            {{ \Carbon\Carbon::parse($info->date)->format('d/m/Y') }}<br>
+                                            <small class="text-muted">
+                                                {{ \Carbon\Carbon::parse($info->date)->format('g:i') }}
+                                                {{ \Carbon\Carbon::parse($info->date)->format('A') === 'AM' ? 'ص' : 'م' }}
+                                            </small>
+                                        </td>
                                         <td>{{ $info->user->phone ?? '-' }}</td>
 <td>
     @foreach($info->orderProducts as $item)

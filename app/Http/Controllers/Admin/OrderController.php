@@ -87,6 +87,7 @@ class OrderController extends Controller
     {
         $validatedData = $request->validate([
             'date' => 'required|date',
+            'note' => 'nullable|string|max:1000',
             'address' => 'required',
             'user_id' => 'required|exists:users,id',
             'delivery_id' => 'nullable|exists:deliveries,id',
@@ -101,21 +102,20 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            // Generate order number
             $lastOrder = Order::latest('id')->first();
             $orderNumber = $lastOrder ? $lastOrder->number + 1 : 1;
 
             $delivery = Delivery::find($validatedData['delivery_id']);
 
-            // Create order
             $order = Order::create([
                 'number' => $orderNumber,
-                'order_status' => 1, // Pending
+                'order_status' => 1,
                 'date' => $validatedData['date'],
                 'user_id' => $validatedData['user_id'],
                 'address' => $validatedData['address'],
+                'note' => $validatedData['note'] ?? null,
                 'delivery_id' => $validatedData['delivery_id'],
-                'delivery_fee' => $delivery ? $delivery->price : 0, 
+                'delivery_fee' => $delivery ? $delivery->price : 0,
                 'payment_type' => $validatedData['payment_type'],
                 'payment_status' => $validatedData['payment_status'],
                 'total_prices' => $validatedData['total_prices'],
@@ -232,6 +232,7 @@ class OrderController extends Controller
     {
         $validatedData = $request->validate([
             'date' => 'required|date',
+            'note' => 'nullable|string|max:1000',
             'address' => 'required',
             'user_id' => 'required|exists:users,id',
             'delivery_id' => 'nullable|exists:deliveries,id',
@@ -243,29 +244,27 @@ class OrderController extends Controller
             'products' => 'required|array|min:1',
             'products_data' => 'required|string',
         ]);
-        
+
         try {
             DB::beginTransaction();
-            
-            // Find the order
+
             $order = Order::findOrFail($id);
-            
-            // Get delivery fee
+
             $delivery = Delivery::find($validatedData['delivery_id']);
             $deliveryFee = $delivery ? $delivery->price : 0;
-            
-            // Update order with the calculated totals from frontend
+
             $order->update([
                 'date' => $validatedData['date'],
                 'user_id' => $validatedData['user_id'],
                 'address' => $validatedData['address'],
+                'note' => $validatedData['note'] ?? null,
                 'delivery_id' => $validatedData['delivery_id'],
                 'delivery_fee' => $deliveryFee,
                 'payment_type' => $validatedData['payment_type'],
                 'payment_status' => $validatedData['payment_status'],
                 'order_status' => $validatedData['order_status'],
-                'total_prices' => $validatedData['total_prices'], // This will be net total after all discounts
-                'total_discounts' => $validatedData['total_discounts'], // This includes both product and additional discounts
+                'total_prices' => $validatedData['total_prices'],
+                'total_discounts' => $validatedData['total_discounts'],
             ]);
             
             // Delete all previous order products

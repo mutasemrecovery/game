@@ -168,16 +168,16 @@ return [
      'Error loading products. Please try again' => 'خطأ في تحميل المنتجات. يرجى المحاولة مرة أخرى',
 
      // Step 3 - Review Cart
-     'Review Your Cart' => 'مراجعة سلتك',
+     'Review Your Cart' => 'الشخصيات المختارة',
      'Your cart is empty' => 'سلتك فارغة',
      'Back to Products' => 'العودة إلى المنتجات',
      'Proceed to Checkout' => 'المتابعة إلى تثبيث الحجز',
 
      // Step 4 - Checkout
      'Complete Your Order' => 'الحجز المبدأي',
-     'Customer Name' => 'اسم العميل',
-     'Customer Phone' => 'رقم هاتف العميل',
-     'Delivery' => 'التوصيل',
+     'Customer Name' => 'الإسم ',
+     'Customer Phone' => 'رقم الهاتف',
+     'Delivery' => 'التوصيل ، أو بدون توصيل',
      'Select Delivery' => 'اختر موقع التوصيل',
      'Payment Type' => 'طريقة الدفع',
      'Select Payment Type' => 'اختر طريقة الدفع',
@@ -245,7 +245,7 @@ return [
     'Image' => 'الصورة',
     'Total Products' => 'إجمالي المنتجات',
     'Available Products' => 'المنتجات المتوفرة',
-    'Customer Address' => 'عنوان العميل',
+    'Customer Address' => 'العنوان بالتفصيل',
     "send Products To Customer"=>"إرسال المنتجات للعميل",
     'Selling_price' => 'سعر البيع',
     "Number"=>"الرقم",
@@ -330,6 +330,11 @@ return [
     "Fixed Amount"=>"ثابت",
     "Additional Discount"=>"الخصومات",
     "Display All Products"=>"عرض جميع المنتجات",
+    'Booked' => 'محجوز',
+    'Please select a date first to check availability' => 'يرجى اختيار التاريخ أولاً للتحقق من توفر المنتج.',
+    'Order Time' => 'وقت الطلب',
+    'Note' => 'ملاحظة',
+    'Optional note' => 'ملاحظة اختيارية...',
     ""=>"",
 
 

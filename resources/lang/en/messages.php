@@ -207,8 +207,6 @@ return [
     'View Details' => 'View Details',
     'You have no previous orders' => 'You have no previous orders',
     'Back to Homepage' => 'Back to Homepage',
-      ""=>"",
-
     'Product Selection' => 'Product Selection',
     'Select Date' => 'Select Date',
     'Select Time' => 'Select Time',
@@ -223,7 +221,6 @@ return [
     'No products selected' => 'No products selected',
     'Send via WhatsApp' => 'Send via WhatsApp',
     'Please select a date' => 'Please select a date',
-    'Loading products...' => 'Loading products...',
     'Error loading products. Please try again.' => 'Error loading products. Please try again.',
     'No products found' => 'No products found',
     'Available' => 'Available',
@@ -279,14 +276,8 @@ return [
     'No_data' => 'No Data Available',
 
     // Form Fields
-    'from_date' => 'From Date',
-    'to_date' => 'To Date',
-    'Number' => 'Number',
     'number' => 'Number',
-    'User' => 'User',
-    'user' => 'User',
     'delivery_place' => 'Delivery Place',
-    'date' => 'Date',
 
     // Table Headers
     'total_prices' => 'Total Price',
@@ -327,10 +318,12 @@ return [
     'unpaid' => 'Unpaid',
 
     "Display All Products"=>"Display All Products",
-    ""=>"",
-    ""=>"",
-    ""=>"",
-    ""=>"",
-    ""=>"",
+    'Booked' => 'Booked',
+    'Select a date first' => 'Select a Date First',
+    'Choose a date to check product availability' => 'Choose a date to check product availability for your booking.',
+    'Please select a date first to check availability' => 'Please select a date first to check product availability.',
+    'Order Time' => 'Order Time',
+    'Note' => 'Note',
+    'Optional note' => 'Optional note...',
 ];
 
