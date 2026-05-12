@@ -66,6 +66,7 @@ Route::patch('orders/{id}/quick-status', [OrderController::class, 'quickUpdateSt
 
 // Notifications
 Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+Route::get('notifications/stream', [NotificationController::class, 'stream'])->name('admin.notifications.stream');
 Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('admin.notifications.mark-all-read');
 Route::post('notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('admin.notifications.mark-read');
 

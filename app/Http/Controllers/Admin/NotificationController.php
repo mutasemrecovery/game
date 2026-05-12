@@ -24,6 +24,75 @@ class NotificationController extends Controller
         ]);
     }
 
+    /**
+     * Server-Sent Events stream.
+     * Runs for ~25 s then closes; EventSource auto-reconnects seamlessly.
+     */
+    public function stream(Request $request)
+    {
+        $admin = Auth::guard('admin')->user();
+
+        // Release session file lock so other browser tabs are not blocked
+        session()->save();
+
+        return response()->stream(function () use ($admin) {
+            // Kill any PHP output buffering layers
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            $lastCheck = now()->subSeconds(1);
+            $start     = microtime(true);
+            $maxRun    = 25; // seconds before graceful close + reconnect
+
+            echo ": connected\n\n";
+            flush();
+
+            while (microtime(true) - $start < $maxRun) {
+                if (connection_aborted()) {
+                    break;
+                }
+
+                sleep(2);
+
+                if (connection_aborted()) {
+                    break;
+                }
+
+                $fresh = $admin->unreadNotifications()
+                    ->where('created_at', '>=', $lastCheck)
+                    ->orderBy('created_at')
+                    ->get();
+
+                if ($fresh->isNotEmpty()) {
+                    $lastCheck = $fresh->last()->created_at->addSecond();
+
+                    foreach ($fresh as $n) {
+                        echo 'data: ' . json_encode([
+                            'id'         => $n->id,
+                            'data'       => $n->data,
+                            'created_at' => $n->created_at->diffForHumans(),
+                        ]) . "\n\n";
+                        flush();
+                    }
+                } else {
+                    // Keep-alive so proxy/browser doesn't close the connection
+                    echo ": ping\n\n";
+                    flush();
+                }
+            }
+
+            // Signal client to immediately reconnect
+            echo 'data: ' . json_encode(['reconnect' => true]) . "\n\n";
+            flush();
+        }, 200, [
+            'Content-Type'      => 'text/event-stream',
+            'Cache-Control'     => 'no-cache',
+            'X-Accel-Buffering' => 'no',   // nginx / LiteSpeed: don't buffer
+            'Connection'        => 'keep-alive',
+        ]);
+    }
+
     public function markAllRead()
     {
         Auth::guard('admin')->user()->unreadNotifications->markAsRead();
