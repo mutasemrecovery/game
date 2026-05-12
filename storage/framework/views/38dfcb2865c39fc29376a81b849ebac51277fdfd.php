@@ -222,10 +222,7 @@
                         <span><?php echo e(__('messages.Subtotal')); ?>:</span>
                         <span>JD <?php echo e(number_format($order->total_prices, 2)); ?></span>
                     </div>
-                    <div class="order-item text-success">
-                        <span><?php echo e(__('messages.Discount')); ?>:</span>
-                        <span>-JD <?php echo e(number_format($order->total_discounts, 2)); ?></span>
-                    </div>
+                  
                     <div class="order-item">
                         <span><?php echo e(__('messages.Delivery Fee')); ?>:</span>
                         <span>JD <?php echo e(number_format($order->delivery_fee, 2)); ?></span>

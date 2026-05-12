@@ -222,10 +222,7 @@
                         <span>{{ __('messages.Subtotal') }}:</span>
                         <span>JD {{ number_format($order->total_prices, 2) }}</span>
                     </div>
-                    <div class="order-item text-success">
-                        <span>{{ __('messages.Discount') }}:</span>
-                        <span>-JD {{ number_format($order->total_discounts, 2) }}</span>
-                    </div>
+                  
                     <div class="order-item">
                         <span>{{ __('messages.Delivery Fee') }}:</span>
                         <span>JD {{ number_format($order->delivery_fee, 2) }}</span>

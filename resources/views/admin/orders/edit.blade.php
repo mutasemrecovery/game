@@ -191,10 +191,13 @@
                                     {{ __('messages.Processing') }}
                                 </option>
                                 <option value="3" {{ old('order_status', $order->order_status) == 3 ? 'selected' : '' }}>
-                                    {{ __('messages.Cancelled') }} 
+                                    {{ __('messages.Cancelled') }}
                                 </option>
-                                <option value="6" {{ old('order_status', $order->order_status) == 4 ? 'selected' : '' }}>
-                                   {{ __('messages.Completed') }}
+                                <option value="6" {{ old('order_status', $order->order_status) == 6 ? 'selected' : '' }}>
+                                    {{ __('messages.Executed') }}
+                                </option>
+                                <option value="7" {{ old('order_status', $order->order_status) == 7 ? 'selected' : '' }}>
+                                    {{ __('messages.Returned') }}
                                 </option>
                             </select>
                             @error('order_status')

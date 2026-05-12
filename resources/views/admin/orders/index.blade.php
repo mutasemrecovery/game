@@ -3,21 +3,23 @@
     {{ __('messages.orders') }}
 @endsection
 
-
-
+@section('css')
+<style>
+.conflict-product { color: #dc3545; font-weight: 600; }
+.conflict-badge { font-size: .7rem; }
+</style>
+@endsection
 
 @section('content')
-
-
     <div class="card">
         <div class="card-header">
             <h3 class="card-title card_title_center"> {{ __('messages.orders') }} </h3>
             <input type="hidden" id="token_search" value="{{ csrf_token() }}">
-
-            <a href="{{ route('orders.create') }}" class="btn btn-sm btn-success"> {{ __('messages.New') }}
-                {{ __('messages.orders') }}</a>
+            <a href="{{ route('orders.create') }}" class="btn btn-sm btn-success">
+                {{ __('messages.New') }} {{ __('messages.orders') }}
+            </a>
         </div>
-        <!-- /.card-header -->
+
         <div class="card-body">
             <form method="GET" action="{{ route('orders.index') }}">
                 <div class="row mb-3">
@@ -62,8 +64,6 @@
                 </div>
             </form>
 
-
-
             <div class="clearfix"></div>
 
             <div id="ajax_responce_serarchDiv" class="col-md-12">
@@ -85,24 +85,30 @@
                             </thead>
                             <tbody>
                                 @foreach ($data as $info)
-                                    <tr>
-
-
+                                    @php
+                                        $hasConflict = $info->orderProducts->pluck('product_id')
+                                            ->intersect($conflictedProductIds)->isNotEmpty();
+                                    @endphp
+                                    <tr @if($hasConflict) style="border-right: 3px solid #dc3545;" @endif>
                                         <td>{{ $info->number }}</td>
                                         <td>{{ $info->total_prices }}</td>
                                         <td>{{ $info->delivery_fee }}</td>
                                         <td>{{ $info->total_discounts }}</td>
                                         <td>
                                             @if ($info->order_status == 1)
-                                                Pending
+                                                <span class="badge badge-warning">{{ __('messages.Pending') }}</span>
                                             @elseif($info->order_status == 2)
-                                                OnTheWay
+                                                <span class="badge badge-info">{{ __('messages.Processing') }}</span>
                                             @elseif($info->order_status == 3)
-                                                Cancelled
+                                                <span class="badge badge-danger">{{ __('messages.Cancelled') }}</span>
                                             @elseif($info->order_status == 4)
-                                                Failed
+                                                <span class="badge badge-secondary">{{ __('messages.failed') }}</span>
+                                            @elseif($info->order_status == 6)
+                                                <span class="badge badge-success">{{ __('messages.Executed') }}</span>
+                                            @elseif($info->order_status == 7)
+                                                <span class="badge badge-primary">{{ __('messages.Returned') }}</span>
                                             @else
-                                                DELIVERD
+                                                <span class="badge badge-light">{{ $info->order_status }}</span>
                                             @endif
                                         </td>
                                         <td>{{ $info->user->name }}</td>
@@ -115,25 +121,50 @@
                                             </small>
                                         </td>
                                         <td>{{ $info->user->phone ?? '-' }}</td>
-<td>
-    @foreach($info->orderProducts as $item)
-        <small>{{ $item->product->name_ar }} ({{ $item->quantity }})</small><br>
-    @endforeach
-</td>
-
                                         <td>
-                                            @if ($info->order_status != 6 && $info->order_status != 3)
+                                            @foreach($info->orderProducts as $item)
+                                                @php $isConflict = in_array($item->product_id, $conflictedProductIds); @endphp
+                                                <small @if($isConflict) class="conflict-product" title="{{ __('messages.Conflict Warning') }}" @endif>
+                                                    @if($isConflict)<i class="fas fa-exclamation-triangle"></i> @endif
+                                                    {{ $item->product->name_ar }} ({{ $item->quantity }})
+                                                </small><br>
+                                            @endforeach
+                                        </td>
+                                        <td style="min-width:160px;">
+                                            {{-- Quick action buttons --}}
+                                            @if(in_array($info->order_status, [1, 2]))
+                                                <button class="btn btn-xs btn-success mb-1 btn-quick-status"
+                                                    data-id="{{ $info->id }}" data-status="6"
+                                                    title="{{ __('messages.Mark as Executed') }}">
+                                                    <i class="fas fa-check"></i> {{ __('messages.Executed') }}
+                                                </button>
+                                                <button class="btn btn-xs btn-danger mb-1 btn-quick-status"
+                                                    data-id="{{ $info->id }}" data-status="3"
+                                                    title="{{ __('messages.Cancel') }}">
+                                                    <i class="fas fa-times"></i> {{ __('messages.Cancel') }}
+                                                </button>
+                                            @endif
+
+                                            @if($info->order_status == 6)
+                                                <button class="btn btn-xs btn-primary mb-1 btn-quick-status"
+                                                    data-id="{{ $info->id }}" data-status="7"
+                                                    title="{{ __('messages.Mark as Returned') }}">
+                                                    <i class="fas fa-undo"></i> {{ __('messages.Returned') }}
+                                                </button>
+                                            @endif
+
+                                            {{-- Edit / Show --}}
+                                            @if (!in_array($info->order_status, [3, 7]))
                                                 @can('order-edit')
                                                     <a href="{{ route('orders.edit', $info->id) }}"
-                                                        class="btn btn-sm btn-primary">{{ __('messages.Edit') }}</a>
+                                                        class="btn btn-sm btn-warning mb-1">{{ __('messages.Edit') }}</a>
                                                 @endcan
                                             @endif
 
                                             @can('order-table')
                                                 <a href="{{ route('orders.show', $info->id) }}"
-                                                    class="btn btn-sm btn-secondary">{{ __('messages.Show') }}</a>
+                                                    class="btn btn-sm btn-secondary mb-1">{{ __('messages.Show') }}</a>
                                             @endcan
-
                                         </td>
                                     </tr>
                                 @endforeach
@@ -142,22 +173,41 @@
                         <br>
                         {{ $data->appends(request()->query())->links() }}
                     @else
-                        <div class="alert alert-danger">
-                            {{ __('messages.No_data') }} </div>
-                </div>
-                @endif
-            @endcan
+                        <div class="alert alert-danger">{{ __('messages.No_data') }}</div>
+                    @endif
+                @endcan
+            </div>
         </div>
-
-
-
     </div>
-
-    </div>
-
-    </div>
-
 @endsection
 
 @section('script')
+<script>
+$(document).ready(function () {
+    $(document).on('click', '.btn-quick-status', function () {
+        var btn    = $(this);
+        var id     = btn.data('id');
+        var status = btn.data('status');
+
+        var labels = { 6: '{{ __("messages.Executed") }}', 3: '{{ __("messages.Cancelled") }}', 7: '{{ __("messages.Returned") }}' };
+        if (!confirm('{{ __("messages.Confirm action") }}: ' + labels[status] + ' ?')) return;
+
+        btn.prop('disabled', true);
+        $.ajax({
+            url: '{{ url("") }}/{{ LaravelLocalization::getCurrentLocale() }}/admin/orders/' + id + '/quick-status',
+            method: 'PATCH',
+            data: { _token: '{{ csrf_token() }}', status: status },
+            success: function (res) {
+                if (res.success) {
+                    location.reload();
+                }
+            },
+            error: function (xhr) {
+                alert(xhr.responseJSON?.message || '{{ __("messages.Error creating order: ") }}');
+                btn.prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
 @endsection

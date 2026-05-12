@@ -142,13 +142,13 @@ return [
      'Checkout' => 'Reservation',
 
      // Step 1 - Date & Time
-     'Select Order Date' => 'Select reservation Date',
+     'Select Order Date' => 'To view the available character images for a specific date, please select the date.',
      'Time' => 'Time',
      'Order Date' => 'Order Date',
      'Continue to Products' => 'Continue to Products',
 
      // Step 2 - Product Selection
-     'Select Your Products' => 'Select Your Products',
+     'Select Your Products' => 'You can display the image by entering the name',
      'Loading products...' => 'Loading products...',
      'Loading available products...' => 'Loading available products...',
      'Back' => 'Back',
@@ -322,8 +322,21 @@ return [
     'Select a date first' => 'Select a Date First',
     'Choose a date to check product availability' => 'Choose a date to check product availability for your booking.',
     'Please select a date first to check availability' => 'Please select a date first to check product availability.',
-    'Order Time' => 'Order Time',
+    'Order Time' => 'Party time (hour)',
     'Note' => 'Note',
     'Optional note' => 'Optional note...',
+    'No Delivery' => 'No Delivery',
+
+    // Order statuses (new)
+    'Executed'         => 'Executed',
+    'Returned'         => 'Returned',
+    'Mark as Executed' => 'Mark as Executed',
+    'Mark as Returned' => 'Mark as Returned',
+    'Conflict Warning' => 'Conflict Warning',
+    'Mark All Read'    => 'Mark All Read',
+    'Confirm action'   => 'Confirm action',
+    'failed'           => 'Failed',
+    'Order updated successfully' => 'Order updated successfully',
+    'Error loading order: '      => 'Error loading order: ',
 ];
 

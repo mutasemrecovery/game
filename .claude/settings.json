@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php -r ' *)"
+      "Bash(php -r ' *)",
+      "Bash(order\")",
+      "PowerShell(Get-ChildItem \"c:\\\\xampp\\\\htdocs\\\\game\\\\database\\\\migrations\\\\\" | Where-Object { $_.Name -match \"notif|order\" } | Select-Object Name)"
     ]
   }
 }

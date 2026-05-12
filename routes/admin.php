@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\ProductController;
@@ -59,14 +60,18 @@ Route::get('/permissions/{guard_name}', function($guard_name){
 });
 
 
-// Route for ajax
-Route::get('orders/available-products', [OrderController::class, 'getAvailableProducts'])
-->name('orders.available-products');
-// web.php
+// Order AJAX routes
+Route::get('orders/available-products', [OrderController::class, 'getAvailableProducts'])->name('orders.available-products');
+Route::patch('orders/{id}/quick-status', [OrderController::class, 'quickUpdateStatus'])->name('orders.quick-status');
+
+// Notifications
+Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('admin.notifications.mark-all-read');
+Route::post('notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('admin.notifications.mark-read');
+
 Route::get('/products/selection', [ProductSelectionController::class, 'index'])->name('products.selection');
 Route::post('/products/filtered', [ProductSelectionController::class, 'getFilteredProducts'])->name('products.filtered');
 Route::get('/deliveries/get-price',  [OrderController::class, 'getPrice'])->name('deliveries.get-price');
-// end
 
 // Resource Route
 Route::resource('users', UserController::class);

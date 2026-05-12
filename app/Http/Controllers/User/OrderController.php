@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Delivery;
 use App\Models\Order;
@@ -11,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Unit;
 use App\Models\User;
+use App\Notifications\NewOrderNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +87,16 @@ class OrderController extends Controller
 
             DB::commit();
 
+            // Notify all admins of the new booking
+            try {
+                $order->load('user');
+                foreach (Admin::all() as $admin) {
+                    $admin->notify(new NewOrderNotification($order));
+                }
+            } catch (\Exception $e) {
+                Log::error('New-order notification failed: ' . $e->getMessage());
+            }
+
             return redirect()->route('user.order.success', $order->id)
             ->with('success', __('messages.Order created successfully'));
 
@@ -125,16 +137,14 @@ class OrderController extends Controller
 
     public function getAvailableProductsForUser(Request $request)
     {
-        $selectedDate = Carbon::parse($request->date);
+        $selectedDate = Carbon::parse($request->date)->toDateString();
 
-        $startDate = $selectedDate->copy()->subDay()->startOfDay();
-        $endDate = $selectedDate->copy()->addDay()->endOfDay();
-
-        $unavailableOrderIds = Order::where('order_status', 1)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->pluck('id');
-
-        $bookedProductIds = OrderProduct::whereIn('order_id', $unavailableOrderIds)
+        // A product is "booked" if it's in any active order (not cancelled/returned)
+        // whose date is on or before the requested date (characters still "out")
+        $bookedProductIds = OrderProduct::whereHas('order', function ($q) use ($selectedDate) {
+                $q->whereNotIn('order_status', [3, 7])
+                  ->whereDate('date', '<=', $selectedDate);
+            })
             ->pluck('product_id')
             ->unique()
             ->toArray();

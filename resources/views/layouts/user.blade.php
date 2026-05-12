@@ -93,9 +93,7 @@
 <body>
 
     <div class="steps-header">
-        <div class="container">
-            <h1 class="text-center mb-0">{{ __('messages.Create Your Order') }}</h1>
-        </div>
+      
     </div>
 
     <div class="container" id="main-container">
@@ -114,7 +112,6 @@
                         <!-- Date picker -->
                         <div class="row mb-4">
                             <div class="col-md-6 offset-md-3">
-                                <label for="order_date" class="form-label fs-5">{{ __('messages.Order Date') }}</label>
                                 <input type="text" id="order_date" name="date"
                                     class="form-control form-control-lg" required>
 
@@ -161,11 +158,11 @@
                 <!-- Fixed bottom nav for step 1 -->
                 <div class="step1-fixed-nav" id="step1-nav">
                     <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">
-                        <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                        <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
                     </button>
                     <button type="button" class="btn btn-primary btn-lg" onclick="goToCart()" disabled
                         id="review-cart-btn">
-                        {{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>
+                        {{ __('messages.Review Cart') }} <i class="fas fa-arrow-left ms-2"></i>
                     </button>
                 </div>
             </div>
@@ -183,10 +180,10 @@
 
                         <div class="text-center mt-4">
                             <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
-                                <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                                <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
                             </button>
                             <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)">
-                                {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-right ms-2"></i>
+                                {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-left ms-2"></i>
                             </button>
                         </div>
                     </div>
@@ -198,9 +195,7 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="custom-card card">
-                            <div class="card-header bg-transparent border-0 pt-4">
-                                <h3>{{ __('messages.Complete Your Order') }}</h3>
-                            </div>
+                            
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -231,9 +226,8 @@
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="delivery_id" class="form-label">{{ __('messages.Delivery') }}</label>
-                                        <select class="form-select select2" id="delivery_id" name="delivery_id" required>
-                                            <option value="" disabled selected>
+                                        <select class="form-select select2" id="delivery_id" name="delivery_id">
+                                            <option value="" data-price="0" selected>
                                                 {{ __('messages.Select Delivery') }}</option>
 
                                             @foreach ($deliveries as $delivery)
@@ -258,12 +252,6 @@
                                                     <option value="{{ $h }}">{{ $h }}</option>
                                                 @endfor
                                             </select>
-                                            <select id="time_minute" class="form-control" >
-                                                <option value="00">00</option>
-                                                <option value="15">15</option>
-                                                <option value="30">30</option>
-                                                <option value="45">45</option>
-                                            </select>
                                             <select id="time_period" class="form-control">
                                                 <option value="AM">ص</option>
                                                 <option value="PM">م</option>
@@ -274,7 +262,6 @@
 
                                     <!-- Note field -->
                                     <div class="col-md-12 mb-3">
-                                        <label for="note" class="form-label">{{ __('messages.Note') }}</label>
                                         <textarea class="form-control" id="note" name="note" rows="3"
                                             placeholder="{{ __('messages.Optional note') }}">{{ old('note') }}</textarea>
                                         @error('note')
@@ -505,8 +492,8 @@
         // ── Display products ─────────────────────────────────────────
 
         function displayProducts(products) {
-            // Booked products appear first
-            products = [...products].sort((a, b) => (b.booked ? 1 : 0) - (a.booked ? 1 : 0));
+            // Booked products appear last
+            products = [...products].sort((a, b) => (a.booked ? 1 : 0) - (b.booked ? 1 : 0));
 
             $('#product-search').val('');
             const container = $('#products-container');
@@ -611,10 +598,10 @@
             const count = Object.keys(selectedProducts).length;
             if (count > 0) {
                 btn.prop('disabled', false);
-                btn.html(`{{ __('messages.Review Cart') }} (${count}) <i class="fas fa-arrow-right ms-2"></i>`);
+                btn.html(`{{ __('messages.Review Cart') }} (${count}) <i class="fas fa-arrow-left ms-2"></i>`);
             } else {
                 btn.prop('disabled', true);
-                btn.html('{{ __('messages.Review Cart') }} <i class="fas fa-arrow-right ms-2"></i>');
+                btn.html('{{ __('messages.Review Cart') }} <i class="fas fa-arrow-left ms-2"></i>');
             }
         }
 
@@ -692,10 +679,6 @@
                     <span>{{ __('messages.Subtotal') }}:</span>
                     <span>JD ${subtotal.toFixed(2)}</span>
                 </div>
-                <div class="summary-item text-success">
-                    <span>{{ __('messages.Discount') }}:</span>
-                    <span>-JD ${totalDiscount.toFixed(2)}</span>
-                </div>
                 <div class="summary-item">
                     <span>{{ __('messages.Delivery Fee') }}:</span>
                     <span>JD ${deliveryFee.toFixed(2)}</span>
@@ -772,7 +755,7 @@
         // Combine 12-hour time selection into 24-hour hidden field before submit
         function combineOrderTime() {
             let hour = parseInt($('#time_hour').val());
-            const minute = $('#time_minute').val();
+            const minute = '00';
             const period = $('#time_period').val();
 
             if (period === 'AM' && hour === 12) hour = 0;

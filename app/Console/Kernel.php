@@ -15,7 +15,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Hourly reminders from 8 AM for unexecuted orders
+        $schedule->command('orders:notify-unexecuted')->hourly();
+
+        // Hourly reminders from 8 AM for unreturned characters
+        $schedule->command('orders:notify-unreturned')->hourly();
+
+        // Daily at 6 PM: warn about tomorrow's orders with unreturned characters
+        $schedule->command('orders:notify-conflicts')->dailyAt('18:00');
     }
 
     /**

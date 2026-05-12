@@ -153,13 +153,13 @@ return [
      'Checkout' => 'الحجز',
 
      // Step 1 - Date & Time
-     'Select Order Date' => 'حدد تاريخ الحجز',
+     'Select Order Date' => 'لرؤية صور الشخصيات المتاحة لتاريخ معين حدد التاريخ',
      'Time' => 'الوقت',
      'Order Date' => 'تاريخ الطلب',
      'Continue to Products' => 'الانتقال إلى المنتجات',
 
      // Step 2 - Product Selection
-     'Select Your Products' => 'اختر منتجاتك',
+     'Select Your Products' => 'يمكنك إظهار الصورة بكتابة الإسم',
      'Loading products...' => 'جارٍ تحميل المنتجات...',
      'Loading available products...' => 'جارٍ تحميل المنتجات المتاحة...',
      'Back' => 'رجوع',
@@ -178,7 +178,7 @@ return [
      'Customer Name' => 'الإسم ',
      'Customer Phone' => 'رقم الهاتف',
      'Delivery' => 'التوصيل ، أو بدون توصيل',
-     'Select Delivery' => 'اختر موقع التوصيل',
+     'Select Delivery' => 'اختر موقع التوصيل ، أو بدون توصيل',
      'Payment Type' => 'طريقة الدفع',
      'Select Payment Type' => 'اختر طريقة الدفع',
      'Cash' => 'نقداً',
@@ -332,9 +332,22 @@ return [
     "Display All Products"=>"عرض جميع المنتجات",
     'Booked' => 'محجوز',
     'Please select a date first to check availability' => 'يرجى اختيار التاريخ أولاً للتحقق من توفر المنتج.',
-    'Order Time' => 'وقت الطلب',
+    'Order Time' => 'موعد الحفلة (الساعة)',
     'Note' => 'ملاحظة',
-    'Optional note' => 'ملاحظة اختيارية...',
+    'Optional note' => 'ملاحظات إضافية تود إخبارنا بها (اختيارية)',
+    'No Delivery' => 'بدون توصيل',
+
+    // Order statuses (new)
+    'Executed'         => 'تم التنفيذ',
+    'Returned'         => 'تم الإرجاع',
+    'Mark as Executed' => 'تم التنفيذ',
+    'Mark as Returned' => 'تم الإرجاع',
+    'Conflict Warning' => 'تنبيه تعارض',
+    'Mark All Read'    => 'تحديد الكل كمقروء',
+    'Confirm action'   => 'تأكيد العملية',
+    'failed'           => 'فشل',
+    'Order updated successfully' => 'تم تحديث الطلب بنجاح',
+    'Error loading order: '      => 'خطأ في تحميل الطلب: ',
     ""=>"",
 
 

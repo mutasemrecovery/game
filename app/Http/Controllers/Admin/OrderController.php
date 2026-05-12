@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\User;
+use App\Notifications\NewOrderNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,7 +72,17 @@ class OrderController extends Controller
         $deliveries = Delivery::all();
         $data = $query->paginate(PAGINATION_COUNT);
 
-        return view('admin.orders.index', compact('data', 'deliveries', 'filters'));
+        // Product IDs that appear in more than one active (not cancelled/returned) order
+        $conflictedProductIds = OrderProduct::whereHas('order', function ($q) {
+                $q->whereNotIn('order_status', [3, 7]);
+            })
+            ->select('product_id')
+            ->groupBy('product_id')
+            ->havingRaw('COUNT(DISTINCT order_id) > 1')
+            ->pluck('product_id')
+            ->toArray();
+
+        return view('admin.orders.index', compact('data', 'deliveries', 'filters', 'conflictedProductIds'));
     }
 
 
@@ -99,6 +111,13 @@ class OrderController extends Controller
             'products_data' => 'required|string',
         ]);
 
+        // Conflict check before saving
+        $productsData = json_decode($request->products_data, true);
+        $conflictError = $this->checkProductConflicts($productsData, $validatedData['date'], null);
+        if ($conflictError) {
+            return back()->withInput()->with('error', $conflictError);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -122,9 +141,6 @@ class OrderController extends Controller
                 'total_discounts' => $validatedData['total_discounts'],
             ]);
 
-            // Create order products
-            $productsData = json_decode($request->products_data, true);
-            
             foreach ($productsData as $productData) {
                 OrderProduct::create([
                     'order_id' => $order->id,
@@ -139,6 +155,16 @@ class OrderController extends Controller
 
             DB::commit();
 
+            // Notify all admins of the new order
+            try {
+                $order->load('user');
+                foreach (Admin::all() as $admin) {
+                    $admin->notify(new NewOrderNotification($order));
+                }
+            } catch (\Exception $e) {
+                Log::error('Admin new-order notification failed: ' . $e->getMessage());
+            }
+
             return redirect()->route('orders.index')
                 ->with('success', __('messages.Order created successfully'));
 
@@ -149,55 +175,90 @@ class OrderController extends Controller
         }
     }
 
-   public function getAvailableProducts(Request $request)
-{
-    $selectedDate = Carbon::parse($request->date);
-    $currentOrderId = $request->order_id; // Add this parameter
-    
-    // Define date range: one day before, selected day, one day after
-    $startDate = $selectedDate->copy()->subDay()->startOfDay();
-    $endDate = $selectedDate->copy()->addDay()->endOfDay();
-    
-    // Get products that don't have pending orders in the date range
-    // BUT exclude the current order being edited
-    $unavailableProductIds = Order::where('order_status', 1) // Pending orders
-        ->whereBetween('date', [$startDate, $endDate])
-        ->when($currentOrderId, function($query, $currentOrderId) {
-            return $query->where('id', '!=', $currentOrderId); // Exclude current order
-        })
-        ->pluck('id');
-        
-    $unavailableProductIdsArray = OrderProduct::whereIn('order_id', $unavailableProductIds)
-        ->pluck('product_id')
-        ->unique()
-        ->toArray();
-    
-    // Get available products with current offers
-    $currentDate = now();
-    $products = Product::where('status', 1) // Active products
-        ->whereNotIn('id', $unavailableProductIdsArray)
-        ->with(['offers' => function($query) use ($currentDate) {
-            $query->where('start_at', '<=', $currentDate)
+    public function getAvailableProducts(Request $request)
+    {
+        $selectedDate   = Carbon::parse($request->date)->toDateString();
+        $currentOrderId = $request->order_id;
+
+        // Block products that are in any active order (not cancelled/returned)
+        // whose date is on or before the requested date (characters still "out")
+        $blockedProductIds = OrderProduct::whereHas('order', function ($q) use ($selectedDate, $currentOrderId) {
+                $q->whereNotIn('order_status', [3, 7])
+                  ->whereDate('date', '<=', $selectedDate);
+                if ($currentOrderId) {
+                    $q->where('id', '!=', $currentOrderId);
+                }
+            })
+            ->pluck('product_id')
+            ->unique()
+            ->toArray();
+
+        $currentDate = now();
+        $products = Product::where('status', 1)
+            ->whereNotIn('id', $blockedProductIds)
+            ->with(['offers' => function ($q) use ($currentDate) {
+                $q->where('start_at', '<=', $currentDate)
                   ->where('expired_at', '>=', $currentDate);
-        }])
-        ->get()
-        ->map(function($product) {
-            $offer = $product->offers->first();
-            
-            return [
-                'id' => $product->id,
-                'name_en' => $product->name_en,
-                'name_ar' => $product->name_ar,
-                'selling_price' => $product->selling_price,
-                'image' => asset('assets/admin/uploads/' . $product->productImages->first()->photo), 
-                'offer_price' => $offer ? $offer->price : null,
-            ];
-        });
-        
-    return response()->json([
-        'products' => $products
-    ]);
-}
+            }, 'productImages'])
+            ->get()
+            ->map(function ($product) {
+                $offer = $product->offers->first();
+                return [
+                    'id'            => $product->id,
+                    'name_en'       => $product->name_en,
+                    'name_ar'       => $product->name_ar,
+                    'selling_price' => $product->selling_price,
+                    'image'         => asset('assets/admin/uploads/' . optional($product->productImages->first())->photo),
+                    'offer_price'   => $offer ? $offer->price : null,
+                ];
+            });
+
+        return response()->json(['products' => $products]);
+    }
+
+    public function quickUpdateStatus(Request $request, $id)
+    {
+        $request->validate(['status' => 'required|in:3,6,7']);
+
+        $order = Order::findOrFail($id);
+
+        // Allow executing even if order date was yesterday; allow returning on same day or after
+        $order->update(['order_status' => (int) $request->status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.Order updated successfully'),
+            'status'  => (int) $request->status,
+        ]);
+    }
+
+    private function checkProductConflicts(array $productsData, string $date, ?int $excludeOrderId): ?string
+    {
+        if (empty($productsData)) {
+            return null;
+        }
+
+        $productIds = array_column($productsData, 'product_id');
+        $requestedDate = Carbon::parse($date)->toDateString();
+
+        $conflicting = OrderProduct::whereIn('product_id', $productIds)
+            ->whereHas('order', function ($q) use ($requestedDate, $excludeOrderId) {
+                $q->whereNotIn('order_status', [3, 7])
+                  ->whereDate('date', '<=', $requestedDate);
+                if ($excludeOrderId) {
+                    $q->where('id', '!=', $excludeOrderId);
+                }
+            })
+            ->with('product')
+            ->get();
+
+        if ($conflicting->isEmpty()) {
+            return null;
+        }
+
+        $names = $conflicting->pluck('product.name_ar')->unique()->filter()->implode('، ');
+        return 'يوجد تعارض في الشخصيات التالية (لم يتم إرجاعها بعد): ' . $names;
+    }
 
 
    public function show($id)
@@ -238,12 +299,21 @@ class OrderController extends Controller
             'delivery_id' => 'nullable|exists:deliveries,id',
             'payment_type' => 'required|string',
             'payment_status' => 'required|in:1,2',
-            'order_status' => 'required|in:1,2,3,4,5,6',
+            'order_status' => 'required|in:1,2,3,4,5,6,7',
             'total_prices' => 'required|numeric|min:0',
             'total_discounts' => 'required|numeric|min:0',
             'products' => 'required|array|min:1',
             'products_data' => 'required|string',
         ]);
+
+        // Conflict check (skip for cancelled/returned orders)
+        if (!in_array($validatedData['order_status'], [3, 7])) {
+            $productsData = json_decode($request->products_data, true);
+            $conflictError = $this->checkProductConflicts($productsData, $validatedData['date'], (int) $id);
+            if ($conflictError) {
+                return back()->withInput()->with('error', $conflictError);
+            }
+        }
 
         try {
             DB::beginTransaction();
@@ -269,10 +339,9 @@ class OrderController extends Controller
             
             // Delete all previous order products
             OrderProduct::where('order_id', $order->id)->delete();
-            
-            // Create new order products
-            $productsData = json_decode($request->products_data, true);
-            
+
+            $productsData = $productsData ?? json_decode($request->products_data, true);
+
             foreach ($productsData as $productData) {
                 OrderProduct::create([
                     'order_id' => $order->id,
