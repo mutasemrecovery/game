@@ -72,15 +72,26 @@ class OrderController extends Controller
         $deliveries = Delivery::all();
         $data = $query->paginate(PAGINATION_COUNT);
 
-        // Product IDs that appear in more than one active (not cancelled/returned) order
-        $conflictedProductIds = OrderProduct::whereHas('order', function ($q) {
-                $q->whereNotIn('order_status', [3, 7]);
+        // Products that are in a status=6 (executed/unreturned) order AND also in
+        // a future/current pending order — these are the real conflicts.
+        $executedProductIds = OrderProduct::whereHas('order', function ($q) {
+                $q->where('order_status', 6);
             })
-            ->select('product_id')
-            ->groupBy('product_id')
-            ->havingRaw('COUNT(DISTINCT order_id) > 1')
             ->pluck('product_id')
+            ->unique()
             ->toArray();
+
+        $conflictedProductIds = [];
+        if (!empty($executedProductIds)) {
+            $conflictedProductIds = OrderProduct::whereIn('product_id', $executedProductIds)
+                ->whereHas('order', function ($q) {
+                    $q->whereIn('order_status', [1, 2])
+                      ->whereDate('date', '>=', now()->toDateString());
+                })
+                ->pluck('product_id')
+                ->unique()
+                ->toArray();
+        }
 
         return view('admin.orders.index', compact('data', 'deliveries', 'filters', 'conflictedProductIds'));
     }
@@ -180,11 +191,9 @@ class OrderController extends Controller
         $selectedDate   = Carbon::parse($request->date)->toDateString();
         $currentOrderId = $request->order_id;
 
-        // Block products that are in any active order (not cancelled/returned)
-        // whose date is on or before the requested date (characters still "out")
-        $blockedProductIds = OrderProduct::whereHas('order', function ($q) use ($selectedDate, $currentOrderId) {
-                $q->whereNotIn('order_status', [3, 7])
-                  ->whereDate('date', '<=', $selectedDate);
+        // Rule 1: characters physically out (executed, not yet returned)
+        $executedUnreturned = OrderProduct::whereHas('order', function ($q) use ($currentOrderId) {
+                $q->where('order_status', 6);
                 if ($currentOrderId) {
                     $q->where('id', '!=', $currentOrderId);
                 }
@@ -192,6 +201,20 @@ class OrderController extends Controller
             ->pluck('product_id')
             ->unique()
             ->toArray();
+
+        // Rule 2: characters already booked for this specific date
+        $bookedSameDay = OrderProduct::whereHas('order', function ($q) use ($selectedDate, $currentOrderId) {
+                $q->whereIn('order_status', [1, 2])
+                  ->whereDate('date', $selectedDate);
+                if ($currentOrderId) {
+                    $q->where('id', '!=', $currentOrderId);
+                }
+            })
+            ->pluck('product_id')
+            ->unique()
+            ->toArray();
+
+        $blockedProductIds = array_unique(array_merge($executedUnreturned, $bookedSameDay));
 
         $currentDate = now();
         $products = Product::where('status', 1)
@@ -238,13 +261,13 @@ class OrderController extends Controller
             return null;
         }
 
-        $productIds = array_column($productsData, 'product_id');
+        $productIds    = array_column($productsData, 'product_id');
         $requestedDate = Carbon::parse($date)->toDateString();
 
-        $conflicting = OrderProduct::whereIn('product_id', $productIds)
-            ->whereHas('order', function ($q) use ($requestedDate, $excludeOrderId) {
-                $q->whereNotIn('order_status', [3, 7])
-                  ->whereDate('date', '<=', $requestedDate);
+        // Conflict type 1: character physically out (executed, not returned)
+        $conflict1 = OrderProduct::whereIn('product_id', $productIds)
+            ->whereHas('order', function ($q) use ($excludeOrderId) {
+                $q->where('order_status', 6);
                 if ($excludeOrderId) {
                     $q->where('id', '!=', $excludeOrderId);
                 }
@@ -252,12 +275,26 @@ class OrderController extends Controller
             ->with('product')
             ->get();
 
+        // Conflict type 2: same date already booked (pending/processing)
+        $conflict2 = OrderProduct::whereIn('product_id', $productIds)
+            ->whereHas('order', function ($q) use ($requestedDate, $excludeOrderId) {
+                $q->whereIn('order_status', [1, 2])
+                  ->whereDate('date', $requestedDate);
+                if ($excludeOrderId) {
+                    $q->where('id', '!=', $excludeOrderId);
+                }
+            })
+            ->with('product')
+            ->get();
+
+        $conflicting = $conflict1->merge($conflict2);
+
         if ($conflicting->isEmpty()) {
             return null;
         }
 
         $names = $conflicting->pluck('product.name_ar')->unique()->filter()->implode('، ');
-        return 'يوجد تعارض في الشخصيات التالية (لم يتم إرجاعها بعد): ' . $names;
+        return 'يوجد تعارض في الشخصيات التالية: ' . $names;
     }
 
 

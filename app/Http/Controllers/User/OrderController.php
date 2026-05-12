@@ -139,15 +139,24 @@ class OrderController extends Controller
     {
         $selectedDate = Carbon::parse($request->date)->toDateString();
 
-        // A product is "booked" if it's in any active order (not cancelled/returned)
-        // whose date is on or before the requested date (characters still "out")
-        $bookedProductIds = OrderProduct::whereHas('order', function ($q) use ($selectedDate) {
-                $q->whereNotIn('order_status', [3, 7])
-                  ->whereDate('date', '<=', $selectedDate);
+        // Rule 1: characters physically out — executed orders not yet returned (any date)
+        $executedUnreturned = OrderProduct::whereHas('order', function ($q) {
+                $q->where('order_status', 6);
             })
             ->pluck('product_id')
             ->unique()
             ->toArray();
+
+        // Rule 2: characters already booked for this specific date (pending/processing)
+        $bookedSameDay = OrderProduct::whereHas('order', function ($q) use ($selectedDate) {
+                $q->whereIn('order_status', [1, 2])
+                  ->whereDate('date', $selectedDate);
+            })
+            ->pluck('product_id')
+            ->unique()
+            ->toArray();
+
+        $bookedProductIds = array_unique(array_merge($executedUnreturned, $bookedSameDay));
 
         $currentDate = now();
         $products = Product::where('status', 1)
