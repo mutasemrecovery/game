@@ -184,6 +184,8 @@ return [
      'Order created successfully' => 'Order created successfully',
      'Error creating order: ' => 'Error creating order: ',
      // Add these to your resources/lang/en/messages.php
+    'Character Photos' => 'Character Photos',
+    'Click to view full size' => 'Tap to view full size',
     'Initial Booking' => 'Initial Booking',
     'Order Success' => 'Order Success',
     'Order Placed Successfully!' => 'Order Placed Successfully!',

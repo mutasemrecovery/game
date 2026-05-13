@@ -194,6 +194,8 @@ return [
      // Success/Error Messages
      'Order created successfully' => 'تم إنشاء الطلب بنجاح',
      'Error creating order: ' => 'خطأ في إنشاء الطلب: ',
+    'Character Photos' => 'صور الشخصيات',
+    'Click to view full size' => 'اضغط لرؤيتها بالحجم الكامل',
     'Initial Booking' => 'إنشاء حجز مبدأي',
     'Order Success' => 'تم الطلب بنجاح',
     'Order Placed Successfully!' => 'تم إرسال طلبك بنجاح!',

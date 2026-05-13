@@ -85,6 +85,18 @@
             max-height: 75vh;
             object-fit: contain;
         }
+        .img-hint {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.45);
+            color: #fff;
+            font-size: 0.72rem;
+            text-align: center;
+            padding: 4px 6px;
+            pointer-events: none;
+        }
         @media (max-width: 576px) {
             .step1-fixed-nav {
                 padding: 6px 20px;
@@ -114,9 +126,8 @@
             <div class="step-content active" id="step1">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">
-                            {!! __('messages.Select Order Date') !!}
-                        </h3>
+                        <h3 class="text-center mb-1">{{ __('messages.Character Photos') }}</h3>
+                        <p class="text-center text-muted mb-0">{!! __('messages.Select Order Date') !!}</p>
                     </div>
 
                     <div class="card-body">
@@ -189,15 +200,17 @@
                             <!-- Cart items displayed here -->
                         </div>
 
-                        <div class="text-center mt-4">
-                            <button type="button" class="btn btn-secondary btn-lg me-3" onclick="previousStep(2)">
-                                <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
-                            </button>
-                            <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)">
-                                {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-left ms-2"></i>
-                            </button>
-                        </div>
                     </div>
+                </div>
+
+                <!-- Fixed bottom nav for step 2 -->
+                <div class="step1-fixed-nav" id="step2-nav" style="display:none;">
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="previousStep(2)">
+                        <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)">
+                        {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-left ms-2"></i>
+                    </button>
                 </div>
             </div>
 
@@ -432,9 +445,15 @@
             $('#step' + step).addClass('active');
 
             if (step === 1) {
+                $('#step2-nav').hide();
                 updateNavVisibility();
+            } else if (step === 2) {
+                $('#step1-nav').hide();
+                $('#step2-nav').show();
+                $('#main-container').css('padding-bottom', '90px');
             } else {
                 $('#step1-nav').hide();
+                $('#step2-nav').hide();
                 $('#main-container').css('padding-bottom', '20px');
             }
 
@@ -540,6 +559,7 @@
                                 <img src="${product.image}" alt="${name}" class="product-image">
                                 ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
                                 <i class="fas fa-search-plus"></i>
+                                <span class="img-hint">{{ __('messages.Click to view full size') }}</span>
                             </button>
                         </div>
 
