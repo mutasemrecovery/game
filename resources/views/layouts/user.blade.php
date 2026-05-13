@@ -85,6 +85,15 @@
             max-height: 75vh;
             object-fit: contain;
         }
+        @media (max-width: 576px) {
+            .step1-fixed-nav {
+                padding: 6px 20px;
+            }
+            .step1-fixed-nav .btn-lg {
+                padding: 6px 14px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 
     @yield('css')
@@ -105,7 +114,9 @@
             <div class="step-content active" id="step1">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Select Order Date') }}</h3>
+                        <h3 class="text-center">
+                            {!! __('messages.Select Order Date') !!}
+                        </h3>
                     </div>
 
                     <div class="card-body">
@@ -156,7 +167,7 @@
                 </div>
 
                 <!-- Fixed bottom nav for step 1 -->
-                <div class="step1-fixed-nav" id="step1-nav">
+                <div class="step1-fixed-nav" id="step1-nav" style="display:none;">
                     <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">
                         <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
                     </button>
@@ -195,7 +206,9 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="custom-card card">
-                            
+                            <div class="card-header bg-transparent border-0 pt-4">
+                                <h3 class="text-center">{{ __('messages.Initial Booking') }}</h3>
+                            </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -375,6 +388,7 @@
                 } else {
                     fetchAllProducts();
                 }
+                updateNavVisibility();
             });
 
             $('#delivery_id').on('change', function () {
@@ -418,8 +432,7 @@
             $('#step' + step).addClass('active');
 
             if (step === 1) {
-                $('#step1-nav').show();
-                $('#main-container').css('padding-bottom', '90px');
+                updateNavVisibility();
             } else {
                 $('#step1-nav').hide();
                 $('#main-container').css('padding-bottom', '20px');
@@ -590,7 +603,20 @@
                 card.addClass('selected');
             }
             updateReviewCartButton();
+            updateNavVisibility();
             updateHiddenFields();
+        }
+
+        function updateNavVisibility() {
+            const hasDate = !!$('#order_date').val();
+            const hasProducts = Object.keys(selectedProducts).length > 0;
+            if (hasDate && hasProducts) {
+                $('#step1-nav').show();
+                $('#main-container').css('padding-bottom', '90px');
+            } else {
+                $('#step1-nav').hide();
+                $('#main-container').css('padding-bottom', '20px');
+            }
         }
 
         function updateReviewCartButton() {
@@ -764,10 +790,6 @@
             $('#order_time').val(String(hour).padStart(2, '0') + ':' + minute + ':00');
         }
 
-        // Keep page bottom padding on initial load
-        $(document).ready(function () {
-            $('#main-container').css('padding-bottom', '90px');
-        });
     </script>
 </body>
 

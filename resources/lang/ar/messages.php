@@ -153,7 +153,7 @@ return [
      'Checkout' => 'الحجز',
 
      // Step 1 - Date & Time
-     'Select Order Date' => 'لرؤية صور الشخصيات المتاحة لتاريخ معين حدد التاريخ',
+    'Select Order Date' => 'لرؤية صور الشخصيات المتاحة لتاريخ معين<br><span class="text-danger">حدد التاريخ</span>',
      'Time' => 'الوقت',
      'Order Date' => 'تاريخ الطلب',
      'Continue to Products' => 'الانتقال إلى المنتجات',
@@ -194,6 +194,7 @@ return [
      // Success/Error Messages
      'Order created successfully' => 'تم إنشاء الطلب بنجاح',
      'Error creating order: ' => 'خطأ في إنشاء الطلب: ',
+    'Initial Booking' => 'إنشاء حجز مبدأي',
     'Order Success' => 'تم الطلب بنجاح',
     'Order Placed Successfully!' => 'تم إرسال طلبك بنجاح!',
     'Thank you for your order. We will contact you soon.' => 'شكراً لطلبك. سنتواصل معك قريباً.',

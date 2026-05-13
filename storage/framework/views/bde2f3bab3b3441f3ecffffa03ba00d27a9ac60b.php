@@ -85,6 +85,15 @@
             max-height: 75vh;
             object-fit: contain;
         }
+        @media (max-width: 576px) {
+            .step1-fixed-nav {
+                padding: 6px 20px;
+            }
+            .step1-fixed-nav .btn-lg {
+                padding: 6px 14px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 
     <?php echo $__env->yieldContent('css'); ?>
@@ -105,7 +114,10 @@
             <div class="step-content active" id="step1">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center"><?php echo e(__('messages.Select Order Date')); ?></h3>
+                        <h3 class="text-center">
+                            <?php echo __('messages.Select Order Date'); ?>
+
+                        </h3>
                     </div>
 
                     <div class="card-body">
@@ -165,7 +177,7 @@ unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <!-- Fixed bottom nav for step 1 -->
-                <div class="step1-fixed-nav" id="step1-nav">
+                <div class="step1-fixed-nav" id="step1-nav" style="display:none;">
                     <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">
                         <i class="fas fa-arrow-right me-2"></i> <?php echo e(__('messages.Back')); ?>
 
@@ -206,7 +218,9 @@ unset($__errorArgs, $__bag); ?>
                 <div class="row">
                     <div class="col-md-7">
                         <div class="custom-card card">
-                            
+                            <div class="card-header bg-transparent border-0 pt-4">
+                                <h3 class="text-center"><?php echo e(__('messages.Initial Booking')); ?></h3>
+                            </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -424,6 +438,7 @@ unset($__errorArgs, $__bag); ?>
                 } else {
                     fetchAllProducts();
                 }
+                updateNavVisibility();
             });
 
             $('#delivery_id').on('change', function () {
@@ -467,8 +482,7 @@ unset($__errorArgs, $__bag); ?>
             $('#step' + step).addClass('active');
 
             if (step === 1) {
-                $('#step1-nav').show();
-                $('#main-container').css('padding-bottom', '90px');
+                updateNavVisibility();
             } else {
                 $('#step1-nav').hide();
                 $('#main-container').css('padding-bottom', '20px');
@@ -639,7 +653,20 @@ unset($__errorArgs, $__bag); ?>
                 card.addClass('selected');
             }
             updateReviewCartButton();
+            updateNavVisibility();
             updateHiddenFields();
+        }
+
+        function updateNavVisibility() {
+            const hasDate = !!$('#order_date').val();
+            const hasProducts = Object.keys(selectedProducts).length > 0;
+            if (hasDate && hasProducts) {
+                $('#step1-nav').show();
+                $('#main-container').css('padding-bottom', '90px');
+            } else {
+                $('#step1-nav').hide();
+                $('#main-container').css('padding-bottom', '20px');
+            }
         }
 
         function updateReviewCartButton() {
@@ -813,10 +840,6 @@ unset($__errorArgs, $__bag); ?>
             $('#order_time').val(String(hour).padStart(2, '0') + ':' + minute + ':00');
         }
 
-        // Keep page bottom padding on initial load
-        $(document).ready(function () {
-            $('#main-container').css('padding-bottom', '90px');
-        });
     </script>
 </body>
 

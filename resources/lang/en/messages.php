@@ -184,6 +184,7 @@ return [
      'Order created successfully' => 'Order created successfully',
      'Error creating order: ' => 'Error creating order: ',
      // Add these to your resources/lang/en/messages.php
+    'Initial Booking' => 'Initial Booking',
     'Order Success' => 'Order Success',
     'Order Placed Successfully!' => 'Order Placed Successfully!',
     'Thank you for your order. We will contact you soon.' => 'Thank you for your order. We will contact you soon.',
