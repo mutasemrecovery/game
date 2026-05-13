@@ -64,6 +64,10 @@ Route::get('/permissions/{guard_name}', function($guard_name){
 Route::get('orders/available-products', [OrderController::class, 'getAvailableProducts'])->name('orders.available-products');
 Route::patch('orders/{id}/quick-status', [OrderController::class, 'quickUpdateStatus'])->name('orders.quick-status');
 
+// Order status pages
+Route::get('orders/pending-delivery', [OrderController::class, 'pendingDelivery'])->name('orders.pending-delivery');
+Route::get('orders/out-not-returned', [OrderController::class, 'outNotReturned'])->name('orders.out-not-returned');
+
 // Notifications
 Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
 Route::get('notifications/stream', [NotificationController::class, 'stream'])->name('admin.notifications.stream');

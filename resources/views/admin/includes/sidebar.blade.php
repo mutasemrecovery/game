@@ -46,11 +46,37 @@
                         $user->can('order-add') ||
                         $user->can('order-edit') ||
                         $user->can('order-delete'))
-                    <li class="nav-item">
-                        <a href="{{ route('orders.index') }}" class="nav-link">
+                    <li class="nav-item has-treeview {{ request()->routeIs('orders.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                             <i class="far fa-circle nav-icon"></i>
-                            <p> {{__('messages.Orders')}}  </p>
+                            <p>
+                                {{ __('messages.Orders') }}
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('orders.index') }}"
+                                   class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>{{ __('messages.All Orders') }}</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('orders.pending-delivery') }}"
+                                   class="nav-link {{ request()->routeIs('orders.pending-delivery') ? 'active' : '' }}">
+                                    <i class="fas fa-clock nav-icon text-warning"></i>
+                                    <p>{{ __('messages.Pending Delivery Orders') }}</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('orders.out-not-returned') }}"
+                                   class="nav-link {{ request()->routeIs('orders.out-not-returned') ? 'active' : '' }}">
+                                    <i class="fas fa-undo nav-icon text-danger"></i>
+                                    <p>{{ __('messages.Out Not Returned Orders') }}</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 @endif
 

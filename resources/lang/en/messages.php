@@ -335,8 +335,23 @@ return [
     'Conflict Warning' => 'Conflict Warning',
     'Mark All Read'    => 'Mark All Read',
     'Confirm action'   => 'Confirm action',
-    'failed'           => 'Failed',
-    'Order updated successfully' => 'Order updated successfully',
-    'Error loading order: '      => 'Error loading order: ',
+    'Order updated successfully'   => 'Order updated successfully',
+    'Error loading order: '        => 'Error loading order: ',
+
+    // New order status pages
+    'All Orders'                   => 'All Orders',
+    'Pending Delivery Orders'      => 'Pending Delivery',
+    'Out Not Returned Orders'      => 'Out — Not Returned',
+    'No pending delivery orders'   => 'No pending delivery orders.',
+    'No unreturned orders'         => 'All characters have been returned.',
+    'Days Out'                     => 'Days Out',
+    'days'                         => 'days',
+    'Overdue'                      => 'Overdue',
+    'Today'                        => 'Today',
+    'Upcoming'                     => 'Upcoming',
+    'Party date passed'            => 'Party date has passed',
+    'Party is today'               => 'Party is today',
+    'Future party'                 => 'Future party',
+    'Orders'                       => 'Orders',
 ];
 
