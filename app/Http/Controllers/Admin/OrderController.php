@@ -118,25 +118,27 @@ class OrderController extends Controller
         $deliveries = Delivery::all();
         $data = $query->paginate(PAGINATION_COUNT);
 
-        // Products that are in a status=6 (executed/unreturned) order AND also in
-        // a future/current pending order — these are the real conflicts.
-        $executedProductIds = OrderProduct::whereHas('order', function ($q) {
-                $q->where('order_status', 6);
-            })
-            ->pluck('product_id')
-            ->unique()
-            ->toArray();
-
+        // Products that have a conflict: in a status=6 order AND also in a pending/processing
+        // order whose date falls within ±1 day of the executed order's date.
         $conflictedProductIds = [];
-        if (!empty($executedProductIds)) {
-            $conflictedProductIds = OrderProduct::whereIn('product_id', $executedProductIds)
-                ->whereHas('order', function ($q) {
+        $executedOrders = \App\Models\Order::where('order_status', 6)
+            ->with('orderProducts')
+            ->get();
+        foreach ($executedOrders as $exOrder) {
+            $exProductIds = $exOrder->orderProducts->pluck('product_id')->toArray();
+            if (empty($exProductIds)) continue;
+            $df = Carbon::parse($exOrder->date)->subDay()->toDateString();
+            $dt = Carbon::parse($exOrder->date)->addDay()->toDateString();
+            $hits = OrderProduct::whereIn('product_id', $exProductIds)
+                ->whereHas('order', function ($q) use ($df, $dt, $exOrder) {
                     $q->whereIn('order_status', [1, 2])
-                      ->whereDate('date', '>=', now()->toDateString());
+                      ->whereDate('date', '>=', $df)
+                      ->whereDate('date', '<=', $dt)
+                      ->where('id', '!=', $exOrder->id);
                 })
                 ->pluck('product_id')
-                ->unique()
                 ->toArray();
+            $conflictedProductIds = array_unique(array_merge($conflictedProductIds, $hits));
         }
 
         return view('admin.orders.index', compact('data', 'deliveries', 'filters', 'conflictedProductIds'));
@@ -237,9 +239,13 @@ class OrderController extends Controller
         $selectedDate   = Carbon::parse($request->date)->toDateString();
         $currentOrderId = $request->order_id;
 
-        // Rule 1: characters physically out (executed, not yet returned)
-        $executedUnreturned = OrderProduct::whereHas('order', function ($q) use ($currentOrderId) {
-                $q->where('order_status', 6);
+        // Rule 1: characters executed within ±1 day of the selected date
+        $dateFrom = Carbon::parse($selectedDate)->subDay()->toDateString();
+        $dateTo   = Carbon::parse($selectedDate)->addDay()->toDateString();
+        $executedUnreturned = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo, $currentOrderId) {
+                $q->where('order_status', 6)
+                  ->whereDate('date', '>=', $dateFrom)
+                  ->whereDate('date', '<=', $dateTo);
                 if ($currentOrderId) {
                     $q->where('id', '!=', $currentOrderId);
                 }
@@ -310,10 +316,14 @@ class OrderController extends Controller
         $productIds    = array_column($productsData, 'product_id');
         $requestedDate = Carbon::parse($date)->toDateString();
 
-        // Conflict type 1: character physically out (executed, not returned)
+        // Conflict type 1: character executed within ±1 day of the requested date
+        $dateFrom = Carbon::parse($requestedDate)->subDay()->toDateString();
+        $dateTo   = Carbon::parse($requestedDate)->addDay()->toDateString();
         $conflict1 = OrderProduct::whereIn('product_id', $productIds)
-            ->whereHas('order', function ($q) use ($excludeOrderId) {
-                $q->where('order_status', 6);
+            ->whereHas('order', function ($q) use ($dateFrom, $dateTo, $excludeOrderId) {
+                $q->where('order_status', 6)
+                  ->whereDate('date', '>=', $dateFrom)
+                  ->whereDate('date', '<=', $dateTo);
                 if ($excludeOrderId) {
                     $q->where('id', '!=', $excludeOrderId);
                 }
