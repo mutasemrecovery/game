@@ -280,7 +280,7 @@
     </div>
 
     <!-- ── Floating WhatsApp (step 3 only) ── -->
-    <a id="float-whatsapp" href="https://wa.me/{{ env('WHATSAPP_NUMBER', '962775504609') }}" target="_blank" rel="noopener" style="display:none;">
+    <a id="float-whatsapp" href="https://wa.me/{{ env('WHATSAPP_NUMBER', '962776648373') }}" target="_blank" rel="noopener" style="display:none;">
         <i class="fab fa-whatsapp"></i>
     </a>
 
