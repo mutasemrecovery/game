@@ -63,6 +63,7 @@ Route::get('/permissions/{guard_name}', function($guard_name){
 // Order AJAX routes
 Route::get('orders/available-products', [OrderController::class, 'getAvailableProducts'])->name('orders.available-products');
 Route::patch('orders/{id}/quick-status', [OrderController::class, 'quickUpdateStatus'])->name('orders.quick-status');
+Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
 
 // Order status pages
 Route::get('orders/pending-delivery', [OrderController::class, 'pendingDelivery'])->name('orders.pending-delivery');

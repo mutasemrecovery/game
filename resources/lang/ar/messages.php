@@ -247,6 +247,7 @@ return [
     'I pledge to return the character on the agreed day' => 'أتعهد بإرجاع الشخصية باليوم المتفق عليه',
     'You must pledge to return the character on the agreed day' => 'يجب عليك التعهد بإرجاع الشخصية باليوم المتفق عليه',
     'Tap to view all photos' => 'اضغط لعرض جميع الصور',
+    'Export Excel' => 'تصدير Excel',
     'Shows executed orders before this date' => 'يعرض الطلبات المنفذة قبل هذا التاريخ',
     'Character not returned - urgent' => 'الشخصية لم تُرجع - عاجل',
     'Please select products and a user with a valid phone number' => 'الرجاء اختيار المنتجات والعميل برقم هاتف صحيح',

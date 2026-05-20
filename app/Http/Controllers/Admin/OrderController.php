@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\OrdersExport;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Category;
@@ -15,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 class OrderController extends Controller
 {
     public function getPrice(Request $request)
@@ -138,7 +140,14 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('data', 'deliveries', 'filters', 'conflictedProductIds', 'todayConflictOrderIds'));
     }
 
+    public function export(Request $request)
+    {
+        $filters = session('orders_filters', []);
+        $filters = array_merge($filters, $request->only(['check_date', 'number', 'user_name', 'delivery_place']));
 
+        $filename = 'orders-' . now()->format('Y-m-d-His') . '.xlsx';
+        return Excel::download(new OrdersExport($filters), $filename);
+    }
 
     public function create()
     {

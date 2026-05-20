@@ -17,11 +17,22 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data= Product::paginate(PAGINATION_COUNT);
+        $query = Product::query();
 
-        return view('admin.products.index',compact('data'));
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function ($q) use ($term) {
+                $q->where('name_ar', 'like', '%' . $term . '%')
+                  ->orWhere('name_en', 'like', '%' . $term . '%');
+            });
+        }
+
+        $data   = $query->paginate(PAGINATION_COUNT)->withQueryString();
+        $search = $request->search;
+
+        return view('admin.products.index', compact('data', 'search'));
     }
 
     /**

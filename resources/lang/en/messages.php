@@ -235,7 +235,7 @@ return [
     'Rental Price' => 'Rental Price',
     'I pledge to return the character on the agreed day' => 'I pledge to return the character on the agreed day',
     'You must pledge to return the character on the agreed day' => 'You must pledge to return the character on the agreed day',
-    'Send via WhatsApp' => 'Send via WhatsApp',
+    'Export Excel' => 'Export Excel',
     'Shows executed orders before this date' => 'Shows executed orders before this date',
     'Character not returned - urgent' => 'Character not returned - urgent',
     'Please select products and a user with a valid phone number' => 'Please select products and a user with a valid phone number',

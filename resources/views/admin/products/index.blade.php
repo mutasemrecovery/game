@@ -23,16 +23,27 @@
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-          <div class="row">
-          <div class="col-md-4">
-
-            {{-- <input  type="radio" name="searchbyradio" id="searchbyradio" value="name"> name --}}
-
-            {{-- <input autofocus style="margin-top: 6px !important;" type="text" id="search_by_text" placeholder=" name" class="form-control"> <br> --}}
-
-                      </div>
-
-                          </div>
+          <form method="GET" action="{{ route('products.index') }}" class="mb-3">
+            <div class="row">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <input type="text" name="search" class="form-control"
+                         placeholder="{{ __('messages.Search By Name') }}"
+                         value="{{ $search ?? '' }}" autofocus>
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-search"></i> {{ __('messages.Search') }}
+                    </button>
+                    @if(!empty($search))
+                      <a href="{{ route('products.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                      </a>
+                    @endif
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
                <div class="clearfix"></div>
 
         <div id="ajax_responce_serarchDiv" class="col-md-12">

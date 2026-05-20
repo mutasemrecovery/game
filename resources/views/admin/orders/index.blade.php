@@ -67,6 +67,13 @@
                 </div>
             </form>
 
+            <div class="mb-3">
+                <a href="{{ route('orders.export', request()->query()) }}"
+                   class="btn btn-success">
+                    <i class="fas fa-file-excel me-1"></i> {{ __('messages.Export Excel') }}
+                </a>
+            </div>
+
             <div class="clearfix"></div>
 
             <div id="ajax_responce_serarchDiv" class="col-md-12">
