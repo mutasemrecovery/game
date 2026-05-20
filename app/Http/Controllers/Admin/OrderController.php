@@ -28,47 +28,37 @@ class OrderController extends Controller
     /** Page 1 — booked but not yet given to the client (status 1 or 2) */
     public function pendingDelivery(Request $request)
     {
+        $checkDate = $request->filled('check_date')
+            ? $request->check_date
+            : Carbon::today()->toDateString();
+
         $query = Order::with(['user', 'delivery', 'orderProducts.product'])
             ->whereIn('order_status', [1, 2])
+            ->whereDate('date', '<=', $checkDate)
             ->orderBy('date', 'asc');
 
-        if ($request->filled('from_date')) {
-            $query->whereDate('date', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('date', '<=', $request->to_date);
-        }
-        if ($request->filled('user_name')) {
-            $query->whereHas('user', fn($q) => $q->where('name', 'like', '%' . $request->user_name . '%'));
-        }
-
-        $data = $query->paginate(PAGINATION_COUNT);
+        $data  = $query->paginate(PAGINATION_COUNT)->appends(['check_date' => $checkDate]);
         $today = Carbon::today();
 
-        return view('admin.orders.pending_delivery', compact('data', 'today'));
+        return view('admin.orders.pending_delivery', compact('data', 'today', 'checkDate'));
     }
 
     /** Page 2 — executed (given out) but characters not yet returned (status 6) */
     public function outNotReturned(Request $request)
     {
+        $checkDate = $request->filled('check_date')
+            ? $request->check_date
+            : Carbon::today()->toDateString();
+
         $query = Order::with(['user', 'delivery', 'orderProducts.product'])
             ->where('order_status', 6)
+            ->whereDate('date', '<=', $checkDate)
             ->orderBy('date', 'asc');
 
-        if ($request->filled('from_date')) {
-            $query->whereDate('date', '>=', $request->from_date);
-        }
-        if ($request->filled('to_date')) {
-            $query->whereDate('date', '<=', $request->to_date);
-        }
-        if ($request->filled('user_name')) {
-            $query->whereHas('user', fn($q) => $q->where('name', 'like', '%' . $request->user_name . '%'));
-        }
-
-        $data = $query->paginate(PAGINATION_COUNT);
+        $data  = $query->paginate(PAGINATION_COUNT)->appends(['check_date' => $checkDate]);
         $today = Carbon::today();
 
-        return view('admin.orders.out_not_returned', compact('data', 'today'));
+        return view('admin.orders.out_not_returned', compact('data', 'today', 'checkDate'));
     }
 
     /**

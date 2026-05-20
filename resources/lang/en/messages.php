@@ -236,6 +236,7 @@ return [
     'I pledge to return the character on the agreed day' => 'I pledge to return the character on the agreed day',
     'You must pledge to return the character on the agreed day' => 'You must pledge to return the character on the agreed day',
     'Export Excel' => 'Export Excel',
+    'Shows orders up to this date' => 'Shows orders up to this date',
     'Shows executed orders before this date' => 'Shows executed orders before this date',
     'Character not returned - urgent' => 'Character not returned - urgent',
     'Please select products and a user with a valid phone number' => 'Please select products and a user with a valid phone number',

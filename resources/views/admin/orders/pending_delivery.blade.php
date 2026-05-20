@@ -29,25 +29,17 @@
 
     <div class="card-body">
 
-        {{-- Filters --}}
+        {{-- Single date filter --}}
         <form method="GET" action="{{ route('orders.pending-delivery') }}" class="mb-3">
-            <div class="row">
-                <div class="col-md-3">
-                    <label>{{ __('messages.from_date') }}</label>
-                    <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
-                </div>
-                <div class="col-md-3">
-                    <label>{{ __('messages.to_date') }}</label>
-                    <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
-                </div>
+            <div class="row align-items-end">
                 <div class="col-md-4">
-                    <label>{{ __('messages.User') }}</label>
-                    <input type="text" name="user_name" class="form-control"
-                           placeholder="{{ __('messages.Customer') }}" value="{{ request('user_name') }}">
+                    <label>{{ __('messages.date') }}</label>
+                    <input type="date" name="check_date" class="form-control" value="{{ $checkDate }}">
+                    <small class="text-muted">{{ __('messages.Shows orders up to this date') }}</small>
                 </div>
-                <div class="col-md-2 d-flex align-items-end gap-1">
-                    <button type="submit" class="btn btn-primary w-100">{{ __('messages.Search') }}</button>
-                    <a href="{{ route('orders.pending-delivery') }}" class="btn btn-secondary w-100">{{ __('messages.reset') }}</a>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">{{ __('messages.Search') }}</button>
+                    <a href="{{ route('orders.pending-delivery') }}" class="btn btn-secondary">{{ __('messages.reset') }}</a>
                 </div>
             </div>
         </form>
