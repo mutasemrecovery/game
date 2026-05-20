@@ -444,12 +444,14 @@
                                         <div class="d-flex gap-2">
                                             <select id="time_hour" class="form-control" >
                                                 @for($h = 1; $h <= 12; $h++)
-                                                    <option value="{{ $h }}">{{ $h }}</option> <option value="PM">م</option>
+                                                    <option value="{{ $h }}">{{ $h }}</option>
                                                 @endfor
                                             </select>
-                                            <select id="time_period" class="form-control">
-                                                <option value="PM">م</option>
-                                            </select>
+                                            <span class="form-control d-flex align-items-center justify-content-center"
+                                                  style="width:auto; min-width:48px; font-weight:600; background:#f8f9fa; cursor:default;">
+                                                م
+                                            </span>
+                                            <input type="hidden" id="time_period" value="PM">
                                         </div>
                                         <small style="color: red">{{ __('messages.Note for Time') }}</small>
                                         <input type="hidden" name="order_time" id="order_time">
