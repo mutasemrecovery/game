@@ -24,6 +24,10 @@
     transform: translateZ(0);
 }
 
+#order_date::placeholder{
+    color: #dc3545;
+}
+
 /* Make buttons smaller on mobile so they fit */
 @media (max-width: 576px) {
     .step2-fixed-nav {
@@ -186,7 +190,7 @@
   .product-prices {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.5rem;
   }
   
   .price-original {

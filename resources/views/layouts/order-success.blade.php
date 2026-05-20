@@ -277,6 +277,15 @@
         </div>
         
         <div class="text-center mt-4">
+            @php
+                $waNumber = env('WHATSAPP_NUMBER', '962775504609');
+                $products = $order->orderProducts->map(fn($i) => ($i->product->name_ar ?? $i->product->name_en) . ' x' . $i->quantity)->implode(', ');
+                $waMsg = "🌟 طلب جديد رقم #{$order->number}\n👤 {$order->user->name}\n📞 {$order->user->phone}\n📍 {$order->address}\n📅 " . \Carbon\Carbon::parse($order->date)->format('d/m/Y g:i A') . "\n🎭 {$products}\n💰 JD " . number_format($order->total_prices + $order->delivery_fee, 2);
+            @endphp
+            <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode($waMsg) }}" target="_blank"
+               class="btn btn-success me-2" style="background:#25d366; border-color:#25d366;">
+                <i class="fab fa-whatsapp me-2"></i>{{ __('messages.Send via WhatsApp') }}
+            </a>
             <a href="{{ route('home') }}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>{{ __('messages.Create Another Order') }}
             </a>

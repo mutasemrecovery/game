@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Notifications\UnreturnedOrderNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class NotifyUnreturnedOrders extends Command
 {
@@ -19,9 +20,10 @@ class NotifyUnreturnedOrders extends Command
             return;
         }
 
-        // Orders that were executed but characters not yet returned
+        // Orders that were executed and whose date was yesterday or earlier (should have been returned by now)
         $orders = Order::with('user')
             ->where('order_status', 6)
+            ->whereDate('date', '<=', Carbon::yesterday()->toDateString())
             ->get();
 
         if ($orders->isEmpty()) {
@@ -32,7 +34,7 @@ class NotifyUnreturnedOrders extends Command
         $admins = Admin::all();
 
         foreach ($orders as $order) {
-            $alreadyNotified = \DB::table('notifications')
+            $alreadyNotified = DB::table('notifications')
                 ->where('notifiable_type', Admin::class)
                 ->where('type', UnreturnedOrderNotification::class)
                 ->whereNull('read_at')

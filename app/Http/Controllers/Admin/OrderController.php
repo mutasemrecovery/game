@@ -79,8 +79,8 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         // If new filter submitted, save to session
-        if ($request->isMethod('get') && $request->anyFilled(['from_date', 'to_date', 'number', 'user_name', 'delivery_place'])) {
-            session(['orders_filters' => $request->only(['from_date', 'to_date', 'number', 'user_name', 'delivery_place'])]);
+        if ($request->isMethod('get') && $request->anyFilled(['check_date', 'number', 'user_name', 'delivery_place'])) {
+            session(['orders_filters' => $request->only(['check_date', 'number', 'user_name', 'delivery_place'])]);
         }
 
         // If reset button clicked, clear session
@@ -94,9 +94,10 @@ class OrderController extends Controller
 
         $query = Order::query()->latest();
 
-        if ($request->filled('from_date') && $request->filled('to_date')) {
-            $query->whereDate('date', '>=', $request->from_date)
-                ->whereDate('date', '<=', $request->to_date);
+        // When check_date is set: show only status=6 orders with date BEFORE check_date (not returned yet)
+        if ($request->filled('check_date')) {
+            $query->where('order_status', 6)
+                  ->whereDate('date', '<', $request->check_date);
         }
 
         if ($request->filled('number')) {
@@ -116,32 +117,25 @@ class OrderController extends Controller
         }
 
         $deliveries = Delivery::all();
-        $data = $query->paginate(PAGINATION_COUNT);
+        $data = $query->with(['user', 'delivery', 'orderProducts.product'])->paginate(PAGINATION_COUNT);
 
-        // Products that have a conflict: in a status=6 order AND also in a pending/processing
-        // order whose date falls within ±1 day of the executed order's date.
-        $conflictedProductIds = [];
-        $executedOrders = \App\Models\Order::where('order_status', 6)
-            ->with('orderProducts')
-            ->get();
-        foreach ($executedOrders as $exOrder) {
-            $exProductIds = $exOrder->orderProducts->pluck('product_id')->toArray();
-            if (empty($exProductIds)) continue;
-            $df = Carbon::parse($exOrder->date)->subDay()->toDateString();
-            $dt = Carbon::parse($exOrder->date)->addDay()->toDateString();
-            $hits = OrderProduct::whereIn('product_id', $exProductIds)
-                ->whereHas('order', function ($q) use ($df, $dt, $exOrder) {
-                    $q->whereIn('order_status', [1, 2])
-                      ->whereDate('date', '>=', $df)
-                      ->whereDate('date', '<=', $dt)
-                      ->where('id', '!=', $exOrder->id);
-                })
-                ->pluck('product_id')
-                ->toArray();
-            $conflictedProductIds = array_unique(array_merge($conflictedProductIds, $hits));
+        // TODAY conflict: new orders (status=1,2) with date=today that contain products
+        // from old unreturned status=6 orders → these need urgent red alert.
+        $today = Carbon::today()->toDateString();
+        $unreturendProductIds = OrderProduct::whereHas('order', fn($q) => $q->where('order_status', 6))
+            ->pluck('product_id')->unique()->toArray();
+
+        $todayConflictOrderIds = [];
+        if (!empty($unreturendProductIds)) {
+            $todayConflictOrderIds = OrderProduct::whereIn('product_id', $unreturendProductIds)
+                ->whereHas('order', fn($q) => $q->whereIn('order_status', [1, 2])->whereDate('date', $today))
+                ->pluck('order_id')->unique()->toArray();
         }
 
-        return view('admin.orders.index', compact('data', 'deliveries', 'filters', 'conflictedProductIds'));
+        // General conflict: any status=1/2 order whose products are in an unreturned status=6 order
+        $conflictedProductIds = $unreturendProductIds;
+
+        return view('admin.orders.index', compact('data', 'deliveries', 'filters', 'conflictedProductIds', 'todayConflictOrderIds'));
     }
 
 
@@ -239,11 +233,11 @@ class OrderController extends Controller
         $selectedDate   = Carbon::parse($request->date)->toDateString();
         $currentOrderId = $request->order_id;
 
-        // Rule 1: characters executed within ±1 day of the selected date
+        // Rule 1: characters executed OR pending within ±1 day of the selected date
         $dateFrom = Carbon::parse($selectedDate)->subDay()->toDateString();
         $dateTo   = Carbon::parse($selectedDate)->addDay()->toDateString();
         $executedUnreturned = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo, $currentOrderId) {
-                $q->where('order_status', 6)
+                $q->whereIn('order_status', [1, 6])
                   ->whereDate('date', '>=', $dateFrom)
                   ->whereDate('date', '<=', $dateTo);
                 if ($currentOrderId) {
@@ -254,9 +248,9 @@ class OrderController extends Controller
             ->unique()
             ->toArray();
 
-        // Rule 2: characters already booked for this specific date
+        // Rule 2: characters already booked for this specific date (processing)
         $bookedSameDay = OrderProduct::whereHas('order', function ($q) use ($selectedDate, $currentOrderId) {
-                $q->whereIn('order_status', [1, 2])
+                $q->whereIn('order_status', [2])
                   ->whereDate('date', $selectedDate);
                 if ($currentOrderId) {
                     $q->where('id', '!=', $currentOrderId);
@@ -316,12 +310,12 @@ class OrderController extends Controller
         $productIds    = array_column($productsData, 'product_id');
         $requestedDate = Carbon::parse($date)->toDateString();
 
-        // Conflict type 1: character executed within ±1 day of the requested date
+        // Conflict type 1: character executed OR pending within ±1 day of the requested date
         $dateFrom = Carbon::parse($requestedDate)->subDay()->toDateString();
         $dateTo   = Carbon::parse($requestedDate)->addDay()->toDateString();
         $conflict1 = OrderProduct::whereIn('product_id', $productIds)
             ->whereHas('order', function ($q) use ($dateFrom, $dateTo, $excludeOrderId) {
-                $q->where('order_status', 6)
+                $q->whereIn('order_status', [1, 6])
                   ->whereDate('date', '>=', $dateFrom)
                   ->whereDate('date', '<=', $dateTo);
                 if ($excludeOrderId) {
@@ -331,10 +325,10 @@ class OrderController extends Controller
             ->with('product')
             ->get();
 
-        // Conflict type 2: same date already booked (pending/processing)
+        // Conflict type 2: same date already booked (processing)
         $conflict2 = OrderProduct::whereIn('product_id', $productIds)
             ->whereHas('order', function ($q) use ($requestedDate, $excludeOrderId) {
-                $q->whereIn('order_status', [1, 2])
+                $q->whereIn('order_status', [2])
                   ->whereDate('date', $requestedDate);
                 if ($excludeOrderId) {
                     $q->where('id', '!=', $excludeOrderId);

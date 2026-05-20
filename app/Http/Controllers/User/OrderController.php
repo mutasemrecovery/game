@@ -139,11 +139,11 @@ class OrderController extends Controller
     {
         $selectedDate = Carbon::parse($request->date)->toDateString();
 
-        // Rule 1: characters executed within ±1 day of the selected date
+        // Rule 1: characters executed OR pending within ±1 day of the selected date
         $dateFrom = Carbon::parse($selectedDate)->subDay()->toDateString();
         $dateTo   = Carbon::parse($selectedDate)->addDay()->toDateString();
         $executedUnreturned = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo) {
-                $q->where('order_status', 6)
+                $q->whereIn('order_status', [1, 6])
                   ->whereDate('date', '>=', $dateFrom)
                   ->whereDate('date', '<=', $dateTo);
             })
@@ -151,9 +151,9 @@ class OrderController extends Controller
             ->unique()
             ->toArray();
 
-        // Rule 2: characters already booked for this specific date (pending/processing)
+        // Rule 2: characters already booked for this specific date (processing)
         $bookedSameDay = OrderProduct::whereHas('order', function ($q) use ($selectedDate) {
-                $q->whereIn('order_status', [1, 2])
+                $q->whereIn('order_status', [2])
                   ->whereDate('date', $selectedDate);
             })
             ->pluck('product_id')

@@ -322,13 +322,42 @@
 @section('content')
 <div class="container-fluid">
     <div class="row mb-3 d-print-none">
-        <div class="col-12">
+        <div class="col-12 d-flex flex-wrap gap-2 align-items-center">
             <a href="{{ route('orders.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> {{ __('messages.back') }}
             </a>
             <button onclick="window.print()" class="btn btn-primary">
                 <i class="fas fa-print"></i> {{ __('messages.print') }}
             </button>
+
+            @if(in_array($order->order_status, [1, 2]))
+                <button class="btn btn-success btn-quick-status-show" data-id="{{ $order->id }}" data-status="6">
+                    <i class="fas fa-check"></i> {{ __('messages.Executed') }}
+                </button>
+                <button class="btn btn-danger btn-quick-status-show" data-id="{{ $order->id }}" data-status="3">
+                    <i class="fas fa-times"></i> {{ __('messages.Cancel') }}
+                </button>
+            @endif
+
+            @if($order->order_status == 6)
+                <button class="btn btn-info btn-quick-status-show" data-id="{{ $order->id }}" data-status="7">
+                    <i class="fas fa-undo"></i> {{ __('messages.Returned') }}
+                </button>
+            @endif
+
+            <span class="ms-2">
+                @if($order->order_status == 1)
+                    <span class="badge badge-warning" style="font-size:.95rem;">{{ __('messages.Pending') }}</span>
+                @elseif($order->order_status == 2)
+                    <span class="badge badge-info" style="font-size:.95rem;">{{ __('messages.Processing') }}</span>
+                @elseif($order->order_status == 3)
+                    <span class="badge badge-danger" style="font-size:.95rem;">{{ __('messages.Cancelled') }}</span>
+                @elseif($order->order_status == 6)
+                    <span class="badge badge-success" style="font-size:.95rem;">{{ __('messages.Executed') }}</span>
+                @elseif($order->order_status == 7)
+                    <span class="badge badge-primary" style="font-size:.95rem;">{{ __('messages.Returned') }}</span>
+                @endif
+            </span>
         </div>
     </div>
 
@@ -488,8 +517,25 @@
 
 @section('script')
 <script>
-    // Auto-focus print dialog when page loads (optional)
-    // window.onload = function() {
-    //     window.print();
-    // }
+$(document).on('click', '.btn-quick-status-show', function () {
+    var btn    = $(this);
+    var id     = btn.data('id');
+    var status = btn.data('status');
+    var labels = { 6: '{{ __("messages.Executed") }}', 3: '{{ __("messages.Cancelled") }}', 7: '{{ __("messages.Returned") }}' };
+    if (!confirm('{{ __("messages.Confirm action") }}: ' + labels[status] + ' ?')) return;
+    btn.prop('disabled', true);
+    $.ajax({
+        url: '{{ url("") }}/{{ LaravelLocalization::getCurrentLocale() }}/admin/orders/' + id + '/quick-status',
+        method: 'PATCH',
+        data: { _token: '{{ csrf_token() }}', status: status },
+        success: function (res) {
+            if (res.success) location.reload();
+        },
+        error: function (xhr) {
+            alert(xhr.responseJSON?.message || 'Error');
+            btn.prop('disabled', false);
+        }
+    });
+});
 </script>
+@endsection

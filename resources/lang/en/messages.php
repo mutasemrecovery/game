@@ -146,6 +146,7 @@ return [
      'Time' => 'Time',
      'Order Date' => 'Order Date',
      'Continue to Products' => 'Continue to Products',
+     'Search By Name' => 'Search By Name',
 
      // Step 2 - Product Selection
      'Select Your Products' => 'You can display the image by entering the name',
@@ -231,6 +232,12 @@ return [
     'Price' => 'Price',
     'Remove' => 'Remove',
     'Select' => 'Select',
+    'Rental Price' => 'Rental Price',
+    'I pledge to return the character on the agreed day' => 'I pledge to return the character on the agreed day',
+    'You must pledge to return the character on the agreed day' => 'You must pledge to return the character on the agreed day',
+    'Send via WhatsApp' => 'Send via WhatsApp',
+    'Shows executed orders before this date' => 'Shows executed orders before this date',
+    'Character not returned - urgent' => 'Character not returned - urgent',
     'Please select products and a user with a valid phone number' => 'Please select products and a user with a valid phone number',
     'Hello! Here are the selected products for' => 'Hello! Here are the selected products for',
     'at' => 'at',

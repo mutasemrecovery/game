@@ -7,6 +7,13 @@
 <style>
 .conflict-product { color: #dc3545; font-weight: 600; }
 .conflict-badge { font-size: .7rem; }
+.today-conflict-row { border-right: 4px solid #dc3545 !important; background: #fff5f5 !important; }
+.today-conflict-bar {
+    background: #dc3545; color: #fff; font-size: 0.78rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 4px; display: inline-block;
+    animation: blink-alert 1.2s step-start infinite;
+}
+@keyframes blink-alert { 50% { opacity: 0.4; } }
 </style>
 @endsection
 
@@ -24,14 +31,10 @@
             <form method="GET" action="{{ route('orders.index') }}">
                 <div class="row mb-3">
                     <div class="col-md-3">
-                        <label>{{ __('messages.from_date') }}</label>
-                        <input type="date" name="from_date" class="form-control"
-                            value="{{ request('from_date', $filters['from_date'] ?? '') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label>{{ __('messages.to_date') }}</label>
-                        <input type="date" name="to_date" class="form-control"
-                            value="{{ request('to_date', $filters['to_date'] ?? '') }}">
+                        <label>{{ __('messages.date') }}</label>
+                        <input type="date" name="check_date" class="form-control"
+                            value="{{ request('check_date', $filters['check_date'] ?? '') }}">
+                        <small class="text-muted">{{ __('messages.Shows executed orders before this date') }}</small>
                     </div>
                     <div class="col-md-2">
                         <label>{{ __('messages.Number') }}</label>
@@ -88,8 +91,10 @@
                                     @php
                                         $hasConflict = $info->orderProducts->pluck('product_id')
                                             ->intersect($conflictedProductIds)->isNotEmpty();
+                                        $isTodayConflict = in_array($info->id, $todayConflictOrderIds);
                                     @endphp
-                                    <tr @if($hasConflict) style="border-right: 3px solid #dc3545;" @endif>
+                                    <tr class="{{ $isTodayConflict ? 'today-conflict-row' : ($hasConflict ? '' : '') }}"
+                                        @if($hasConflict && !$isTodayConflict) style="border-right: 3px solid #ffc107;" @endif>
                                         <td>{{ $info->number }}</td>
                                         <td>{{ $info->total_prices }}</td>
                                         <td>{{ $info->delivery_fee }}</td>
@@ -122,6 +127,12 @@
                                         </td>
                                         <td>{{ $info->user->phone ?? '-' }}</td>
                                         <td>
+                                            @if($isTodayConflict)
+                                                <span class="today-conflict-bar mb-1 d-block">
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    {{ __('messages.Character not returned - urgent') }}
+                                                </span>
+                                            @endif
                                             @foreach($info->orderProducts as $item)
                                                 @php $isConflict = in_array($item->product_id, $conflictedProductIds); @endphp
                                                 <small @if($isConflict) class="conflict-product" title="{{ __('messages.Conflict Warning') }}" @endif>
