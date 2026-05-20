@@ -139,28 +139,16 @@ class OrderController extends Controller
     {
         $selectedDate = Carbon::parse($request->date)->toDateString();
 
-        // Rule 1: characters executed OR pending within ±1 day of the selected date
+        // Block any product that has ANY order within ±1 day of the selected date, regardless of status
         $dateFrom = Carbon::parse($selectedDate)->subDay()->toDateString();
         $dateTo   = Carbon::parse($selectedDate)->addDay()->toDateString();
-        $executedUnreturned = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo) {
-                $q->whereIn('order_status', [1, 6])
-                  ->whereDate('date', '>=', $dateFrom)
+        $bookedProductIds = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo) {
+                $q->whereDate('date', '>=', $dateFrom)
                   ->whereDate('date', '<=', $dateTo);
             })
             ->pluck('product_id')
             ->unique()
             ->toArray();
-
-        // Rule 2: characters already booked for this specific date (processing)
-        $bookedSameDay = OrderProduct::whereHas('order', function ($q) use ($selectedDate) {
-                $q->whereIn('order_status', [2])
-                  ->whereDate('date', $selectedDate);
-            })
-            ->pluck('product_id')
-            ->unique()
-            ->toArray();
-
-        $bookedProductIds = array_unique(array_merge($executedUnreturned, $bookedSameDay));
 
         $currentDate = now();
         $products = Product::where('status', 1)

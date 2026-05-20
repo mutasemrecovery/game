@@ -30,11 +30,15 @@
         <div class="card-body">
             <form method="GET" action="{{ route('orders.index') }}">
                 <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label>{{ __('messages.date') }}</label>
-                        <input type="date" name="check_date" class="form-control"
-                            value="{{ request('check_date', $filters['check_date'] ?? '') }}">
-                        <small class="text-muted">{{ __('messages.Shows executed orders before this date') }}</small>
+                    <div class="col-md-2">
+                        <label>{{ __('messages.from_date') }}</label>
+                        <input type="date" name="from_date" class="form-control"
+                            value="{{ request('from_date', $filters['from_date'] ?? '') }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('messages.to_date') }}</label>
+                        <input type="date" name="to_date" class="form-control"
+                            value="{{ request('to_date', $filters['to_date'] ?? '') }}">
                     </div>
                     <div class="col-md-2">
                         <label>{{ __('messages.Number') }}</label>

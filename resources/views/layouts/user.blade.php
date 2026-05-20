@@ -279,8 +279,8 @@
         </div>
     </div>
 
-    <!-- ── Floating WhatsApp ── -->
-    <a id="float-whatsapp" href="https://wa.me/{{ env('WHATSAPP_NUMBER', '962775504609') }}" target="_blank" rel="noopener">
+    <!-- ── Floating WhatsApp (step 3 only) ── -->
+    <a id="float-whatsapp" href="https://wa.me/{{ env('WHATSAPP_NUMBER', '962775504609') }}" target="_blank" rel="noopener" style="display:none;">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -626,6 +626,7 @@
 
             $('#header-step1').toggle(step === 1);
             $('#header-step3').toggle(step === 3);
+            $('#float-whatsapp').toggle(step === 3);
             if (step !== 1) {
                 $('#gallery-section').hide();
                 closeFsGallery();

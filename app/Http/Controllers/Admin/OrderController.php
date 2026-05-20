@@ -81,8 +81,8 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         // If new filter submitted, save to session
-        if ($request->isMethod('get') && $request->anyFilled(['check_date', 'number', 'user_name', 'delivery_place'])) {
-            session(['orders_filters' => $request->only(['check_date', 'number', 'user_name', 'delivery_place'])]);
+        if ($request->isMethod('get') && $request->anyFilled(['from_date', 'to_date', 'number', 'user_name', 'delivery_place'])) {
+            session(['orders_filters' => $request->only(['from_date', 'to_date', 'number', 'user_name', 'delivery_place'])]);
         }
 
         // If reset button clicked, clear session
@@ -96,10 +96,11 @@ class OrderController extends Controller
 
         $query = Order::query()->latest();
 
-        // When check_date is set: show only status=6 orders with date BEFORE check_date (not returned yet)
-        if ($request->filled('check_date')) {
-            $query->where('order_status', 6)
-                  ->whereDate('date', '<', $request->check_date);
+        if ($request->filled('from_date')) {
+            $query->whereDate('date', '>=', $request->from_date);
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('date', '<=', $request->to_date);
         }
 
         if ($request->filled('number')) {
