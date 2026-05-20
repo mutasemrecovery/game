@@ -30,8 +30,6 @@
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Swiper -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
     <style>
         .booked-product {
@@ -109,115 +107,6 @@
             }
         }
 
-        /* ── Gallery thumbnail strip ── */
-        #gallery-section {
-            display: none;
-            width: 100%;
-            background: #111;
-            padding: 6px;
-            cursor: pointer;
-        }
-        .gallery-thumb-strip {
-            display: flex;
-            gap: 4px;
-            overflow: hidden;
-        }
-        .gallery-thumb {
-            flex: 1 1 0;
-            aspect-ratio: 1;
-            max-width: 33.33%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 3px;
-        }
-        .gallery-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .gallery-thumb-more {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            color: #fff;
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .gallery-thumb-hint {
-            text-align: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.72rem;
-            padding: 4px 0 2px;
-            letter-spacing: .5px;
-        }
-
-        /* ── Full-screen viewer ── */
-        #fs-gallery {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: #000;
-            display: none;
-            flex-direction: column;
-        }
-        #fs-gallery .fs-top-bar {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            z-index: 10;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%);
-        }
-        #fs-gallery .fs-counter {
-            color: #fff;
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: .5px;
-        }
-        #fs-gallery .fs-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.6rem;
-            line-height: 1;
-            cursor: pointer;
-            padding: 0 4px;
-        }
-        #fs-gallery .swiper {
-            width: 100%;
-            height: 100%;
-        }
-        #fs-gallery .swiper-slide {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-        }
-        #fs-gallery .swiper-slide img {
-            max-width: 100%;
-            max-height: 100vh;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-        #fs-gallery .swiper-button-next,
-        #fs-gallery .swiper-button-prev {
-            color: rgba(255,255,255,0.75) !important;
-        }
-        #fs-gallery .swiper-button-next::after,
-        #fs-gallery .swiper-button-prev::after {
-            font-size: 1.1rem !important;
-        }
-
         /* ── Floating WhatsApp ── */
         #float-whatsapp {
             position: fixed;
@@ -260,24 +149,6 @@
         <h3 class="text-center" id="header-step3" style="display:none;">{{ __('messages.Initial Booking') }}</h3>
     </div>
 
-    <!-- ── Gallery thumbnail strip (step 1 preview) ── -->
-    <div id="gallery-section" onclick="openFsGallery(0)">
-        <div class="gallery-thumb-strip" id="gallery-thumbs"></div>
-        <p class="gallery-thumb-hint">{{ __('messages.Tap to view all photos') }}</p>
-    </div>
-
-    <!-- ── Full-screen photo viewer (like phone gallery) ── -->
-    <div id="fs-gallery">
-        <div class="fs-top-bar">
-            <span class="fs-counter" id="fs-counter">1 / 1</span>
-            <button class="fs-close" onclick="closeFsGallery()">&#x2715;</button>
-        </div>
-        <div class="swiper" id="fsSwiper">
-            <div class="swiper-wrapper" id="fs-slides"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-        </div>
-    </div>
 
     <!-- ── Floating WhatsApp (step 3 only) ── -->
     <a id="float-whatsapp" href="https://wa.me/{{ env('WHATSAPP_NUMBER', '962776648373') }}" target="_blank" rel="noopener" style="display:none;">
@@ -543,7 +414,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
 
     <script>
         flatpickr("#order_date", {
@@ -629,12 +500,6 @@
             $('#header-step1').toggle(step === 1);
             $('#header-step3').toggle(step === 3);
             $('#float-whatsapp').toggle(step === 3);
-            if (step !== 1) {
-                $('#gallery-section').hide();
-                closeFsGallery();
-            } else if (_allPhotos.length > 0) {
-                $('#gallery-section').show();
-            }
 
             if (step === 1) {
                 $('#step2-nav').hide();
@@ -662,7 +527,6 @@
                 success: function (response) {
                     productsData = response.products;
                     displayProducts(response.products);
-                    buildGalleryFromProducts(response.products);
                 },
                 error: function () {
                     hideProductsLoading();
@@ -680,7 +544,6 @@
                 success: function (response) {
                     productsData = response.products;
                     displayProducts(response.products);
-                    buildGalleryFromProducts(response.products);
                 },
                 error: function () {
                     hideProductsLoading();
@@ -1014,99 +877,6 @@
             combineOrderTime();
             return true;
         }
-
-        // ── Full-screen photo gallery (phone gallery style) ──────────
-        let _allPhotos  = [];
-        let _fsSwiper   = null;
-
-        function buildGalleryFromProducts(products) {
-            _allPhotos = [];
-            products.forEach(function(p) {
-                if (p.photos && p.photos.length) {
-                    p.photos.forEach(function(ph) { _allPhotos.push(ph); });
-                } else if (p.image) {
-                    _allPhotos.push(p.image);
-                }
-            });
-            if (!_allPhotos.length) return;
-
-            // ── Build 3-thumbnail preview strip ──
-            const strip = document.getElementById('gallery-thumbs');
-            strip.innerHTML = '';
-            const show = Math.min(3, _allPhotos.length);
-            for (let i = 0; i < show; i++) {
-                const thumb = document.createElement('div');
-                thumb.className = 'gallery-thumb';
-                const isLast = i === 2 && _allPhotos.length > 3;
-                thumb.innerHTML = `<img src="${_allPhotos[i]}" loading="lazy" alt="">` +
-                    (isLast ? `<div class="gallery-thumb-more">+${_allPhotos.length - 2}</div>` : '');
-                strip.appendChild(thumb);
-            }
-            $('#gallery-section').show();
-
-            // ── Build full-screen Swiper slides ──
-            const fsSlides = document.getElementById('fs-slides');
-            fsSlides.innerHTML = '';
-            _allPhotos.forEach(function(src) {
-                const s = document.createElement('div');
-                s.className = 'swiper-slide';
-                s.innerHTML = `<img src="${src}" loading="lazy" alt="">`;
-                fsSlides.appendChild(s);
-            });
-        }
-
-        function openFsGallery(startIndex) {
-            if (!_allPhotos.length) return;
-            startIndex = startIndex || 0;
-
-            // Destroy old instance
-            if (_fsSwiper) { _fsSwiper.destroy(true, true); _fsSwiper = null; }
-
-            const total = _allPhotos.length;
-            document.getElementById('fs-counter').textContent = (startIndex + 1) + ' / ' + total;
-
-            _fsSwiper = new Swiper('#fsSwiper', {
-                initialSlide: startIndex,
-                loop: total > 1,
-                grabCursor: true,
-                keyboard: { enabled: true },
-                navigation: {
-                    nextEl: '#fs-gallery .swiper-button-next',
-                    prevEl: '#fs-gallery .swiper-button-prev'
-                },
-                on: {
-                    slideChange: function () {
-                        document.getElementById('fs-counter').textContent =
-                            (this.realIndex + 1) + ' / ' + total;
-                    }
-                }
-            });
-
-            const fs = document.getElementById('fs-gallery');
-            fs.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeFsGallery() {
-            document.getElementById('fs-gallery').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-
-        // Close on background tap (not on nav buttons)
-        document.getElementById('fs-gallery').addEventListener('click', function(e) {
-            if (e.target === this) closeFsGallery();
-        });
-
-        // Swipe up/down to close
-        (function() {
-            let startY = 0;
-            const fs = document.getElementById('fs-gallery');
-            fs.addEventListener('touchstart', function(e) { startY = e.touches[0].clientY; }, { passive: true });
-            fs.addEventListener('touchend', function(e) {
-                const diff = e.changedTouches[0].clientY - startY;
-                if (Math.abs(diff) > 80) closeFsGallery();
-            }, { passive: true });
-        })();
 
     </script>
 </body>
