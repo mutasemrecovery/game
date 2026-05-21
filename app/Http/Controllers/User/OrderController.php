@@ -144,7 +144,8 @@ class OrderController extends Controller
         $dateTo   = Carbon::parse($selectedDate)->addDay()->toDateString();
         $bookedProductIds = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo) {
                 $q->whereDate('date', '>=', $dateFrom)
-                  ->whereDate('date', '<=', $dateTo);
+                  ->whereDate('date', '<=', $dateTo)
+                  ->where('order_status', '!=', 3);
             })
             ->pluck('product_id')
             ->unique()

@@ -283,7 +283,7 @@
         </div>
 
         @php
-            $waNumber = env('WHATSAPP_NUMBER', '962775504609');
+            $waNumber = env('WHATSAPP_NUMBER', '962776648373');
             $products = $order->orderProducts->map(fn($i) => ($i->product->name_ar ?? $i->product->name_en) . ' x' . $i->quantity)->implode(', ');
             $waMsg = "🌟 طلب جديد رقم #{$order->number}\n👤 {$order->user->name}\n📞 {$order->user->phone}\n📍 {$order->address}\n📅 " . \Carbon\Carbon::parse($order->date)->format('d/m/Y g:i A') . "\n🎭 {$products}\n💰 JD " . number_format($order->total_prices + $order->delivery_fee, 2);
         @endphp
