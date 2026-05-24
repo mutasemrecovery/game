@@ -31,7 +31,7 @@
                 <div class="col-md-4">
                     <label>{{ __('messages.date') }}</label>
                     <input type="date" name="check_date" class="form-control" value="{{ $checkDate }}">
-                    <small class="text-muted">{{ __('messages.Shows orders up to this date') }}</small>
+                    <small class="text-muted">{{ __('messages.Shows executed orders before this date') }}</small>
                 </div>
                 <div class="col-md-3">
                     <button type="submit" class="btn btn-primary">{{ __('messages.Search') }}</button>
@@ -132,7 +132,20 @@ $(document).ready(function () {
             url: '{{ url("") }}/{{ LaravelLocalization::getCurrentLocale() }}/admin/orders/' + id + '/quick-status',
             method: 'PATCH',
             data: { _token: '{{ csrf_token() }}', status: status },
-            success: function (res) { if (res.success) location.reload(); },
+            success: function (res) {
+                if (!res.success) return;
+                var row = btn.closest('tr');
+                // Remove days-badge urgency styling
+                row.removeClass('urgent-row normal-row');
+                // Update days badge to green "Returned"
+                row.find('.days-badge').css({ 'background': '#b2f2bb', 'color': '#2f9e44' })
+                   .text('{{ __("messages.Returned") }}');
+                // Remove action buttons except view/edit
+                row.find('.btn-quick-status').remove();
+                // Green highlight and move to bottom
+                row.css({ 'background': '#d4edda', 'border-right': '4px solid #28a745', 'transition': 'background 0.4s' });
+                row.appendTo(row.closest('tbody'));
+            },
             error: function (xhr) {
                 alert(xhr.responseJSON?.message || 'Error');
                 btn.prop('disabled', false);

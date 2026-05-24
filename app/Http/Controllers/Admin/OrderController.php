@@ -34,7 +34,7 @@ class OrderController extends Controller
 
         $query = Order::with(['user', 'delivery', 'orderProducts.product'])
             ->whereIn('order_status', [1, 2])
-            ->whereDate('date', '<=', $checkDate)
+            ->whereDate('date', $checkDate)
             ->orderBy('date', 'asc');
 
         $data  = $query->paginate(PAGINATION_COUNT)->appends(['check_date' => $checkDate]);
@@ -50,9 +50,11 @@ class OrderController extends Controller
             ? $request->check_date
             : Carbon::today()->toDateString();
 
+        $dayBefore = Carbon::parse($checkDate)->subDay()->toDateString();
+
         $query = Order::with(['user', 'delivery', 'orderProducts.product'])
             ->where('order_status', 6)
-            ->whereDate('date', '<=', $checkDate)
+            ->whereDate('date', $dayBefore)
             ->orderBy('date', 'asc');
 
         $data  = $query->paginate(PAGINATION_COUNT)->appends(['check_date' => $checkDate]);
