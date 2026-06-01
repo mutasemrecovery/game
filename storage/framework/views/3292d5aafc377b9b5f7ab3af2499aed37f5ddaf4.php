@@ -6,3 +6,4 @@
     <!-- Default to the left -->
     <strong>Copyright &copy; 2023 <a href="">Game</a>.</strong> All rights reserved.
   </footer>
+<?php /**PATH C:\xampp\htdocs\game\resources\views/admin/includes/footer.blade.php ENDPATH**/ ?>

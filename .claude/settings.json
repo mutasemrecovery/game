@@ -4,7 +4,8 @@
       "Bash(php -r ' *)",
       "Bash(order\")",
       "PowerShell(Get-ChildItem \"c:\\\\xampp\\\\htdocs\\\\game\\\\database\\\\migrations\\\\\" | Where-Object { $_.Name -match \"notif|order\" } | Select-Object Name)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\game\\\\database\\\\migrations\" -Name)"
     ]
   }
 }

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>@yield('title')</title>
+    <title><?php echo $__env->yieldContent('title'); ?></title>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- jQuery UI -->
@@ -15,17 +15,17 @@
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('assets/admin/plugins/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/plugins/fontawesome-free/css/all.min.css')); ?>">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('assets/admin/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/dist/css/adminlte.min.css')); ?>">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="{{ asset('assets/admin/fonts/SansPro/SansPro.min.css') }}">
-    @if (App::getLocale() == 'ar')
-        <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/custom_rtl.css') }}">
-    @endif
-    <link rel="stylesheet" href="{{ asset('assets_front/css/style.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/fonts/SansPro/SansPro.min.css')); ?>">
+    <?php if(App::getLocale() == 'ar'): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/bootstrap_rtl-v4.2.1/bootstrap.min.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/bootstrap_rtl-v4.2.1/custom_rtl.css')); ?>">
+    <?php endif; ?>
+    <link rel="stylesheet" href="<?php echo e(asset('assets_front/css/style.css')); ?>">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
@@ -139,26 +139,26 @@
         .pledge-wrapper label { cursor: pointer; font-weight: 500; }
     </style>
 
-    @yield('css')
+    <?php echo $__env->yieldContent('css'); ?>
 </head>
 
 <body>
 
     <div class="steps-header">
-        <h3 class="text-center mb-1" id="header-step1">{{ __('messages.Character Photos') }}</h3>
-        <h3 class="text-center" id="header-step3" style="display:none;">{{ __('messages.Initial Booking') }}</h3>
+        <h3 class="text-center mb-1" id="header-step1"><?php echo e(__('messages.Character Photos')); ?></h3>
+        <h3 class="text-center" id="header-step3" style="display:none;"><?php echo e(__('messages.Initial Booking')); ?></h3>
     </div>
 
 
     <!-- ── Floating WhatsApp (step 3 only) ── -->
-    <a id="float-whatsapp" href="https://wa.me/{{ env('WHATSAPP_NUMBER', '962776648373') }}" target="_blank" rel="noopener" style="display:none;">
+    <a id="float-whatsapp" href="https://wa.me/<?php echo e(env('WHATSAPP_NUMBER', '962776648373')); ?>" target="_blank" rel="noopener" style="display:none;">
         <i class="fab fa-whatsapp"></i>
     </a>
 
     <div class="container" id="main-container">
 
-        <form action="{{ route('userOrders.store') }}" method="post" enctype='multipart/form-data'>
-            @csrf
+        <form action="<?php echo e(route('userOrders.store')); ?>" method="post" enctype='multipart/form-data'>
+            <?php echo csrf_field(); ?>
 
             <!-- Step 1: Date & Products -->
             <div class="step-content active" id="step1">
@@ -172,14 +172,21 @@
                             <div class="col-md-6 offset-md-3">
                                    <div class="card-header bg-transparent border-0 pt-4">
                       
-                        <p class="text-center text-muted mb-0">{!! __('messages.Select Order Date') !!}</p>
+                        <p class="text-center text-muted mb-0"><?php echo __('messages.Select Order Date'); ?></p>
                     </div>
                                 <input type="text" id="order_date" name="date"
-                                    class="form-control form-control-lg" required placeholder="{{ __('messages.Select Date') }}">
+                                    class="form-control form-control-lg" required placeholder="<?php echo e(__('messages.Select Date')); ?>">
 
-                                @error('date')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
+                                <?php $__errorArgs = ['date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
 
@@ -189,15 +196,15 @@
                               
                                 <div style="max-width: 320px; width: 100%;">
                                     <input type="text" id="product-search" class="form-control"
-                                        placeholder="{{ __('messages.Search By Name') }}">
+                                        placeholder="<?php echo e(__('messages.Search By Name')); ?>">
                                 </div>
                             </div>
 
                             <div id="products-loading" class="text-center py-5">
                                 <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">{{ __('messages.Loading products...') }}</span>
+                                    <span class="visually-hidden"><?php echo e(__('messages.Loading products...')); ?></span>
                                 </div>
-                                <p class="mt-2 text-muted">{{ __('messages.Loading available products...') }}</p>
+                                <p class="mt-2 text-muted"><?php echo e(__('messages.Loading available products...')); ?></p>
                             </div>
 
                             <div id="products-container" class="product-grid" style="display: none;">
@@ -208,9 +215,11 @@
                             <div id="no-date-notice" style="display:none;"
                                  class="alert alert-warning mt-3 text-center">
                                 <i class="fas fa-calendar-alt me-2"></i>
-                                {{ __('messages.Please select a date first to check availability') }}
+                                <?php echo e(__('messages.Please select a date first to check availability')); ?>
+
                                 <button type="button" class="btn btn-sm btn-primary ms-3" onclick="openDatePicker()">
-                                    {{ __('messages.Select Date') }}
+                                    <?php echo e(__('messages.Select Date')); ?>
+
                                 </button>
                             </div>
                         </div>
@@ -220,11 +229,12 @@
                 <!-- Fixed bottom nav for step 1 -->
                 <div class="step1-fixed-nav" id="step1-nav" style="display:none;">
                     <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">
-                        <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
+                        <i class="fas fa-arrow-right me-2"></i> <?php echo e(__('messages.Back')); ?>
+
                     </button>
                     <button type="button" class="btn btn-primary btn-lg" onclick="goToCart()" disabled
                         id="review-cart-btn">
-                        {{ __('messages.Review Cart') }} <i class="fas fa-arrow-left ms-2"></i>
+                        <?php echo e(__('messages.Review Cart')); ?> <i class="fas fa-arrow-left ms-2"></i>
                     </button>
                 </div>
             </div>
@@ -233,7 +243,7 @@
             <div class="step-content" id="step2">
                 <div class="custom-card card">
                     <div class="card-header bg-transparent border-0 pt-4">
-                        <h3 class="text-center">{{ __('messages.Review Your Cart') }}</h3>
+                        <h3 class="text-center"><?php echo e(__('messages.Review Your Cart')); ?></h3>
                     </div>
                     <div class="card-body">
                         <div id="cart-items">
@@ -246,10 +256,11 @@
                 <!-- Fixed bottom nav for step 2 -->
                 <div class="step1-fixed-nav" id="step2-nav" style="display:none;">
                     <button type="button" class="btn btn-secondary btn-lg" onclick="previousStep(2)">
-                        <i class="fas fa-arrow-right me-2"></i> {{ __('messages.Back') }}
+                        <i class="fas fa-arrow-right me-2"></i> <?php echo e(__('messages.Back')); ?>
+
                     </button>
                     <button type="button" class="btn btn-primary btn-lg" onclick="nextStep(2)">
-                        {{ __('messages.Proceed to Checkout') }} <i class="fas fa-arrow-left ms-2"></i>
+                        <?php echo e(__('messages.Proceed to Checkout')); ?> <i class="fas fa-arrow-left ms-2"></i>
                     </button>
                 </div>
             </div>
@@ -259,64 +270,91 @@
                 <div class="row">
                     <div class="col-md-7">
                         <div class="custom-card card">
-                            {{-- <div class="card-header bg-transparent border-0 pt-4">
-                               
-                            </div> --}}
+                            
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="name" class="form-label">{{ __('messages.Customer Name') }}</label>
+                                        <label for="name" class="form-label"><?php echo e(__('messages.Customer Name')); ?></label>
                                         <input type="text" class="form-control" id="name" name="name"
-                                            value="{{ old('name') }}" required>
-                                        @error('name')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            value="<?php echo e(old('name')); ?>" required>
+                                        <?php $__errorArgs = ['name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="phone" class="form-label">{{ __('messages.Customer Phone') }}</label>
+                                        <label for="phone" class="form-label"><?php echo e(__('messages.Customer Phone')); ?></label>
                                         <input type="tel" class="form-control" id="phone" name="phone"
-                                            value="{{ old('phone') }}" required>
-                                        @error('phone')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            value="<?php echo e(old('phone')); ?>" required>
+                                        <?php $__errorArgs = ['phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
-                                        <label for="address" class="form-label">{{ __('messages.Customer Address') }}</label>
+                                        <label for="address" class="form-label"><?php echo e(__('messages.Customer Address')); ?></label>
                                         <input type="text" class="form-control" id="address" name="address"
-                                            value="{{ old('address') }}" required>
-                                        @error('address')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            value="<?php echo e(old('address')); ?>" required>
+                                        <?php $__errorArgs = ['address'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <select class="form-select select2" id="delivery_id" name="delivery_id">
                                             <option value="" data-price="0" selected>
-                                                {{ __('messages.Select Delivery') }}</option>
+                                                <?php echo e(__('messages.Select Delivery')); ?></option>
 
-                                            @foreach ($deliveries as $delivery)
-                                                <option value="{{ $delivery->id }}"
-                                                    data-price="{{ $delivery->price }}"
-                                                    {{ old('delivery_id') == $delivery->id ? 'selected' : '' }}>
-                                                    {{ $delivery->place }}
+                                            <?php $__currentLoopData = $deliveries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $delivery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($delivery->id); ?>"
+                                                    data-price="<?php echo e($delivery->price); ?>"
+                                                    <?php echo e(old('delivery_id') == $delivery->id ? 'selected' : ''); ?>>
+                                                    <?php echo e($delivery->place); ?>
+
                                                 </option>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </select>
-                                        @error('delivery_id')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                        <?php $__errorArgs = ['delivery_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                     <!-- Time picker -->
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">{{ __('messages.Order Time') }}</label>
+                                        <label class="form-label"><?php echo e(__('messages.Order Time')); ?></label>
                                         <div class="d-flex gap-2">
                                             <select id="time_hour" class="form-control" >
-                                                @for($h = 1; $h <= 12; $h++)
-                                                    <option value="{{ $h }}">{{ $h }}</option>
-                                                @endfor
+                                                <?php for($h = 1; $h <= 12; $h++): ?>
+                                                    <option value="<?php echo e($h); ?>"><?php echo e($h); ?></option>
+                                                <?php endfor; ?>
                                             </select>
                                             <span class="form-control d-flex align-items-center justify-content-center"
                                                   style="width:auto; min-width:48px; font-weight:600; background:#f8f9fa; cursor:default;">
@@ -324,17 +362,24 @@
                                             </span>
                                             <input type="hidden" id="time_period" value="PM">
                                         </div>
-                                        <small style="color: red">{{ __('messages.Note for Time') }}</small>
+                                        <small style="color: red"><?php echo e(__('messages.Note for Time')); ?></small>
                                         <input type="hidden" name="order_time" id="order_time">
                                     </div>
 
                                     <!-- Note field -->
                                     <div class="col-md-12 mb-3">
                                         <textarea class="form-control" id="note" name="note" rows="3"
-                                            placeholder="{{ __('messages.Optional note') }}">{{ old('note') }}</textarea>
-                                        @error('note')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                            placeholder="<?php echo e(__('messages.Optional note')); ?>"><?php echo e(old('note')); ?></textarea>
+                                        <?php $__errorArgs = ['note'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+                                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                     </div>
 
                                 </div>
@@ -344,7 +389,8 @@
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="pledge_checkbox">
                                         <label class="form-check-label" for="pledge_checkbox">
-                                            {{ __('messages.I pledge to return the character on the agreed day') }}
+                                            <?php echo e(__('messages.I pledge to return the character on the agreed day')); ?>
+
                                         </label>
                                     </div>
                                 </div>
@@ -352,11 +398,13 @@
                                 <div class="text-center mt-4">
                                     <button type="button" class="btn btn-secondary btn-lg me-3"
                                         onclick="previousStep(3)">
-                                        <i class="fas fa-arrow-left me-2"></i> {{ __('messages.Back') }}
+                                        <i class="fas fa-arrow-left me-2"></i> <?php echo e(__('messages.Back')); ?>
+
                                     </button>
                                     <button type="submit" class="btn btn-success btn-lg"
                                         id="place-order-btn" onclick="return placeOrder()">
-                                        <i class="fas fa-check me-2"></i> {{ __('messages.Place Order') }}
+                                        <i class="fas fa-check me-2"></i> <?php echo e(__('messages.Place Order')); ?>
+
                                     </button>
                                 </div>
                             </div>
@@ -365,7 +413,7 @@
 
                     <div class="col-md-5">
                         <div class="checkout-summary">
-                            <h4 class="mb-3">{{ __('messages.Order Summary') }}</h4>
+                            <h4 class="mb-3"><?php echo e(__('messages.Order Summary')); ?></h4>
                             <div id="checkout-summary-content">
                                 <!-- Summary populated here -->
                             </div>
@@ -408,7 +456,7 @@
                           style="display:none; position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.55); color:#fff; padding:2px 10px; border-radius:12px; font-size:0.85rem; z-index:3;"></span>
                     <!-- booked overlay -->
                     <div id="modalBookedOverlay" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.55); align-items:center; justify-content:center; z-index:4;">
-                        <span style="background:#dc3545; color:#fff; font-weight:700; font-size:1.2rem; padding:8px 28px; border-radius:6px;">{{ __('messages.Booked') }}</span>
+                        <span style="background:#dc3545; color:#fff; font-weight:700; font-size:1.2rem; padding:8px 28px; border-radius:6px;"><?php echo e(__('messages.Booked')); ?></span>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap" style="padding:10px 15px; gap:8px;">
@@ -426,7 +474,8 @@
                     <div id="modalPriceInfo" style="font-size:0.93rem;"></div>
                     <!-- Select/Book button -->
                     <button type="button" id="modalSelectBtn" class="btn btn-success" onclick="toggleProductInModal()">
-                        <i class="fas fa-check me-1"></i>{{ __('messages.Select') }}
+                        <i class="fas fa-check me-1"></i><?php echo e(__('messages.Select')); ?>
+
                     </button>
                 </div>
             </div>
@@ -494,7 +543,7 @@
             $('#order_date').removeClass('is-invalid');
 
             if (Object.keys(selectedProducts).length === 0) {
-                alert('{{ __('messages.Please select at least one product') }}');
+                alert('<?php echo e(__('messages.Please select at least one product')); ?>');
                 return;
             }
             updateCartDisplay();
@@ -544,7 +593,7 @@
         function fetchAllProducts() {
             showProductsLoading();
             $.ajax({
-                url: '{{ route('user.orders.all-products') }}',
+                url: '<?php echo e(route('user.orders.all-products')); ?>',
                 method: 'GET',
                 success: function (response) {
                     productsData = response.products;
@@ -552,7 +601,7 @@
                 },
                 error: function () {
                     hideProductsLoading();
-                    alert('{{ __('messages.Error loading products. Please try again') }}');
+                    alert('<?php echo e(__('messages.Error loading products. Please try again')); ?>');
                 }
             });
         }
@@ -560,7 +609,7 @@
         function fetchAvailableProducts(date) {
             showProductsLoading();
             $.ajax({
-                url: '{{ route('user.orders.available-products') }}',
+                url: '<?php echo e(route('user.orders.available-products')); ?>',
                 method: 'GET',
                 data: { date: date },
                 success: function (response) {
@@ -569,7 +618,7 @@
                 },
                 error: function () {
                     hideProductsLoading();
-                    alert('{{ __('messages.Error loading products. Please try again') }}');
+                    alert('<?php echo e(__('messages.Error loading products. Please try again')); ?>');
                 }
             });
         }
@@ -612,7 +661,7 @@
 
             if (products.length === 0) {
                 container.html(
-                    '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p>{{ __('messages.No products available for the selected date') }}</p></div>'
+                    '<div class="empty-state"><i class="fas fa-box-open fa-3x mb-3"></i><p><?php echo e(__('messages.No products available for the selected date')); ?></p></div>'
                 );
                 hideProductsLoading();
                 return;
@@ -630,7 +679,7 @@
                          data-product-id="${product.id}"
                          ${!isBooked ? `onclick="toggleProduct(${product.id})"` : ''}>
 
-                        ${isBooked ? `<div class="booked-overlay"><span>{{ __('messages.Booked') }}</span></div>` : ''}
+                        ${isBooked ? `<div class="booked-overlay"><span><?php echo e(__('messages.Booked')); ?></span></div>` : ''}
 
                         <div class="product-image-container">
                             <button type="button"
@@ -638,7 +687,7 @@
                                 <img src="${product.image}" alt="${name}" class="product-image">
                                 ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
                                 <i class="fas fa-search-plus"></i>
-                                <span class="img-hint">{{ __('messages.Click to view full size') }}</span>
+                                <span class="img-hint"><?php echo e(__('messages.Click to view full size')); ?></span>
                             </button>
                         </div>
 
@@ -647,7 +696,7 @@
                                 <div>
                                     <h5 class="product-name">${name}</h5>
                                     <div class="product-prices">
-                                        <span style="color:#1a2ebd; font-size:0.8rem; font-weight:600;">{{ __('messages.Rental Price') }}</span>
+                                        <span style="color:#1a2ebd; font-size:0.8rem; font-weight:600;"><?php echo e(__('messages.Rental Price')); ?></span>
                                         ${product.offer_price
                                             ? `<span class="price-original">JD ${product.selling_price}</span>
                                                <span class="price-offer">JD ${product.offer_price}</span>`
@@ -655,7 +704,7 @@
                                         }
                                     </div>
                                 </div>
-                                ${!isBooked ? `<button type="button" class="select-button">{{ __('messages.Select') }}</button>` : ''}
+                                ${!isBooked ? `<button type="button" class="select-button"><?php echo e(__('messages.Select')); ?></button>` : ''}
                             </div>
                         </div>
 
@@ -724,10 +773,10 @@
             const count = Object.keys(selectedProducts).length;
             if (count > 0) {
                 btn.prop('disabled', false);
-                btn.html(`{{ __('messages.Review Cart') }} (${count}) <i class="fas fa-arrow-left ms-2"></i>`);
+                btn.html(`<?php echo e(__('messages.Review Cart')); ?> (${count}) <i class="fas fa-arrow-left ms-2"></i>`);
             } else {
                 btn.prop('disabled', true);
-                btn.html('{{ __('messages.Review Cart') }} <i class="fas fa-arrow-left ms-2"></i>');
+                btn.html('<?php echo e(__('messages.Review Cart')); ?> <i class="fas fa-arrow-left ms-2"></i>');
             }
         }
 
@@ -739,7 +788,7 @@
 
             if (Object.keys(selectedProducts).length === 0) {
                 container.html(
-                    '<div class="empty-state"><i class="fas fa-shopping-cart fa-3x mb-3"></i><p>{{ __('messages.Your cart is empty') }}</p></div>'
+                    '<div class="empty-state"><i class="fas fa-shopping-cart fa-3x mb-3"></i><p><?php echo e(__('messages.Your cart is empty')); ?></p></div>'
                 );
                 return;
             }
@@ -802,15 +851,15 @@
 
             $('#checkout-summary-content').html(`
                 <div class="summary-item">
-                    <span>{{ __('messages.Subtotal') }}:</span>
+                    <span><?php echo e(__('messages.Subtotal')); ?>:</span>
                     <span>JD ${subtotal.toFixed(2)}</span>
                 </div>
                 <div class="summary-item">
-                    <span>{{ __('messages.Delivery Fee') }}:</span>
+                    <span><?php echo e(__('messages.Delivery Fee')); ?>:</span>
                     <span>JD ${deliveryFee.toFixed(2)}</span>
                 </div>
                 <div class="summary-item total">
-                    <span>{{ __('messages.Total') }}:</span>
+                    <span><?php echo e(__('messages.Total')); ?>:</span>
                     <span>JD ${total.toFixed(2)}</span>
                 </div>
             `);
@@ -888,7 +937,7 @@
                    <span style="color:#e63946;font-weight:700;">JD ${product.offer_price}</span>`
                 : `<span style="font-weight:700;">JD ${product.selling_price}</span>`;
             $('#modalPriceInfo').html(
-                `<span style="color:#1a2ebd;font-size:0.78rem;font-weight:600;margin-inline-end:4px;">{{ __('messages.Rental Price') }}</span>` + priceHtml
+                `<span style="color:#1a2ebd;font-size:0.78rem;font-weight:600;margin-inline-end:4px;"><?php echo e(__('messages.Rental Price')); ?></span>` + priceHtml
             );
 
             _updateModalSelectBtn(product);
@@ -899,18 +948,18 @@
             if (product.booked) {
                 btn.prop('disabled', true)
                    .removeClass('btn-success btn-warning').addClass('btn-secondary')
-                   .html('{{ __("messages.Booked") }}');
+                   .html('<?php echo e(__("messages.Booked")); ?>');
                 return;
             }
             const isSelected = !!selectedProducts[product.id];
             if (isSelected) {
                 btn.prop('disabled', false)
                    .removeClass('btn-success btn-secondary').addClass('btn-warning')
-                   .html('<i class="fas fa-times me-1"></i>{{ __("messages.Remove") }}');
+                   .html('<i class="fas fa-times me-1"></i><?php echo e(__("messages.Remove")); ?>');
             } else {
                 btn.prop('disabled', false)
                    .removeClass('btn-warning btn-secondary').addClass('btn-success')
-                   .html('<i class="fas fa-check me-1"></i>{{ __("messages.Select") }}');
+                   .html('<i class="fas fa-check me-1"></i><?php echo e(__("messages.Select")); ?>');
             }
         }
 
@@ -957,7 +1006,7 @@
         // ── Pledge + submit ───────────────────────────────────────────
         function placeOrder() {
             if (!$('#pledge_checkbox').is(':checked')) {
-                alert('{{ __('messages.You must pledge to return the character on the agreed day') }}');
+                alert('<?php echo e(__('messages.You must pledge to return the character on the agreed day')); ?>');
                 return false;
             }
             combineOrderTime();
@@ -968,3 +1017,4 @@
 </body>
 
 </html>
+<?php /**PATH C:\xampp\htdocs\game\resources\views/layouts/user.blade.php ENDPATH**/ ?>

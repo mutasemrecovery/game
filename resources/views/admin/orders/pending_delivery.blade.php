@@ -38,7 +38,7 @@
             </div>
         </form>
 
-        @if($data->isEmpty())
+        @if($data->isEmpty() && $executedData->isEmpty() && $cancelledData->isEmpty())
             <div class="alert alert-success">
                 <i class="fas fa-check-circle mr-2"></i> {{ __('messages.No pending delivery orders') }}
             </div>
@@ -58,7 +58,7 @@
                     <th>{{ __('messages.Action') }}</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="pending-tbody">
                 @foreach($data as $order)
                     <tr>
                         <td>{{ $order->number }}</td>
@@ -68,6 +68,9 @@
                                 {{ \Carbon\Carbon::parse($order->date)->format('g:i') }}
                                 {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
                             </small>
+                            @if($order->end_date)
+                                <br><small class="text-danger">← {{ \Carbon\Carbon::parse($order->end_date)->format('d/m/Y') }}</small>
+                            @endif
                         </td>
                         <td>{{ $order->user->name ?? '-' }}</td>
                         <td>{{ $order->user->phone ?? '-' }}</td>
@@ -105,10 +108,78 @@
                         </td>
                     </tr>
                 @endforeach
+
+                @foreach($executedData as $order)
+                    <tr style="background:#d4edda; border-right:4px solid #28a745;">
+                        <td>{{ $order->number }}</td>
+                        <td>
+                            <strong>{{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}</strong><br>
+                            <small class="text-muted">
+                                {{ \Carbon\Carbon::parse($order->date)->format('g:i') }}
+                                {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
+                            </small>
+                        </td>
+                        <td>{{ $order->user->name ?? '-' }}</td>
+                        <td>{{ $order->user->phone ?? '-' }}</td>
+                        <td>
+                            @foreach($order->orderProducts as $item)
+                                <span class="product-pill">{{ $item->product->name_ar }} ({{ $item->quantity }})</span>
+                            @endforeach
+                        </td>
+                        <td>{{ $order->delivery->place ?? '-' }}<br><small>{{ $order->address }}</small></td>
+                        <td><small>{{ $order->note ?? '-' }}</small></td>
+                        <td><span class="badge badge-success">{{ __('messages.Executed') }}</span></td>
+                        <td style="min-width:100px;">
+                            @can('order-edit')
+                            <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-xs btn-warning mb-1">
+                                <i class="fas fa-edit mr-1"></i>{{ __('messages.Edit') }}
+                            </a>
+                            @endcan
+                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-xs btn-secondary mb-1">
+                                <i class="fas fa-eye mr-1"></i>{{ __('messages.Show') }}
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
+
+                @foreach($cancelledData as $order)
+                    <tr style="background:#f8d7da; border-right:4px solid #dc3545;">
+                        <td>{{ $order->number }}</td>
+                        <td>
+                            <strong>{{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}</strong><br>
+                            <small class="text-muted">
+                                {{ \Carbon\Carbon::parse($order->date)->format('g:i') }}
+                                {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
+                            </small>
+                        </td>
+                        <td>{{ $order->user->name ?? '-' }}</td>
+                        <td>{{ $order->user->phone ?? '-' }}</td>
+                        <td>
+                            @foreach($order->orderProducts as $item)
+                                <span class="product-pill">{{ $item->product->name_ar }} ({{ $item->quantity }})</span>
+                            @endforeach
+                        </td>
+                        <td>{{ $order->delivery->place ?? '-' }}<br><small>{{ $order->address }}</small></td>
+                        <td><small>{{ $order->note ?? '-' }}</small></td>
+                        <td><span class="badge badge-danger">{{ __('messages.Cancelled') }}</span></td>
+                        <td style="min-width:100px;">
+                            @can('order-edit')
+                            <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-xs btn-warning mb-1">
+                                <i class="fas fa-edit mr-1"></i>{{ __('messages.Edit') }}
+                            </a>
+                            @endcan
+                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-xs btn-secondary mb-1">
+                                <i class="fas fa-eye mr-1"></i>{{ __('messages.Show') }}
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
         </div>
-        <br>{{ $data->appends(request()->query())->links() }}
+        @if($data->isNotEmpty())
+            <br>{{ $data->appends(request()->query())->links() }}
+        @endif
         @endif
 
     </div>
@@ -138,15 +209,16 @@ $(document).ready(function () {
                 if (!res.success) return;
                 if (status == 6) {
                     var row = btn.closest('tr');
-                    // Update badge
                     row.find('td').eq(7).html('<span class="badge badge-success">{{ __("messages.Executed") }}</span>');
-                    // Remove action buttons except view
                     row.find('.btn-quick-status').remove();
-                    // Green highlight and move to bottom
-                    row.css({ 'background': '#d4edda', 'transition': 'background 0.4s' });
-                    row.appendTo(row.closest('tbody'));
-                } else {
-                    location.reload();
+                    row.css({ 'background': '#d4edda', 'border-right': '4px solid #28a745', 'transition': 'background 0.4s' });
+                    row.appendTo('#pending-tbody');
+                } else if (status == 3) {
+                    var row = btn.closest('tr');
+                    row.find('td').eq(7).html('<span class="badge badge-danger">{{ __("messages.Cancelled") }}</span>');
+                    row.find('.btn-quick-status').remove();
+                    row.css({ 'background': '#f8d7da', 'border-right': '4px solid #dc3545', 'transition': 'background 0.4s' });
+                    row.appendTo('#pending-tbody');
                 }
             },
             error: function (xhr) {

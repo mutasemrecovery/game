@@ -364,5 +364,11 @@ return [
     'Party is today'               => 'Party is today',
     'Future party'                 => 'Future party',
     'Orders'                       => 'Orders',
+
+    // Multi-day booking
+    'Start Date'                   => 'Start Date',
+    'End Date'                     => 'End Date (optional)',
+    'end_date_hint'                => 'Leave empty for single-day booking',
+    'Changing the date may affect product availability. Continue?' => 'Changing the date may affect product availability. Continue?',
 ];
 

@@ -32,15 +32,28 @@ class OrderController extends Controller
             ? $request->check_date
             : Carbon::today()->toDateString();
 
-        $query = Order::with(['user', 'delivery', 'orderProducts.product'])
+        $data = Order::with(['user', 'delivery', 'orderProducts.product'])
             ->whereIn('order_status', [1, 2])
             ->whereDate('date', $checkDate)
-            ->orderBy('date', 'asc');
+            ->orderBy('date', 'asc')
+            ->paginate(PAGINATION_COUNT)
+            ->appends(['check_date' => $checkDate]);
 
-        $data  = $query->paginate(PAGINATION_COUNT)->appends(['check_date' => $checkDate]);
+        $executedData = Order::with(['user', 'delivery', 'orderProducts.product'])
+            ->where('order_status', 6)
+            ->whereDate('date', $checkDate)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $cancelledData = Order::with(['user', 'delivery', 'orderProducts.product'])
+            ->where('order_status', 3)
+            ->whereDate('date', $checkDate)
+            ->orderBy('date', 'asc')
+            ->get();
+
         $today = Carbon::today();
 
-        return view('admin.orders.pending_delivery', compact('data', 'today', 'checkDate'));
+        return view('admin.orders.pending_delivery', compact('data', 'executedData', 'cancelledData', 'today', 'checkDate'));
     }
 
     /** Page 2 — executed (given out) but characters not yet returned (status 6) */
@@ -52,15 +65,23 @@ class OrderController extends Controller
 
         $dayBefore = Carbon::parse($checkDate)->subDay()->toDateString();
 
-        $query = Order::with(['user', 'delivery', 'orderProducts.product'])
+        // For multi-day orders use end_date as the return date; fallback to date for single-day
+        $data = Order::with(['user', 'delivery', 'orderProducts.product'])
             ->where('order_status', 6)
-            ->whereDate('date', $dayBefore)
-            ->orderBy('date', 'asc');
+            ->whereRaw('COALESCE(DATE(end_date), DATE(date)) = ?', [$dayBefore])
+            ->orderBy('date', 'asc')
+            ->paginate(PAGINATION_COUNT)
+            ->appends(['check_date' => $checkDate]);
 
-        $data  = $query->paginate(PAGINATION_COUNT)->appends(['check_date' => $checkDate]);
+        $returnedData = Order::with(['user', 'delivery', 'orderProducts.product'])
+            ->where('order_status', 7)
+            ->whereRaw('COALESCE(DATE(end_date), DATE(date)) = ?', [$dayBefore])
+            ->orderBy('date', 'asc')
+            ->get();
+
         $today = Carbon::today();
 
-        return view('admin.orders.out_not_returned', compact('data', 'today', 'checkDate'));
+        return view('admin.orders.out_not_returned', compact('data', 'returnedData', 'today', 'checkDate'));
     }
 
     /**
@@ -166,9 +187,13 @@ class OrderController extends Controller
             'products_data' => 'required|string',
         ]);
 
+        $request->validate(['end_date' => 'nullable|date|after_or_equal:date']);
+
         // Conflict check before saving
         $productsData = json_decode($request->products_data, true);
-        $conflictError = $this->checkProductConflicts($productsData, $validatedData['date'], null);
+        $conflictError = $this->checkProductConflicts(
+            $productsData, $validatedData['date'], $request->end_date ?: null, null
+        );
         if ($conflictError) {
             return back()->withInput()->with('error', $conflictError);
         }
@@ -185,6 +210,7 @@ class OrderController extends Controller
                 'number' => $orderNumber,
                 'order_status' => 1,
                 'date' => $validatedData['date'],
+                'end_date' => $request->end_date ?: null,
                 'user_id' => $validatedData['user_id'],
                 'address' => $validatedData['address'],
                 'note' => $validatedData['note'] ?? null,
@@ -303,43 +329,74 @@ class OrderController extends Controller
         ]);
     }
 
-    private function checkProductConflicts(array $productsData, string $date, ?int $excludeOrderId): ?string
+    /**
+     * Get products available for a date range (admin AJAX).
+     * Blocks any product whose existing order range overlaps [from-1, to+1].
+     */
+    public function getAvailableProductsForRange(Request $request)
+    {
+        $fromDate       = Carbon::parse($request->from_date)->toDateString();
+        $toDate         = Carbon::parse($request->to_date ?? $request->from_date)->toDateString();
+        $currentOrderId = $request->order_id;
+
+        $checkFrom = Carbon::parse($fromDate)->subDay()->toDateString();
+        $checkTo   = Carbon::parse($toDate)->addDay()->toDateString();
+
+        $blockedProductIds = OrderProduct::whereHas('order', function ($q) use ($checkFrom, $checkTo, $currentOrderId) {
+            $q->where('order_status', '!=', 3)
+              ->whereDate('date', '<=', $checkTo)
+              ->whereRaw('COALESCE(DATE(end_date), DATE(date)) >= ?', [$checkFrom]);
+            if ($currentOrderId) {
+                $q->where('id', '!=', $currentOrderId);
+            }
+        })->pluck('product_id')->unique()->toArray();
+
+        $currentDate = now();
+        $products = Product::where('status', 1)
+            ->whereNotIn('id', $blockedProductIds)
+            ->with(['offers' => function ($q) use ($currentDate) {
+                $q->where('start_at', '<=', $currentDate)->where('expired_at', '>=', $currentDate);
+            }, 'productImages'])
+            ->get()
+            ->map(function ($product) {
+                $offer = $product->offers->first();
+                return [
+                    'id'            => $product->id,
+                    'name_en'       => $product->name_en,
+                    'name_ar'       => $product->name_ar,
+                    'selling_price' => $product->selling_price,
+                    'image'         => asset('assets/admin/uploads/' . optional($product->productImages->first())->photo),
+                    'offer_price'   => $offer ? $offer->price : null,
+                ];
+            });
+
+        return response()->json(['products' => $products]);
+    }
+
+    private function checkProductConflicts(array $productsData, string $date, ?string $endDate, ?int $excludeOrderId): ?string
     {
         if (empty($productsData)) {
             return null;
         }
 
-        $productIds    = array_column($productsData, 'product_id');
-        $requestedDate = Carbon::parse($date)->toDateString();
+        $productIds = array_column($productsData, 'product_id');
+        $startDate  = Carbon::parse($date)->toDateString();
+        $finishDate = $endDate ? Carbon::parse($endDate)->toDateString() : $startDate;
 
-        // Conflict type 1: character executed OR pending within ±1 day of the requested date
-        $dateFrom = Carbon::parse($requestedDate)->subDay()->toDateString();
-        $dateTo   = Carbon::parse($requestedDate)->addDay()->toDateString();
-        $conflict1 = OrderProduct::whereIn('product_id', $productIds)
-            ->whereHas('order', function ($q) use ($dateFrom, $dateTo, $excludeOrderId) {
-                $q->whereIn('order_status', [1, 6])
-                  ->whereDate('date', '>=', $dateFrom)
-                  ->whereDate('date', '<=', $dateTo);
+        $checkFrom = Carbon::parse($startDate)->subDay()->toDateString();
+        $checkTo   = Carbon::parse($finishDate)->addDay()->toDateString();
+
+        $conflicting = OrderProduct::whereIn('product_id', $productIds)
+            ->whereHas('order', function ($q) use ($checkFrom, $checkTo, $excludeOrderId) {
+                $q->where('order_status', '!=', 3)
+                  ->whereDate('date', '<=', $checkTo)
+                  ->whereRaw('COALESCE(DATE(end_date), DATE(date)) >= ?', [$checkFrom]);
                 if ($excludeOrderId) {
                     $q->where('id', '!=', $excludeOrderId);
                 }
             })
             ->with('product')
             ->get();
-
-        // Conflict type 2: same date already booked (processing)
-        $conflict2 = OrderProduct::whereIn('product_id', $productIds)
-            ->whereHas('order', function ($q) use ($requestedDate, $excludeOrderId) {
-                $q->whereIn('order_status', [2])
-                  ->whereDate('date', $requestedDate);
-                if ($excludeOrderId) {
-                    $q->where('id', '!=', $excludeOrderId);
-                }
-            })
-            ->with('product')
-            ->get();
-
-        $conflicting = $conflict1->merge($conflict2);
 
         if ($conflicting->isEmpty()) {
             return null;
@@ -395,10 +452,14 @@ class OrderController extends Controller
             'products_data' => 'required|string',
         ]);
 
+        $request->validate(['end_date' => 'nullable|date|after_or_equal:date']);
+
         // Conflict check (skip for cancelled/returned orders)
         if (!in_array($validatedData['order_status'], [3, 7])) {
             $productsData = json_decode($request->products_data, true);
-            $conflictError = $this->checkProductConflicts($productsData, $validatedData['date'], (int) $id);
+            $conflictError = $this->checkProductConflicts(
+                $productsData, $validatedData['date'], $request->end_date ?: null, (int) $id
+            );
             if ($conflictError) {
                 return back()->withInput()->with('error', $conflictError);
             }
@@ -414,6 +475,7 @@ class OrderController extends Controller
 
             $order->update([
                 'date' => $validatedData['date'],
+                'end_date' => $request->end_date ?: null,
                 'user_id' => $validatedData['user_id'],
                 'address' => $validatedData['address'],
                 'note' => $validatedData['note'] ?? null,

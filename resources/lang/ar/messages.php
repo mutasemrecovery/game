@@ -375,8 +375,11 @@ return [
     'Party is today'               => 'الحفلة اليوم',
     'Future party'                 => 'حفلة قادمة',
     'Orders'                       => 'الطلبات',
-    ""=>"",
 
-
+    // Multi-day booking
+    'Start Date'                   => 'تاريخ البداية',
+    'End Date'                     => 'تاريخ الانتهاء (اختياري)',
+    'end_date_hint'                => 'اتركه فارغاً للحجز ليوم واحد',
+    'Changing the date may affect product availability. Continue?' => 'تغيير التاريخ قد يؤثر على توفر المنتجات. هل تريد المتابعة؟',
 ];
 

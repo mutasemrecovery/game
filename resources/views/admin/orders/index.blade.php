@@ -135,6 +135,11 @@
                                                 {{ \Carbon\Carbon::parse($info->date)->format('g:i') }}
                                                 {{ \Carbon\Carbon::parse($info->date)->format('A') === 'AM' ? 'ص' : 'م' }}
                                             </small>
+                                            @if($info->end_date)
+                                                <br><small class="text-danger">
+                                                    ← {{ \Carbon\Carbon::parse($info->end_date)->format('d/m/Y') }}
+                                                </small>
+                                            @endif
                                         </td>
                                         <td>{{ $info->user->phone ?? '-' }}</td>
                                         <td>

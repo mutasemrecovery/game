@@ -1,9 +1,9 @@
-@extends('layouts.admin')
-@section('title')
-    {{ __('messages.orders') }}
-@endsection
+<?php $__env->startSection('title'); ?>
+    <?php echo e(__('messages.orders')); ?>
 
-@section('css')
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('css'); ?>
 <style>
 /* Selected item text inside multiple select2 */
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
@@ -13,110 +13,161 @@
 }
 
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title card_title_center"> {{ __('messages.New') }} {{ __('messages.orders') }} </h3>
+            <h3 class="card-title card_title_center"> <?php echo e(__('messages.New')); ?> <?php echo e(__('messages.orders')); ?> </h3>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-            <form action="{{ route('orders.store') }}" method="post" enctype='multipart/form-data'>
-                @csrf
+            <form action="<?php echo e(route('orders.store')); ?>" method="post" enctype='multipart/form-data'>
+                <?php echo csrf_field(); ?>
                 <div class="row">
                     <!-- Order Start Date -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="order_date">{{ __('messages.Start Date') }}</label>
+                            <label for="order_date"><?php echo e(__('messages.Start Date')); ?></label>
                             <input type="datetime-local" class="form-control" id="order_date" name="date"
-                                value="{{ old('date') }}" required>
-                            @error('date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                value="<?php echo e(old('date')); ?>" required>
+                            <?php $__errorArgs = ['date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <!-- Order End Date (multi-day) -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="end_date">{{ __('messages.End Date') }}</label>
+                            <label for="end_date"><?php echo e(__('messages.End Date')); ?></label>
                             <input type="date" class="form-control" id="end_date" name="end_date"
-                                value="{{ old('end_date') }}">
-                            <small class="text-muted">{{ __('messages.end_date_hint') }}</small>
-                            @error('end_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                value="<?php echo e(old('end_date')); ?>">
+                            <small class="text-muted"><?php echo e(__('messages.end_date_hint')); ?></small>
+                            <?php $__errorArgs = ['end_date'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="address">{{ __('messages.Address') }}</label>
+                            <label for="address"><?php echo e(__('messages.Address')); ?></label>
                             <input type="text" class="form-control" id="address" name="address"
-                                value="{{ old('address') }}" required>
-                            @error('address')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                value="<?php echo e(old('address')); ?>" required>
+                            <?php $__errorArgs = ['address'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="note">{{ __('messages.Note') }}</label>
-                            <textarea class="form-control" id="note" name="note" rows="3">{{ old('note') }}</textarea>
-                            @error('note')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label for="note"><?php echo e(__('messages.Note')); ?></label>
+                            <textarea class="form-control" id="note" name="note" rows="3"><?php echo e(old('note')); ?></textarea>
+                            <?php $__errorArgs = ['note'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <!-- Customer Selection -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="user_id">{{ __('messages.Customer') }}</label>
+                            <label for="user_id"><?php echo e(__('messages.Customer')); ?></label>
                             <select class="form-control select2 " id="user_id" name="user_id" required>
-                                <option value="">{{ __('messages.Select Customer') }}</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
+                                <option value=""><?php echo e(__('messages.Select Customer')); ?></option>
+                                <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($user->id); ?>" <?php echo e(old('user_id') == $user->id ? 'selected' : ''); ?>>
+                                        <?php echo e($user->name); ?>
+
                                     </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('user_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['user_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <!-- Products Selection -->
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="products">{{ __('messages.Products') }}</label>
+                            <label for="products"><?php echo e(__('messages.Products')); ?></label>
                             <select class="form-control select2" id="products" name="products[]" multiple required>
                                 <!-- Products will be loaded via AJAX -->
                             </select>
-                            @error('products')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['products'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <!-- Delivery Information -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="delivery_id">{{ __('messages.Delivery') }}</label>
+                            <label for="delivery_id"><?php echo e(__('messages.Delivery')); ?></label>
                             <select class="form-control select2" id="delivery_id" name="delivery_id">
-                                <option value="">{{ __('messages.Select Delivery') }}</option>
-                                @foreach($deliveries as $delivery)
-                                    <option value="{{ $delivery->id }}" {{ old('delivery_id') == $delivery->id ? 'selected' : '' }}>
-                                        {{ $delivery->place }}
+                                <option value=""><?php echo e(__('messages.Select Delivery')); ?></option>
+                                <?php $__currentLoopData = $deliveries; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $delivery): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($delivery->id); ?>" <?php echo e(old('delivery_id') == $delivery->id ? 'selected' : ''); ?>>
+                                        <?php echo e($delivery->place); ?>
+
                                     </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
-                            @error('delivery_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['delivery_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
@@ -125,55 +176,74 @@
                     <!-- Payment Type -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="payment_type">{{ __('messages.Payment Type') }}</label>
+                            <label for="payment_type"><?php echo e(__('messages.Payment Type')); ?></label>
                             <select class="form-control" id="payment_type" name="payment_type" required>
-                                <option value="">{{ __('messages.Select Payment Type') }}</option>
-                                <option value="cash" {{ old('payment_type') == 'cash' ? 'selected' : '' }}>
-                                    {{ __('messages.Cash') }}
+                                <option value=""><?php echo e(__('messages.Select Payment Type')); ?></option>
+                                <option value="cash" <?php echo e(old('payment_type') == 'cash' ? 'selected' : ''); ?>>
+                                    <?php echo e(__('messages.Cash')); ?>
+
                                 </option>
-                                <option value="card" {{ old('payment_type') == 'card' ? 'selected' : '' }}>
-                                    {{ __('messages.Card') }}
+                                <option value="card" <?php echo e(old('payment_type') == 'card' ? 'selected' : ''); ?>>
+                                    <?php echo e(__('messages.Card')); ?>
+
                                 </option>
-                                <option value="transfer" {{ old('payment_type') == 'transfer' ? 'selected' : '' }}>
-                                    {{ __('messages.Cliq') }}
+                                <option value="transfer" <?php echo e(old('payment_type') == 'transfer' ? 'selected' : ''); ?>>
+                                    <?php echo e(__('messages.Cliq')); ?>
+
                                 </option>
                             </select>
-                            @error('payment_type')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['payment_type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <!-- Payment Status -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="payment_status">{{ __('messages.Payment Status') }}</label>
+                            <label for="payment_status"><?php echo e(__('messages.Payment Status')); ?></label>
                             <select class="form-control" id="payment_status" name="payment_status" required>
-                                <option value="2" {{ old('payment_status', 2) == 2 ? 'selected' : '' }}>
-                                    {{ __('messages.Unpaid') }}
+                                <option value="2" <?php echo e(old('payment_status', 2) == 2 ? 'selected' : ''); ?>>
+                                    <?php echo e(__('messages.Unpaid')); ?>
+
                                 </option>
-                                <option value="1" {{ old('payment_status') == 1 ? 'selected' : '' }}>
-                                    {{ __('messages.Paid') }}
+                                <option value="1" <?php echo e(old('payment_status') == 1 ? 'selected' : ''); ?>>
+                                    <?php echo e(__('messages.Paid')); ?>
+
                                 </option>
                             </select>
-                            @error('payment_status')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['payment_status'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <!-- Selected Products Summary -->
                     <div class="col-md-12">
                         <div id="selected-products-summary" style="display: none;">
-                            <h4>{{ __('messages.Selected Products') }}</h4>
+                            <h4><?php echo e(__('messages.Selected Products')); ?></h4>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>{{ __('messages.Product') }}</th>
-                                        <th>{{ __('messages.Quantity') }}</th>
-                                        <th>{{ __('messages.Unit Price') }}</th>
-                                        <th>{{ __('messages.Discount') }}</th>
-                                        <th>{{ __('messages.Total') }}</th>
+                                        <th><?php echo e(__('messages.Product')); ?></th>
+                                        <th><?php echo e(__('messages.Quantity')); ?></th>
+                                        <th><?php echo e(__('messages.Unit Price')); ?></th>
+                                        <th><?php echo e(__('messages.Discount')); ?></th>
+                                        <th><?php echo e(__('messages.Total')); ?></th>
                                     </tr>
                                 </thead>
                                 <tbody id="selected-products-table">
@@ -181,15 +251,15 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th colspan="4">{{ __('messages.Delivery Fee') }}</th>
+                                        <th colspan="4"><?php echo e(__('messages.Delivery Fee')); ?></th>
                                         <th id="total-delivery-fee">0.00</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="4">{{ __('messages.Total Discount') }}</th>
+                                        <th colspan="4"><?php echo e(__('messages.Total Discount')); ?></th>
                                         <th id="total-discount">0.00</th>
                                     </tr>
                                     <tr>
-                                        <th colspan="4">{{ __('messages.Final Total') }}</th>
+                                        <th colspan="4"><?php echo e(__('messages.Final Total')); ?></th>
                                         <th id="final-total">0.00</th>
                                     </tr>
                                 </tfoot>
@@ -205,18 +275,18 @@
                     <div class="col-md-12">
                         <div class="form-group text-center">
                             <button id="do_add_item_cardd" type="submit"
-                                class="btn btn-primary btn-sm">{{ __('messages.Submit') }}</button>
-                            <a href="{{ route('orders.index') }}"
-                                class="btn btn-sm btn-danger">{{ __('messages.Cancel') }}</a>
+                                class="btn btn-primary btn-sm"><?php echo e(__('messages.Submit')); ?></button>
+                            <a href="<?php echo e(route('orders.index')); ?>"
+                                class="btn btn-sm btn-danger"><?php echo e(__('messages.Cancel')); ?></a>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
     <script>
         $(document).ready(function() {
             // Initialize Select2
@@ -243,7 +313,7 @@
                 var fromDateOnly = fromDate.split('T')[0];
                 var toDate       = $('#end_date').val() || fromDateOnly;
                 $.ajax({
-                    url: '{{ route("orders.available-products-range") }}',
+                    url: '<?php echo e(route("orders.available-products-range")); ?>',
                     method: 'GET',
                     data: { from_date: fromDateOnly, to_date: toDate },
                     success: function(response) {
@@ -361,4 +431,5 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\game\resources\views/admin/orders/create.blade.php ENDPATH**/ ?>

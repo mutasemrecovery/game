@@ -12,7 +12,8 @@ class Order extends Model
 
     
     protected $casts = [
-        'date' => 'datetime',
+        'date'         => 'datetime',
+        'end_date'     => 'date',
         'delivery_fee' => 'double',
         'total_prices' => 'double',
         'total_discounts' => 'double',

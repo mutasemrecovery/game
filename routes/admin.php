@@ -62,6 +62,7 @@ Route::get('/permissions/{guard_name}', function($guard_name){
 
 // Order AJAX routes
 Route::get('orders/available-products', [OrderController::class, 'getAvailableProducts'])->name('orders.available-products');
+Route::get('orders/available-products-range', [OrderController::class, 'getAvailableProductsForRange'])->name('orders.available-products-range');
 Route::patch('orders/{id}/quick-status', [OrderController::class, 'quickUpdateStatus'])->name('orders.quick-status');
 Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
 

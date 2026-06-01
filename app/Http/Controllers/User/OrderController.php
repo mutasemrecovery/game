@@ -142,10 +142,12 @@ class OrderController extends Controller
         // Block any product that has ANY order within ±1 day of the selected date, regardless of status
         $dateFrom = Carbon::parse($selectedDate)->subDay()->toDateString();
         $dateTo   = Carbon::parse($selectedDate)->addDay()->toDateString();
+        // Block if ANY order's range (including its end_date) overlaps ±1 day of selected date.
+        // COALESCE(end_date, date) handles both single-day and multi-day orders.
         $bookedProductIds = OrderProduct::whereHas('order', function ($q) use ($dateFrom, $dateTo) {
-                $q->whereDate('date', '>=', $dateFrom)
+                $q->where('order_status', '!=', 3)
                   ->whereDate('date', '<=', $dateTo)
-                  ->where('order_status', '!=', 3);
+                  ->whereRaw('COALESCE(DATE(end_date), DATE(date)) >= ?', [$dateFrom]);
             })
             ->pluck('product_id')
             ->unique()

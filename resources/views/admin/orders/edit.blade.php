@@ -40,13 +40,26 @@
                 @csrf
                 @method('PUT')
                 <div class="row">
-                    <!-- Order Date and Time -->
+                    <!-- Order Start Date -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="order_date">{{ __('messages.Order Date') }}</label>
-                            <input type="datetime-local" class="form-control" id="order_date" name="date" 
+                            <label for="order_date">{{ __('messages.Start Date') }}</label>
+                            <input type="datetime-local" class="form-control" id="order_date" name="date"
                                 value="{{ old('date', date('Y-m-d\TH:i', strtotime($order->date))) }}" required>
                             @error('date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Order End Date (multi-day) -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="end_date">{{ __('messages.End Date') }}</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date"
+                                value="{{ old('end_date', $order->end_date ? $order->end_date->format('Y-m-d') : '') }}">
+                            <small class="text-muted">{{ __('messages.end_date_hint') }}</small>
+                            @error('end_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -283,18 +296,17 @@
                 updateTotals();
             });
             
-            // When order date changes, we might want to load new products
-            $('#order_date').on('change', function() {
-                // You might want to prompt the user before changing the date
-                // as it could affect product availability
+            // Reload products when start or end date changes
+            $('#order_date, #end_date').on('change', function() {
                 if (confirm("{{ __('messages.Changing the date may affect product availability. Continue?') }}")) {
-                    var orderDate = $(this).val();
-                    if (orderDate) {
-                        fetchAvailableProducts(orderDate);
-                    }
+                    var fromDate = $('#order_date').val();
+                    if (fromDate) fetchAvailableProducts(fromDate);
                 } else {
-                    // Reset to original date
-                    $(this).val('{{ date('Y-m-d\TH:i', strtotime($order->date)) }}');
+                    if ($(this).attr('id') === 'order_date') {
+                        $(this).val('{{ date('Y-m-d\TH:i', strtotime($order->date)) }}');
+                    } else {
+                        $(this).val('{{ $order->end_date ? $order->end_date->format('Y-m-d') : '' }}');
+                    }
                 }
             });
 
@@ -387,14 +399,13 @@ function initializeOrderProducts() {
     var orderDate = $('#order_date').val();
     var orderId = {{ $order->id }}; // Get current order ID
     
+    var fromDateOnly = orderDate.split('T')[0];
+    var toDate       = $('#end_date').val() || fromDateOnly;
     // Load all available products via AJAX
     $.ajax({
-        url: '{{ route("orders.available-products") }}',
+        url: '{{ route("orders.available-products-range") }}',
         method: 'GET',
-        data: { 
-            date: orderDate,
-            order_id: orderId // Pass current order ID
-        },
+        data: { from_date: fromDateOnly, to_date: toDate, order_id: orderId },
         success: function(response) {
             if (response.products && response.products.length > 0) {
                 // Add all products to dropdown
@@ -497,14 +508,13 @@ function initializeOrderProducts() {
             }
 
             function fetchAvailableProducts(orderDate) {
-                var orderId = {{ $order->id }};
+                var orderId      = {{ $order->id }};
+                var fromDateOnly = orderDate.split('T')[0];
+                var toDate       = $('#end_date').val() || fromDateOnly;
                 $.ajax({
-                    url: '{{ route("orders.available-products") }}',
+                    url: '{{ route("orders.available-products-range") }}',
                     method: 'GET',
-                     data: { 
-                            date: orderDate,
-                            order_id: orderId
-                        },
+                    data: { from_date: fromDateOnly, to_date: toDate, order_id: orderId },
                     success: function(response) {
                         var productsSelect = $('#products');
                         productsSelect.empty();
