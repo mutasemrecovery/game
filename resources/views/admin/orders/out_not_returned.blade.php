@@ -10,6 +10,39 @@
                padding:1px 8px; font-size:.78rem; margin:1px; }
 .urgent-row  { border-right: 4px solid #dc3545 !important; background:#fff5f5; }
 .normal-row  { border-right: 4px solid #fd7e14 !important; }
+
+/* ── Mobile card layout ── */
+@media (max-width: 767px) {
+    .responsive-table thead { display: none; }
+    .responsive-table tbody tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .responsive-table tbody td {
+        display: flex;
+        align-items: flex-start;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 7px 12px;
+        gap: 8px;
+    }
+    .responsive-table tbody td:last-child { border-bottom: none; }
+    .responsive-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.78rem;
+        color: #555;
+        flex: 0 0 90px;
+        padding-top: 2px;
+    }
+    /* preserve row colors on mobile */
+    .responsive-table tbody tr.urgent-row td { background: #fff5f5; }
+    .responsive-table tbody tr[style*="background:#d4edda"] td { background: #d4edda; }
+}
 </style>
 @endsection
 
@@ -44,8 +77,7 @@
                 <i class="fas fa-check-circle mr-2"></i> {{ __('messages.No unreturned orders') }}
             </div>
         @else
-        <div style="overflow-x:auto;">
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover responsive-table">
             <thead class="custom_thead">
                 <tr>
                     <th>#</th>
@@ -69,8 +101,8 @@
                             : 'background:#ffd8a8;color:#e67700;';
                     @endphp
                     <tr class="{{ $rowClass }}">
-                        <td>{{ $order->number }}</td>
-                        <td>
+                        <td data-label="#">{{ $order->number }}</td>
+                        <td data-label="{{ __('messages.date') }}">
                             <strong>{{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}</strong>
                             @if($order->end_date)
                                 <br><small class="text-danger">← {{ \Carbon\Carbon::parse($order->end_date)->format('d/m/Y') }}</small>
@@ -80,21 +112,21 @@
                                 {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
                             </small>
                         </td>
-                        <td>
+                        <td data-label="{{ __('messages.Days Out') }}">
                             <span class="days-badge" style="{{ $badgeColor }}">
                                 {{ $daysOut }} {{ __('messages.days') }}
                             </span>
                         </td>
-                        <td>{{ $order->user->name ?? '-' }}</td>
-                        <td>{{ $order->user->phone ?? '-' }}</td>
-                        <td>
+                        <td data-label="{{ __('messages.user') }}">{{ $order->user->name ?? '-' }}</td>
+                        <td data-label="{{ __('messages.Phone') }}">{{ $order->user->phone ?? '-' }}</td>
+                        <td data-label="{{ __('messages.products') }}">
                             @foreach($order->orderProducts as $item)
                                 <span class="product-pill">{{ $item->product->name_ar }} ({{ $item->quantity }})</span>
                             @endforeach
                         </td>
-                        <td>{{ $order->delivery->place ?? '-' }}<br><small>{{ $order->address }}</small></td>
-                        <td><small>{{ $order->note ?? '-' }}</small></td>
-                        <td style="min-width:130px;">
+                        <td data-label="{{ __('messages.delivery') }}">{{ $order->delivery->place ?? '-' }}<br><small>{{ $order->address }}</small></td>
+                        <td data-label="{{ __('messages.Note') }}"><small>{{ $order->note ?? '-' }}</small></td>
+                        <td data-label="{{ __('messages.Action') }}" style="min-width:130px;">
                             <button class="btn btn-sm btn-primary mb-1 btn-quick-status"
                                 data-id="{{ $order->id }}" data-status="7">
                                 <i class="fas fa-undo mr-1"></i>{{ __('messages.Returned') }}
@@ -113,29 +145,29 @@
 
                 @foreach($returnedData as $order)
                     <tr style="background:#d4edda; border-right:4px solid #28a745;">
-                        <td>{{ $order->number }}</td>
-                        <td>
+                        <td data-label="#">{{ $order->number }}</td>
+                        <td data-label="{{ __('messages.date') }}">
                             <strong>{{ \Carbon\Carbon::parse($order->date)->format('d/m/Y') }}</strong><br>
                             <small class="text-muted">
                                 {{ \Carbon\Carbon::parse($order->date)->format('g:i') }}
                                 {{ \Carbon\Carbon::parse($order->date)->format('A') === 'AM' ? 'ص' : 'م' }}
                             </small>
                         </td>
-                        <td>
+                        <td data-label="{{ __('messages.Days Out') }}">
                             <span class="days-badge" style="background:#b2f2bb;color:#2f9e44;">
                                 {{ __('messages.Returned') }}
                             </span>
                         </td>
-                        <td>{{ $order->user->name ?? '-' }}</td>
-                        <td>{{ $order->user->phone ?? '-' }}</td>
-                        <td>
+                        <td data-label="{{ __('messages.user') }}">{{ $order->user->name ?? '-' }}</td>
+                        <td data-label="{{ __('messages.Phone') }}">{{ $order->user->phone ?? '-' }}</td>
+                        <td data-label="{{ __('messages.products') }}">
                             @foreach($order->orderProducts as $item)
                                 <span class="product-pill">{{ $item->product->name_ar }} ({{ $item->quantity }})</span>
                             @endforeach
                         </td>
-                        <td>{{ $order->delivery->place ?? '-' }}<br><small>{{ $order->address }}</small></td>
-                        <td><small>{{ $order->note ?? '-' }}</small></td>
-                        <td style="min-width:100px;">
+                        <td data-label="{{ __('messages.delivery') }}">{{ $order->delivery->place ?? '-' }}<br><small>{{ $order->address }}</small></td>
+                        <td data-label="{{ __('messages.Note') }}"><small>{{ $order->note ?? '-' }}</small></td>
+                        <td data-label="{{ __('messages.Action') }}" style="min-width:100px;">
                             @can('order-edit')
                             <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-sm btn-warning mb-1">
                                 <i class="fas fa-edit mr-1"></i>{{ __('messages.Edit') }}
@@ -149,7 +181,6 @@
                 @endforeach
             </tbody>
         </table>
-        </div>
         @if($data->isNotEmpty())
             <br>{{ $data->appends(request()->query())->links() }}
         @endif
@@ -177,7 +208,8 @@ $(document).ready(function () {
                 if (!res.success) return;
                 var row = btn.closest('tr');
                 row.removeClass('urgent-row normal-row');
-                row.find('.days-badge').css({ 'background': '#b2f2bb', 'color': '#2f9e44' })
+                row.find('[data-label="{{ __("messages.Days Out") }}"]').find('.days-badge')
+                   .css({ 'background': '#b2f2bb', 'color': '#2f9e44' })
                    .text('{{ __("messages.Returned") }}');
                 row.find('.btn-quick-status').remove();
                 row.css({ 'background': '#d4edda', 'border-right': '4px solid #28a745', 'transition': 'background 0.4s' });

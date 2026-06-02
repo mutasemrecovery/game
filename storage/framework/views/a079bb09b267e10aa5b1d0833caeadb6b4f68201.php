@@ -10,6 +10,39 @@
                padding:1px 8px; font-size:.78rem; margin:1px; }
 .urgent-row  { border-right: 4px solid #dc3545 !important; background:#fff5f5; }
 .normal-row  { border-right: 4px solid #fd7e14 !important; }
+
+/* ── Mobile card layout ── */
+@media (max-width: 767px) {
+    .responsive-table thead { display: none; }
+    .responsive-table tbody tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .responsive-table tbody td {
+        display: flex;
+        align-items: flex-start;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 7px 12px;
+        gap: 8px;
+    }
+    .responsive-table tbody td:last-child { border-bottom: none; }
+    .responsive-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.78rem;
+        color: #555;
+        flex: 0 0 90px;
+        padding-top: 2px;
+    }
+    /* preserve row colors on mobile */
+    .responsive-table tbody tr.urgent-row td { background: #fff5f5; }
+    .responsive-table tbody tr[style*="background:#d4edda"] td { background: #d4edda; }
+}
 </style>
 <?php $__env->stopSection(); ?>
 
@@ -46,8 +79,7 @@
 
             </div>
         <?php else: ?>
-        <div style="overflow-x:auto;">
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover responsive-table">
             <thead class="custom_thead">
                 <tr>
                     <th>#</th>
@@ -71,8 +103,8 @@
                             : 'background:#ffd8a8;color:#e67700;';
                     ?>
                     <tr class="<?php echo e($rowClass); ?>">
-                        <td><?php echo e($order->number); ?></td>
-                        <td>
+                        <td data-label="#"><?php echo e($order->number); ?></td>
+                        <td data-label="<?php echo e(__('messages.date')); ?>">
                             <strong><?php echo e(\Carbon\Carbon::parse($order->date)->format('d/m/Y')); ?></strong>
                             <?php if($order->end_date): ?>
                                 <br><small class="text-danger">← <?php echo e(\Carbon\Carbon::parse($order->end_date)->format('d/m/Y')); ?></small>
@@ -84,22 +116,22 @@
 
                             </small>
                         </td>
-                        <td>
+                        <td data-label="<?php echo e(__('messages.Days Out')); ?>">
                             <span class="days-badge" style="<?php echo e($badgeColor); ?>">
                                 <?php echo e($daysOut); ?> <?php echo e(__('messages.days')); ?>
 
                             </span>
                         </td>
-                        <td><?php echo e($order->user->name ?? '-'); ?></td>
-                        <td><?php echo e($order->user->phone ?? '-'); ?></td>
-                        <td>
+                        <td data-label="<?php echo e(__('messages.user')); ?>"><?php echo e($order->user->name ?? '-'); ?></td>
+                        <td data-label="<?php echo e(__('messages.Phone')); ?>"><?php echo e($order->user->phone ?? '-'); ?></td>
+                        <td data-label="<?php echo e(__('messages.products')); ?>">
                             <?php $__currentLoopData = $order->orderProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <span class="product-pill"><?php echo e($item->product->name_ar); ?> (<?php echo e($item->quantity); ?>)</span>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </td>
-                        <td><?php echo e($order->delivery->place ?? '-'); ?><br><small><?php echo e($order->address); ?></small></td>
-                        <td><small><?php echo e($order->note ?? '-'); ?></small></td>
-                        <td style="min-width:130px;">
+                        <td data-label="<?php echo e(__('messages.delivery')); ?>"><?php echo e($order->delivery->place ?? '-'); ?><br><small><?php echo e($order->address); ?></small></td>
+                        <td data-label="<?php echo e(__('messages.Note')); ?>"><small><?php echo e($order->note ?? '-'); ?></small></td>
+                        <td data-label="<?php echo e(__('messages.Action')); ?>" style="min-width:130px;">
                             <button class="btn btn-sm btn-primary mb-1 btn-quick-status"
                                 data-id="<?php echo e($order->id); ?>" data-status="7">
                                 <i class="fas fa-undo mr-1"></i><?php echo e(__('messages.Returned')); ?>
@@ -121,8 +153,8 @@
 
                 <?php $__currentLoopData = $returnedData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr style="background:#d4edda; border-right:4px solid #28a745;">
-                        <td><?php echo e($order->number); ?></td>
-                        <td>
+                        <td data-label="#"><?php echo e($order->number); ?></td>
+                        <td data-label="<?php echo e(__('messages.date')); ?>">
                             <strong><?php echo e(\Carbon\Carbon::parse($order->date)->format('d/m/Y')); ?></strong><br>
                             <small class="text-muted">
                                 <?php echo e(\Carbon\Carbon::parse($order->date)->format('g:i')); ?>
@@ -131,22 +163,22 @@
 
                             </small>
                         </td>
-                        <td>
+                        <td data-label="<?php echo e(__('messages.Days Out')); ?>">
                             <span class="days-badge" style="background:#b2f2bb;color:#2f9e44;">
                                 <?php echo e(__('messages.Returned')); ?>
 
                             </span>
                         </td>
-                        <td><?php echo e($order->user->name ?? '-'); ?></td>
-                        <td><?php echo e($order->user->phone ?? '-'); ?></td>
-                        <td>
+                        <td data-label="<?php echo e(__('messages.user')); ?>"><?php echo e($order->user->name ?? '-'); ?></td>
+                        <td data-label="<?php echo e(__('messages.Phone')); ?>"><?php echo e($order->user->phone ?? '-'); ?></td>
+                        <td data-label="<?php echo e(__('messages.products')); ?>">
                             <?php $__currentLoopData = $order->orderProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <span class="product-pill"><?php echo e($item->product->name_ar); ?> (<?php echo e($item->quantity); ?>)</span>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </td>
-                        <td><?php echo e($order->delivery->place ?? '-'); ?><br><small><?php echo e($order->address); ?></small></td>
-                        <td><small><?php echo e($order->note ?? '-'); ?></small></td>
-                        <td style="min-width:100px;">
+                        <td data-label="<?php echo e(__('messages.delivery')); ?>"><?php echo e($order->delivery->place ?? '-'); ?><br><small><?php echo e($order->address); ?></small></td>
+                        <td data-label="<?php echo e(__('messages.Note')); ?>"><small><?php echo e($order->note ?? '-'); ?></small></td>
+                        <td data-label="<?php echo e(__('messages.Action')); ?>" style="min-width:100px;">
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('order-edit')): ?>
                             <a href="<?php echo e(route('orders.edit', $order->id)); ?>" class="btn btn-sm btn-warning mb-1">
                                 <i class="fas fa-edit mr-1"></i><?php echo e(__('messages.Edit')); ?>
@@ -162,7 +194,6 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
-        </div>
         <?php if($data->isNotEmpty()): ?>
             <br><?php echo e($data->appends(request()->query())->links()); ?>
 
@@ -191,7 +222,8 @@ $(document).ready(function () {
                 if (!res.success) return;
                 var row = btn.closest('tr');
                 row.removeClass('urgent-row normal-row');
-                row.find('.days-badge').css({ 'background': '#b2f2bb', 'color': '#2f9e44' })
+                row.find('[data-label="<?php echo e(__("messages.Days Out")); ?>"]').find('.days-badge')
+                   .css({ 'background': '#b2f2bb', 'color': '#2f9e44' })
                    .text('<?php echo e(__("messages.Returned")); ?>');
                 row.find('.btn-quick-status').remove();
                 row.css({ 'background': '#d4edda', 'border-right': '4px solid #28a745', 'transition': 'background 0.4s' });
